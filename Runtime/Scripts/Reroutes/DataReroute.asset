@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e66c6366d904e98bc83428217d4fd7, type: 3}
+  m_Name: DataReroute
+  m_EditorClassIdentifier: 
+  _data:
+    _json: '{"graph":{"variables":{"Kind":"Flow","collection":{"$content":[],"$version":"A"},"$version":"A"},"controlInputDefinitions":[],"controlOutputDefinitions":[],"valueInputDefinitions":[{"hasDefaultValue":false,"defaultValue":null,"_type":"System.Object","key":"InData","label":null,"summary":null,"hideLabel":true}],"valueOutputDefinitions":[{"_type":"System.Object","key":"OutData","label":null,"summary":null,"hideLabel":true}],"title":"DataReroute","summary":null,"pan":{"x":163.0,"y":-106.0},"zoom":1.0,"elements":[{"defaultValues":{},"position":{"x":7.0,"y":-245.0},"guid":"b15378ac-bc82-464a-84ed-b81645f81284","$version":"A","$type":"Unity.VisualScripting.GraphInput","$id":"11"},{"defaultValues":{},"position":{"x":177.0,"y":-245.0},"guid":"050cf1fe-bc13-469b-838b-2ebeebd0aabe","$version":"A","$type":"Unity.VisualScripting.GraphOutput","$id":"13"},{"sourceUnit":{"$ref":"11"},"sourceKey":"InData","destinationUnit":{"$ref":"13"},"destinationKey":"OutData","guid":"a8d060d4-dc77-45db-8f74-81a89abbbbe5","$type":"Unity.VisualScripting.ValueConnection"}],"$version":"A"}}'
+    _objectReferences: []
