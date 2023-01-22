@@ -1,9 +1,14 @@
 {
-	"name": "com.N04H.techartlibrary",
+	"name": "com.n04h.techartlibrary",
 	"displayName": "Tech Art Library Unity",
 	"version": "0.0.1",
 	"unity": "2021.2",
 	"description": " runtime UI for games and applications.\\r\\n\\r\\nUI Toolkit includes:\\r\\n\\r\\n\\u25aa A retained-mem, based on recognized web technologies, that supports stylesheets, and dynamic and contextual event handling.\\r\\n\\u25aa UXML and USS asset types for building and styling user interfaces. These are inspired by standard web technologies such as XML, HTML, and CSS.\\r\\n\\u25aa Tools and resources such as a built-in UI debugger, the support for the UI Builder visual UI authoring tool, and examples available in the editor.",
+	"author": {
+		"name": "N04H",
+		"email": "ououn@outlook.fr",
+		"url": ""
+	},
 	"dependencies": {
 	}
 }
