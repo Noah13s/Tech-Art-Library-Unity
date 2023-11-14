@@ -3,15 +3,22 @@
 	"displayName": "Tech Art Library",
 	"version": "0.0.1",
 	"unity": "2021.1",
-	"description": "",
+	"description": "This is N04H's personal Tech-Art-Library tools for Unity",
 	"author": {
 		"name": "N04H",
-		"email": "ououn@outlook.fr",
+		"email": "ouounoah@gmail.com",
 		"url": "http://noah-portfolio.alwaysdata.net/"
 	},
 	"dependencies": {
 		"com.unity.visualscripting": "1.5.1",
 		"com.unity.shadergraph": "14.0.4",
 		"com.unity.mathematics": "1.2.6"
-	}
+	},
+	"samples": [
+		{
+		  "displayName": "Example 1",
+		  "description": "This sample is just an example",
+		  "path": "Samples~/Example1"
+		}
+	  ]
 }
