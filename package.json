@@ -10,9 +10,9 @@
     "url": "http://noah-portfolio.alwaysdata.net/"
   },
   "dependencies": {
-    "com.unity.visualscripting": "",
+    "com.unity.visualscripting": "1.9.2",
     "com.unity.shadergraph": "14.0.10",
-    "com.unity.mathematics": ""
+    "com.unity.mathematics": "1.2.6"
   },
   "samples": [
     {
