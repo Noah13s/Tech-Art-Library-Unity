@@ -14,26 +14,26 @@
     "com.unity.shadergraph": "14.0.10",
     "com.unity.mathematics": "1.2.6"
   },
-  "samples": [
-    {
-      "displayName": "Example 1",
-      "description": "This sample is just an example",
-      "path": "Samples~/Example1"
-    },
-    {
-      "displayName": "Physics Simulation",
-      "description": "This sample contains Physics Simulation related content",
-      "path": "Samples~/PhysicsSimulation"
-    },
-    {
-      "displayName": "VR",
-      "description": "This sample contains VR related content",
-      "path": "Samples~/VR"
-    },
-    {
-      "displayName": "AR",
-      "description": "This sample contains AR related content",
-      "path": "Samples~/AR"
-    }
-  ]
+	"samples": [
+		{
+		  "displayName": "Example 1",
+		  "description": "This sample is just an example",
+		  "path": "Samples~/Example1"
+		},
+		{
+			"displayName": "VR",
+			"description": "This sample contains VR related content",
+			"path": "Samples~/VR"
+		},
+		{
+			"displayName": "AR",
+			"description": "This sample contains AR related content",
+			"path": "Samples~/AR"
+		},
+		{
+			"displayName": "WebSocket",
+			"description": "This sample contains Websocket related content",
+			"path": "Samples~/WebSocket"
+		}
+	  ]
 }

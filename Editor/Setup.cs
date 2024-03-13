@@ -1,28 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
-using System;
-using System.Threading.Tasks;
 
 public class Setup
 {
     [InitializeOnLoadMethod]
     public static async void InstallDependencies()
     {
-        var value = Client.List(false, true);
+        var listRequest = Client.List(false, true);
 
-        while (!value.IsCompleted)
-            await Task.Delay(100);
+        while (!listRequest.IsCompleted)
+            await Task.Delay(100);// or Thread.Sleep(100);
 
-        foreach (var item in value.Result)
+        if (listRequest.Error != null)
         {
-            if (item.name == "com.username.package")
-                return;
+            Debug.Log("Error: " + listRequest.Error.message);
+            return;
         }
 
-        Debug.LogWarning("The dependency 'com.username.package' is not installed! Installing...");
-        Client.Add("https://github.com/gitusername/gitpackage.git");
+
+        var packages = listRequest.Result;
+        var text = new StringBuilder("Packages:\n");
+        foreach (var package in packages)
+        {
+            if (package.name == "com.username.package")
+            {
+                Debug.LogWarning("The dependency 'com.username.package' is not installed! Installing...");
+                Client.Add("https://github.com/gitusername/gitpackage.git");
+            }
+            if (package.source == PackageSource.Registry)
+            { 
+                text.AppendLine($"{package.name}: {package.version} [{package.resolvedPath}]");
+            }
+        }
+        Debug.Log(text.ToString());
     }
 }
