@@ -1,3 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.PackageManager;
+using System;
+using System.Threading.Tasks;
+
 public class Setup
 {
     [InitializeOnLoadMethod]
@@ -17,4 +25,4 @@ public class Setup
         Debug.LogWarning("The dependency 'com.username.package' is not installed! Installing...");
         Client.Add("https://github.com/gitusername/gitpackage.git");
     }
- 
+}
