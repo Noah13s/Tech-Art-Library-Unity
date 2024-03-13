@@ -1,34 +1,39 @@
 {
-	"name": "com.n04h.techartlibrary",
-	"displayName": "Tech Art Library",
-	"version": "0.0.1",
-	"unity": "2021.1",
-	"description": "This is N04H's personal Tech-Art-Library tools for Unity",
-	"author": {
-		"name": "N04H",
-		"email": "ouounoah@gmail.com",
-		"url": "http://noah-portfolio.alwaysdata.net/"
-	},
-	"dependencies": {
-		"com.unity.visualscripting": "1.5.1",
-		"com.unity.shadergraph": "14.0.4",
-		"com.unity.mathematics": "1.2.6"
-	},
-	"samples": [
-		{
-		  "displayName": "Example 1",
-		  "description": "This sample is just an example",
-		  "path": "Samples~/Example1"
-		},
-		{
-			"displayName": "VR",
-			"description": "This sample contains VR related content",
-			"path": "Samples~/VR"
-		},
-		{
-			"displayName": "AR",
-			"description": "This sample contains AR related content",
-			"path": "Samples~/AR"
-		}
-	  ]
+  "name": "com.n04h.techartlibrary",
+  "displayName": "Tech Art Library",
+  "version": "0.0.1",
+  "unity": "2022.1",
+  "description": "This is N04H's personal Tech-Art-Library tools for Unity",
+  "author": {
+    "name": "N04H",
+    "email": "ouounoah@gmail.com",
+    "url": "http://noah-portfolio.alwaysdata.net/"
+  },
+  "dependencies": {
+    "com.unity.visualscripting": "latest",
+    "com.unity.shadergraph": "latest",
+    "com.unity.mathematics": "latest"
+  },
+  "samples": [
+    {
+      "displayName": "Example 1",
+      "description": "This sample is just an example",
+      "path": "Samples~/Example1"
+    },
+    {
+      "displayName": "Physics Simulation",
+      "description": "This sample contains Physics Simulation related content",
+      "path": "Samples~/PhysicsSimulation"
+    },
+    {
+      "displayName": "VR",
+      "description": "This sample contains VR related content",
+      "path": "Samples~/VR"
+    },
+    {
+      "displayName": "AR",
+      "description": "This sample contains AR related content",
+      "path": "Samples~/AR"
+    }
+  ]
 }
