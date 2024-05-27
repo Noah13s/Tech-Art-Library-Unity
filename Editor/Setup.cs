@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
+using UnityEditor.Build;
 
 public class Setup
 {
     [InitializeOnLoadMethod]
-    public static async void InstallDependencies()
+    private static async void InstallDependencies()
     {
         var listRequest = Client.List(false, true);
 
@@ -39,3 +40,4 @@ public class Setup
         Debug.Log(text.ToString());
     }
 }
+
