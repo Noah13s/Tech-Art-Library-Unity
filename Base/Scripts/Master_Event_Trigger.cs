@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
+
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -142,7 +144,8 @@ public class Master_Event_Trigger : MonoBehaviour
                 case ShapeType.Mesh: 
                     break;
             }
-            rigidBody = gameObject.AddComponent<Rigidbody>();
+            if (rigidBody == null)
+                rigidBody = gameObject.AddComponent<Rigidbody>();
             rigidBody.useGravity = false;
             // Update the previousShapeType for the next comparison
             previousShapeType = ShapeType;

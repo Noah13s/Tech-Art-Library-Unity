@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Master_Counter : MonoBehaviour
 {
-    [Serializable]
+    [System.Serializable]
     public struct TransformSpawnPoints
     {
         [SerializeField]
