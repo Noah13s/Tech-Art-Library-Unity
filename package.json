@@ -10,8 +10,6 @@
     "url": "http://noah-portfolio.alwaysdata.net/"
   },
   "dependencies": {
-	"com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm",
-    "com.unity.visualscripting": "1.9.2",
     "com.unity.shadergraph": "14.0.10",
     "com.unity.mathematics": "1.2.6"
   },

@@ -1,15 +1,21 @@
+using System.IO;
+using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.PackageManager;
-using UnityEditor.Build;
 
 public class Setup
 {
     [InitializeOnLoadMethod]
     private static async void InstallDependencies()
+    {
+        await ListPackages();
+        await ListSamples("com.n04h.techartlibrary"); // Replace with your package name
+    }
+
+    private static async Task ListPackages()
     {
         var listRequest = Client.List(false, true);
 
@@ -22,7 +28,6 @@ public class Setup
             return;
         }
 
-
         var packages = listRequest.Result;
         var text = new StringBuilder("Packages:\n");
         foreach (var package in packages)
@@ -30,7 +35,7 @@ public class Setup
             if (package.name == "com.username.package")
             {
                 Debug.LogWarning("The dependency 'com.username.package' is not installed! Installing...");
-                Client.Add("https://github.com/gitusername/gitpackage.git");
+                await ImportPackage("https://github.com/gitusername/gitpackage.git");
             }
             if (package.source == PackageSource.Registry)
             { 
@@ -39,5 +44,125 @@ public class Setup
         }
         Debug.Log(text.ToString());
     }
+
+    private static async Task ListSamples(string packageName)
+    {
+        // Get the installed package info
+        var listRequest = Client.List(false, true);
+        while (!listRequest.IsCompleted)
+            await Task.Delay(100);
+
+        if (listRequest.Error != null)
+        {
+            Debug.LogError("Error: " + listRequest.Error.message);
+            return;
+        }
+
+        var packages = listRequest.Result;
+        var package = packages.FirstOrDefault(p => p.name == packageName);
+        if (package == null)
+        {
+            Debug.LogError($"Package {packageName} not found.");
+            return;
+        }
+
+        // Read the package.json file to find samples
+        var manifestPath = Path.Combine(package.resolvedPath, "package.json");
+        if (!File.Exists(manifestPath))
+        {
+            Debug.LogError($"Manifest file not found for package {packageName}.");
+            return;
+        }
+
+        var manifestJson = File.ReadAllText(manifestPath);
+        var manifest = JsonUtility.FromJson<PackageManifest>(manifestJson);
+
+        if (manifest.samples == null || manifest.samples.Length == 0)
+        {
+            Debug.Log($"No samples found for package {packageName}.");
+            return;
+        }
+
+        var text = new StringBuilder($"Samples for {packageName}:\n");
+        foreach (var sample in manifest.samples)
+        {
+            var samplePath = Path.Combine(package.resolvedPath, sample.path);
+            var isImported = Directory.Exists(samplePath);
+            text.AppendLine($"  {sample.displayName}: {(isImported ? "Imported" : "Not Imported")}");
+
+            // Add switch statement for each sample
+            switch (sample.displayName)
+            {
+                case "Example 1":
+                case "VR":
+                case "AR":
+                    if (isImported)
+                    {
+                        await ImportPackage("com.unity.xr.openxr", sample.displayName);
+                        await ImportPackage("com.unity.xr.arfoundation", sample.displayName);
+                    }
+                    break;                    
+                case "WebSocket":
+                    if (isImported)
+                    {
+                        await ImportPackage("https://github.com/endel/NativeWebSocket.git#upm", sample.displayName);
+                    }
+                    break;                    
+                case "SerialPort":
+                    // These samples are already imported, no action needed
+                    break;
+                default:
+                    Debug.Log($"Unknown sample '{sample.displayName}'. No action taken.");
+                    break;
+            }
+        }
+
+        Debug.Log(text.ToString());
+    }
+
+    private static async Task ImportPackage(string packageUrl, string sampleDisplayName="")
+    {
+        Debug.LogWarning($"The sample '{sampleDisplayName}' contains dependencies! Importing...");        
+        var addRequest = Client.Add(packageUrl);
+        while (!addRequest.IsCompleted)
+            await Task.Delay(100); // or Thread.Sleep(100);
+
+        if (addRequest.Error != null)
+        {
+            Debug.LogError("Error adding package: " + addRequest.Error.message);
+        }
+        else
+        {
+            Debug.Log("Package added successfully: " + packageUrl);
+        }
+    }
+
+    private static async Task RemovePackage(string packageUrl)
+    {
+        var removeRequest = Client.Remove(packageUrl);
+        while (!removeRequest.IsCompleted)
+            await Task.Delay(100); // or Thread.Sleep(100);
+
+        if (removeRequest.Error != null)
+        {
+            Debug.LogError("Error removing package: " + removeRequest.Error.message);
+        }
+        else
+        {
+            Debug.Log("Package removed successfully: " + packageUrl);
+        }
+    }
 }
 
+[System.Serializable]
+public class PackageManifest
+{
+    public Sample[] samples;
+}
+
+[System.Serializable]
+public class Sample
+{
+    public string displayName;
+    public string path;
+}
