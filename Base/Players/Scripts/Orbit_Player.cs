@@ -13,6 +13,7 @@ public class OrbitCamera : MonoBehaviour
     public float cameraLag = 5f; // Camera lag for target position
     public LayerMask collisionLayer; // Layer mask for collision detection
     public float collisionOffset = 0.2f; // Offset for collision detection
+    public bool RightClickMove = true; // Whether moving the camera by right-clicking is allowed
 
     private float currentRotationX = 0f;
     private float currentRotationY = 0f;
@@ -40,10 +41,13 @@ public class OrbitCamera : MonoBehaviour
 
     void Update()
     {
-        // Rotate the camera based on mouse input
-        currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
-        currentRotationY -= Input.GetAxis("Mouse Y") * sensitivityY;
-        currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
+        if (RightClickMove && Input.GetMouseButton(1))
+        {
+            // Rotate the camera based on mouse input
+            currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
+            currentRotationY -= Input.GetAxis("Mouse Y") * sensitivityY;
+            currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
+        }
 
         // Zoom in and out using scrollwheel if scrolling is allowed
         if (allowScrolling)
