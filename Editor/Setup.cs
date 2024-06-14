@@ -45,7 +45,7 @@ public class Setup
         Debug.Log(text.ToString());
     }
 
-    private static async Task ListSamples(string packageName)
+    public static async Task ListSamples(string packageName)
     {
         // Get the installed package info
         var listRequest = Client.List(false, true);
@@ -86,7 +86,7 @@ public class Setup
         var text = new StringBuilder($"Samples for {packageName}:\n");
         foreach (var sample in manifest.samples)
         {
-            var samplePath = Path.Combine(package.resolvedPath, sample.path);
+            var samplePath = Path.Combine("Assets/Samples", package.displayName, package.version, sample.displayName);
             var isImported = Directory.Exists(samplePath);
             text.AppendLine($"  {sample.displayName}: {(isImported ? "Imported" : "Not Imported")}");
 
@@ -94,7 +94,9 @@ public class Setup
             switch (sample.displayName)
             {
                 case "Example 1":
+
                 case "VR":
+                    break;
                 case "AR":
                     if (isImported)
                     {
@@ -105,7 +107,8 @@ public class Setup
                 case "WebSocket":
                     if (isImported)
                     {
-                        await ImportPackage("https://github.com/endel/NativeWebSocket.git#upm", sample.displayName);
+                        await ImportPackage("https://github.com/endel/NativeWebSocket.git#upm", sample.displayName); 
+                        await ImportPackage("com.unity.cinemachine", sample.displayName);
                     }
                     break;                    
                 case "SerialPort":
