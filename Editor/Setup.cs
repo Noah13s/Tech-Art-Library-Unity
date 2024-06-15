@@ -100,8 +100,9 @@ public class Setup
                 case "AR":
                     if (isImported)
                     {
-                        await ImportPackage("com.unity.xr.openxr", sample.displayName);
                         await ImportPackage("com.unity.xr.arfoundation", sample.displayName);
+                        await ImportPackage("com.unity.render-pipelines.universal", sample.displayName); 
+                        await ImportPackage("com.unity.xr.arcore", sample.displayName);
                     }
                     break;                    
                 case "WebSocket":
@@ -154,6 +155,41 @@ public class Setup
         {
             Debug.Log("Package removed successfully: " + packageUrl);
         }
+    }
+
+    public static async void RemoveAllPackages()
+    {
+        var listRequest = Client.List(true); // List all packages (including built-in ones)
+        while (!listRequest.IsCompleted)
+            await Task.Delay(100);
+
+        if (listRequest.Error != null)
+        {
+            Debug.LogError("Error listing packages: " + listRequest.Error.message);
+            return;
+        }
+
+        var packages = listRequest.Result;
+        foreach (var package in packages)
+        {
+            if (package.source == PackageSource.Registry || package.source == PackageSource.Git)
+            {
+                Debug.Log($"Removing package: {package.name}");
+                var removeRequest = Client.Remove(package.name);
+                while (!removeRequest.IsCompleted)
+                    await Task.Delay(100);
+
+                if (removeRequest.Error != null)
+                {
+                    Debug.LogError("Error removing package: " + removeRequest.Error.message);
+                }
+                else
+                {
+                    Debug.Log("Package removed successfully: " + package.name);
+                }
+            }
+        }
+        AssetDatabase.Refresh();
     }
 }
 
