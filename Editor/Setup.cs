@@ -101,8 +101,9 @@ public class Setup
                     if (isImported)
                     {
                         await ImportPackage("com.unity.xr.arfoundation", sample.displayName);
-                        await ImportPackage("com.unity.render-pipelines.universal", sample.displayName); 
+                        await ImportPackage("com.unity.render-pipelines.universal", sample.displayName);
                         await ImportPackage("com.unity.xr.arcore", sample.displayName);
+                        await ImportPackage("com.unity.xr.interaction.toolkit", sample.displayName);
                     }
                     break;                    
                 case "WebSocket":
