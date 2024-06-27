@@ -24,6 +24,7 @@ public class ARManipulator : MonoBehaviour
 
     private float initialFingerDistance;
     private Vector3 initialScale;
+    private float initialTwoFingerDeltaY;
 
     private ARInputActions inputActions;
 
@@ -92,10 +93,6 @@ public class ARManipulator : MonoBehaviour
             if (hit.collider.gameObject.CompareTag("MovableObject"))
             {
                 Destroy(hit.collider.gameObject);
-                if (currentMode != ManipulationMode.None) 
-                {
-                    changeState(false);
-                }
             }
         }
     }
@@ -145,6 +142,8 @@ public class ARManipulator : MonoBehaviour
                     UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers[1].screenPosition
                 );
                 initialScale = targetObject.transform.localScale;
+                initialTwoFingerDeltaY = (UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers[0].screenPosition.y +
+                                          UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers[1].screenPosition.y) / 2;
             }
         }
     }
@@ -197,7 +196,9 @@ public class ARManipulator : MonoBehaviour
         else if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers.Count == 2)
         {
             // Move up and down on Y axis based on vertical movement of two fingers
-            float verticalDelta = touchDelta.y;
+            float currentTwoFingerDeltaY = (UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers[0].screenPosition.y +
+                                            UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers[1].screenPosition.y) / 2;
+            float verticalDelta = currentTwoFingerDeltaY - initialTwoFingerDeltaY;
             Vector3 newPosition = initialObjectPosition + new Vector3(0, verticalDelta, 0) * 0.01f; // Adjust sensitivity
             targetObject.transform.position = newPosition;
         }
@@ -207,8 +208,11 @@ public class ARManipulator : MonoBehaviour
     {
         Vector2 touchDelta = touchPosition - initialTouchPosition;
         float rotationSpeed = 0.2f;
-        float rotationY = touchDelta.x * rotationSpeed;
-        targetObject.transform.Rotate(Vector3.up, rotationY, Space.World);
+        float rotationY = -touchDelta.x * rotationSpeed; // Inverted rotation
+
+        // Apply rotation delta instead of continuous rotation
+        Quaternion rotationDelta = Quaternion.Euler(0, rotationY, 0);
+        targetObject.transform.rotation = initialObjectRotation * rotationDelta;
     }
 
     private void ScaleObject()

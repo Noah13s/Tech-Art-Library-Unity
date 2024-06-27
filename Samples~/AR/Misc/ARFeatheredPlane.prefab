@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 23747677035716922}
   - component: {fileID: 114973852414686920}
   - component: {fileID: 114999847245811208}
-  - component: {fileID: 7240739692305356974}
+  - component: {fileID: 713906055631902300}
   - component: {fileID: 6937952873183941523}
   m_Layer: 0
   m_Name: ARFeatheredPlane
@@ -88,8 +88,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e26ef56a708151c4993804c4d0e67e11, type: 2}
-  - {fileID: 2100000, guid: 1953d6a5c38e0b6428e30d2272560ac3, type: 2}
+  - {fileID: 2100000, guid: 6a7736a3540b5154faba20e7153efdd6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -139,7 +138,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TrackingStateVisibilityThreshold: 1
   m_HideSubsumed: 1
---- !u!114 &7240739692305356974
+--- !u!114 &713906055631902300
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
