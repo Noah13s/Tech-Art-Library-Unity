@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 
-[ExecuteAlways]
-public class AtomPhysics : MonoBehaviour
-{
-    [Serializable]
-    private struct AtomData
+[Serializable]
+    public struct AtomData
     {
         [Serializable]
         public enum DecayMode
@@ -69,11 +67,18 @@ public class AtomPhysics : MonoBehaviour
         [NonSerialized]
         public float startTime;
     }
+[ExecuteAlways]
+public class AtomPhysics : MonoBehaviour
+{
     [SerializeField]
     private AtomData atomStartData;
     [ReadOnly]
     [SerializeField]
-    private AtomData atomStatus;
+    public AtomData atomStatus;
+
+    public delegate void UnityEvent ();
+    public UnityEvent startDataChanged;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -84,6 +89,7 @@ public class AtomPhysics : MonoBehaviour
     private void OnValidate()
     {
         Setup();
+        startDataChanged.Invoke ();
     }
 
     // Update is called once per frame
