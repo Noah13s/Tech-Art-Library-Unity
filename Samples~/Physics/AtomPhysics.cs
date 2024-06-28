@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 
 
@@ -21,17 +20,27 @@ public class AtomPhysics : MonoBehaviour
             Alpha,
             Gamma
         }
-        [SerializeField]
-        [Tooltip("Number of protons in the nuclei")]
-        public int atomicNumber;
+        [Serializable]
+        public struct Nucleus
+        {
+            [Range(0, 98)]
+            [SerializeField]
+            [Tooltip("Number of protons in the nuclei")]
+            public int atomicNumber;
 
-        [SerializeField]
-        [Tooltip("Number of protons in the nuclei")]
-        public int neutronNumber;
+            [Range(0, 98)]
+            [SerializeField]
+            [Tooltip("Number of neutrons in the nuclei")]
+            public int neutronNumber;
 
+            [ReadOnly]
+            [SerializeField]
+            [Tooltip("The total number of protons and neutrons in the nucleus. It's often found written next to the element symbol")]
+            public int massNumber;
+        }
         [SerializeField]
-        [Tooltip("The total number of protons and neutrons in the nucleus. It's often found written next to the element symbol")]
-        public int massNumber;
+        [Tooltip("")]
+        public Nucleus nucleus;
 
         [SerializeField]
         [Tooltip("When the charge state of an atom is neutral(ground) then the number of electrons equals the number of protons (atomic number)")]
@@ -48,21 +57,28 @@ public class AtomPhysics : MonoBehaviour
         [SerializeField]
         [Tooltip("Elapsed decay time")]
         public float decayTime;
-        
+
         [SerializeField]
         public DecayMode decayMode;
 
         [SerializeField]
         [Tooltip("KineticEnergy of the atom in Joules which is perceived as heat")]
         public float kineticEnergy;
+
+        // New field to store the start time of the countdown
+        [NonSerialized]
+        public float startTime;
     }
     [SerializeField]
     private AtomData atomStartData;
+    [ReadOnly]
+    [SerializeField]
     private AtomData atomStatus;
     // Start is called before the first frame update
     void Start()
     {
         Setup();
+        StartCoroutine(CountDownDecayTime());
     }
 
     private void OnValidate()
@@ -73,7 +89,7 @@ public class AtomPhysics : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void Setup()
@@ -84,21 +100,23 @@ public class AtomPhysics : MonoBehaviour
         switch (atomStatus.chargeState)
         {
             case ChargeState.Neutral:
-                atomStatus.numberOfElectrons = atomStatus.atomicNumber;
+                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber;
                 break;
             case ChargeState.Positive:
-                atomStatus.numberOfElectrons = atomStatus.atomicNumber - 1; // Example for single positive charge
+                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber - 1; // Example for single positive charge
                 break;
             case ChargeState.Negative:
-                atomStatus.numberOfElectrons = atomStatus.atomicNumber + 1; // Example for single negative charge
+                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber + 1; // Example for single negative charge
                 break;
         }
 
-        // Example of further setup linking other parameters
+        atomStartData.nucleus.massNumber = atomStartData.nucleus.neutronNumber + atomStartData.nucleus.atomicNumber;
+
         // Ensure decay time does not exceed half-life
         if (atomStatus.decayTime > atomStatus.halfLife)
         {
             atomStatus.decayTime = atomStatus.halfLife;
+            atomStartData.decayTime = atomStartData.halfLife;
         }
 
         // Example of setting kinetic energy based on decay mode (hypothetical logic)
@@ -116,10 +134,35 @@ public class AtomPhysics : MonoBehaviour
         }
     }
 
-    [ContextMenu("test")]
+    // Coroutine to count down decay time
+    private IEnumerator CountDownDecayTime()
+    {
+        atomStatus.startTime = Time.time;
+
+        while (atomStatus.decayTime > 0)
+        {
+            // Calculate elapsed time in milliseconds
+            float elapsedTime = (Time.time - atomStatus.startTime) * 1000f;
+
+            // Calculate remaining time
+            atomStatus.decayTime = Mathf.Max(0, (int)(atomStartData.decayTime - elapsedTime));
+
+            yield return null;
+        }
+
+        // Handle decay completion (e.g., destroy object, apply effects)
+        Debug.Log("Decay completed!");
+    }
+
+    [ContextMenu("Check atom validity")]
     private void CheckAtomValidity()
     {
         Debug.Log("Checking atom settings validity");
+    }
+
+    private void ResetDecayTime()
+    {
+        atomStartData.decayTime = atomStartData.halfLife;
     }
 
     // Custom editor class within the same script
@@ -129,8 +172,10 @@ public class AtomPhysics : MonoBehaviour
     {
         public override void OnInspectorGUI()
         {
+            EditorGUILayout.LabelField("Atom Data", EditorStyles.boldLabel);
             // Draw the default inspector
             DrawDefaultInspector();
+
 
             // Get a reference to the target object
             AtomPhysics myComponent = (AtomPhysics)target;
@@ -139,6 +184,12 @@ public class AtomPhysics : MonoBehaviour
             if (GUILayout.Button("Check settings validity"))
             {
                 myComponent.CheckAtomValidity();
+            }
+
+            // Add a button and handle its click event
+            if (GUILayout.Button("Reset decay time"))
+            {
+                myComponent.ResetDecayTime();
             }
         }
     }
