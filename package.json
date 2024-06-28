@@ -38,6 +38,11 @@
 			"displayName": "SerialPort",
 			"description": "This sample contains SerialPort related content",
 			"path": "Samples~/SerialPort"
+		},
+		{
+			"displayName": "Physics",
+			"description": "This sample contains Physics related content",
+			"path": "Samples~/Physics"
 		}
 	  ]
 }
