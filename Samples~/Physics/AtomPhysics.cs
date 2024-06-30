@@ -14,7 +14,8 @@ using UnityEngine.Events;
         [Serializable]
         public enum DecayMode
         {
-            Beta = 0,
+            Stable = 0,
+            Beta,
             Alpha,
             Gamma
         }
@@ -49,15 +50,22 @@ using UnityEngine.Events;
         public ChargeState chargeState;
 
         [SerializeField]
+        [Tooltip("Disregard decay of atom")]
+        public bool disregardDecay;
+        
+        [SerializeField]
+        public DecayMode decayMode;
+
+        [ConditionalVisibility("disregardDecay")]
+        [SerializeField]
         [Tooltip("Half decay life time of the atom")]
         public float halfLife;
 
+        [ConditionalVisibility("disregardDecay")]
         [SerializeField]
         [Tooltip("Elapsed decay time")]
         public float decayTime;
 
-        [SerializeField]
-        public DecayMode decayMode;
 
         [SerializeField]
         [Tooltip("KineticEnergy of the atom in Joules which is perceived as heat")]
@@ -76,8 +84,8 @@ public class AtomPhysics : MonoBehaviour
     [SerializeField]
     public AtomData atomStatus;
 
-    public delegate void UnityEvent ();
-    public UnityEvent startDataChanged;
+    public delegate void StartDataChangedEvent();
+    public StartDataChangedEvent startDataChanged;
 
     // Start is called before the first frame update
     void Start()
@@ -89,7 +97,10 @@ public class AtomPhysics : MonoBehaviour
     private void OnValidate()
     {
         Setup();
-        startDataChanged.Invoke ();
+        if (startDataChanged != null)
+        {
+            startDataChanged.Invoke();
+        }
     }
 
     // Update is called once per frame
@@ -124,20 +135,6 @@ public class AtomPhysics : MonoBehaviour
             atomStatus.decayTime = atomStatus.halfLife;
             atomStartData.decayTime = atomStartData.halfLife;
         }
-
-        // Example of setting kinetic energy based on decay mode (hypothetical logic)
-        switch (atomStatus.decayMode)
-        {
-            case AtomData.DecayMode.Beta:
-                atomStatus.kineticEnergy = 0.5f; // Placeholder value
-                break;
-            case AtomData.DecayMode.Alpha:
-                atomStatus.kineticEnergy = 1.0f; // Placeholder value
-                break;
-            case AtomData.DecayMode.Gamma:
-                atomStatus.kineticEnergy = 1.5f; // Placeholder value
-                break;
-        }
     }
 
     // Coroutine to count down decay time
@@ -147,12 +144,14 @@ public class AtomPhysics : MonoBehaviour
 
         while (atomStatus.decayTime > 0)
         {
-            // Calculate elapsed time in milliseconds
-            float elapsedTime = (Time.time - atomStatus.startTime) * 1000f;
+            if (!atomStartData.disregardDecay && atomStatus.decayMode != AtomData.DecayMode.Stable)
+            {
+                // Calculate elapsed time in milliseconds
+                float elapsedTime = (Time.time - atomStatus.startTime) * 1000f;
 
-            // Calculate remaining time
-            atomStatus.decayTime = Mathf.Max(0, (int)(atomStartData.decayTime - elapsedTime));
-
+                // Calculate remaining time
+                atomStatus.decayTime = Mathf.Max(0, (int)(atomStartData.decayTime - elapsedTime));
+            }
             yield return null;
         }
 

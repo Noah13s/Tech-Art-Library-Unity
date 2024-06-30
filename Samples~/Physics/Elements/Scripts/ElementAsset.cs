@@ -10,6 +10,7 @@ public class ElementAsset : ScriptableObject
     [Range(0, 98)]
     [SerializeField]
     public int atomicNumber;
+    public int[] stableIsotopes;
 
     /*
     private void OnValidate()

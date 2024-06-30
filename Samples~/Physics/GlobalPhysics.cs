@@ -11,6 +11,14 @@ public enum ChargeState
     Negative
 }
 
+public enum MatterState
+{
+    Solid = 0,
+    Liquid,
+    Gas,
+    Plasma
+}
+
 [Serializable]
 public struct Temperature
 {
