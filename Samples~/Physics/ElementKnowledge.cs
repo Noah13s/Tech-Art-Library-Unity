@@ -9,7 +9,7 @@ using UnityEngine;
 using System.Text;
 
 [RequireComponent(typeof(AtomPhysics))]
-public class ElementIdentifier : MonoBehaviour
+public class ElementKnowledge : MonoBehaviour
 {
     public bool autoIdentify;
     public TextAsset csvFile;  // CSV file to be imported
@@ -47,7 +47,6 @@ public class ElementIdentifier : MonoBehaviour
         LoadElementsFromCSV();
     }
 
-    [ContextMenu("test")]
     private void LoadElementsFromCSV()
     {
         elements = new List<ElementAsset>();
@@ -138,8 +137,6 @@ public class ElementIdentifier : MonoBehaviour
         return values.ToArray();
     }
 
-
-
     private void IdentifyElement()
     {
         if (elements == null || elements.Count == 0)
@@ -159,9 +156,39 @@ public class ElementIdentifier : MonoBehaviour
         }
     }
 
+    private void CheckStability()
+    {
+        if (elements == null || elements.Count == 0)
+        {
+            Debug.LogError("Element list is empty or not loaded");
+            return;
+        }
+
+        int atomicNumber = atom.atomStatus.nucleus.atomicNumber;
+        int neutronNumber = atom.atomStatus.nucleus.neutronNumber;
+
+        foreach (ElementAsset element in elements)
+        {
+            if (element.atomicNumber == atomicNumber)
+            {
+                if (element.stableIsotopes.Contains(neutronNumber))
+                {
+                    Debug.Log($"The isotope of {element.elementName} with {neutronNumber} neutrons is stable.");
+                }
+                else
+                {
+                    Debug.Log($"The isotope of {element.elementName} with {neutronNumber} neutrons is not stable.");
+                }
+                return;
+            }
+        }
+
+        Debug.LogError($"No element found with atomic number {atomicNumber}");
+    }
+
     // Custom editor class within the same script
 #if UNITY_EDITOR
-    [CustomEditor(typeof(ElementIdentifier))]
+    [CustomEditor(typeof(ElementKnowledge))]
     public class MyComponentEditor : Editor
     {
         public override void OnInspectorGUI()
@@ -171,12 +198,16 @@ public class ElementIdentifier : MonoBehaviour
             DrawDefaultInspector();
 
             // Get a reference to the target object
-            ElementIdentifier myComponent = (ElementIdentifier)target;
+            ElementKnowledge myComponent = (ElementKnowledge)target;
 
             // Add a button and handle its click event
-            if (GUILayout.Button("Identify element"))
+            if (GUILayout.Button("Identify Element"))
             {
                 myComponent.IdentifyElement();
+            }
+            if (GUILayout.Button("Check Stability"))
+            {
+                myComponent.CheckStability();
             }
         }
     }

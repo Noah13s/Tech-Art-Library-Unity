@@ -1,29 +1,28 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
 
 public class ConditionalVisibilityAttribute : PropertyAttribute
 {
     public string conditionalProperty;
-    public bool showInInspector;
+    public bool invertCondition;
 
-    public ConditionalVisibilityAttribute(string conditionalProperty, bool showInInspector = true)
+    public ConditionalVisibilityAttribute(string conditionalProperty, bool invertCondition = false)
     {
         this.conditionalProperty = conditionalProperty;
-        this.showInInspector = showInInspector;
+        this.invertCondition = invertCondition;
     }
 }
+
 [CustomPropertyDrawer(typeof(ConditionalVisibilityAttribute))]
 public class ConditionalVisibilityDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        ConditionalVisibilityAttribute conditionalAttribute = attribute as ConditionalVisibilityAttribute;
+        ConditionalVisibilityAttribute conditionalAttribute = (ConditionalVisibilityAttribute)attribute;
 
         // Check if the conditional property exists in the serialized object
-        SerializedProperty conditionalProp = property.serializedObject.FindProperty(conditionalAttribute.conditionalProperty);
+        SerializedProperty conditionalProp = FindPropertyRelative(property, conditionalAttribute.conditionalProperty);
         if (conditionalProp == null)
         {
             Debug.LogWarning($"Conditional property {conditionalAttribute.conditionalProperty} not found.");
@@ -32,9 +31,14 @@ public class ConditionalVisibilityDrawer : PropertyDrawer
         }
 
         // Check the value of the conditional property
-        bool showProperty = conditionalProp.boolValue == conditionalAttribute.showInInspector;
+        bool showProperty = conditionalProp.boolValue;
 
-        // If showInInspector is false, hide the property
+        if (conditionalAttribute.invertCondition)
+        {
+            showProperty = !showProperty;
+        }
+
+        // If showProperty is false, hide the property
         if (!showProperty)
             return;
 
@@ -43,19 +47,29 @@ public class ConditionalVisibilityDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        ConditionalVisibilityAttribute conditionalAttribute = attribute as ConditionalVisibilityAttribute;
+        ConditionalVisibilityAttribute conditionalAttribute = (ConditionalVisibilityAttribute)attribute;
 
-        SerializedProperty conditionalProp = property.serializedObject.FindProperty(conditionalAttribute.conditionalProperty);
+        SerializedProperty conditionalProp = FindPropertyRelative(property, conditionalAttribute.conditionalProperty);
         if (conditionalProp == null)
         {
             Debug.LogWarning($"Conditional property {conditionalAttribute.conditionalProperty} not found.");
             return EditorGUIUtility.singleLineHeight;
         }
 
-        bool showProperty = conditionalProp.boolValue == conditionalAttribute.showInInspector;
+        bool showProperty = conditionalProp.boolValue;
+
+        if (conditionalAttribute.invertCondition)
+        {
+            showProperty = !showProperty;
+        }
 
         // Return the height of the property field if it's visible, otherwise zero to hide it
         return showProperty ? EditorGUI.GetPropertyHeight(property, label) : 0f;
     }
-}
 
+    private SerializedProperty FindPropertyRelative(SerializedProperty property, string relativePath)
+    {
+        var path = property.propertyPath.Replace(property.name, relativePath);
+        return property.serializedObject.FindProperty(path);
+    }
+}

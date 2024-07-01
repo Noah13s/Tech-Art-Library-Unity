@@ -225,6 +225,7 @@ GameObject:
   - component: {fileID: 1719228713}
   - component: {fileID: 1719228712}
   - component: {fileID: 1719228714}
+  - component: {fileID: 1719228715}
   m_Layer: 0
   m_Name: Atom
   m_TagString: Untagged
@@ -241,32 +242,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 1719228711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 169376cb923c93e41a75c277f69c2c1d, type: 3}
+  m_Script: {fileID: 11500000, guid: 770062bb743e6d449a47daff40c6fe01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   atomStartData:
     nucleus:
-      atomicNumber: 1
-      neutronNumber: 0
-      massNumber: 1
-    numberOfElectrons: 0
+      atomicNumber: 21
+      neutronNumber: 7
+      massNumber: 28
+    numberOfElectrons: 13
     chargeState: 0
     disregardDecay: 1
     decayMode: 0
-    halfLife: 10000
-    decayTime: 10000
+    halfLife: 0
+    decayTime: 0
     kineticEnergy: 0
   atomStatus:
     nucleus:
-      atomicNumber: 1
-      neutronNumber: 0
-      massNumber: 1
-    numberOfElectrons: 1
+      atomicNumber: 21
+      neutronNumber: 7
+      massNumber: 28
+    numberOfElectrons: 21
     chargeState: 0
     disregardDecay: 1
     decayMode: 0
-    halfLife: 10000
-    decayTime: 10000
+    halfLife: 0
+    decayTime: 0
     kineticEnergy: 0
 --- !u!4 &1719228713
 Transform:
@@ -277,7 +278,7 @@ Transform:
   m_GameObject: {fileID: 1719228711}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 283.25006, y: 298.82715, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -292,11 +293,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1719228711}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43bdb68918f00a54592b968f96a91baf, type: 3}
+  m_Script: {fileID: 11500000, guid: f67bed59d52d103478a9031d173e6f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   autoIdentify: 0
   csvFile: {fileID: 4900000, guid: 9587296c85dbbc245af2e53ac8a02bf6, type: 3}
+--- !u!114 &1719228715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719228711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95fdec13ed669e24dba8cfd1571bc24c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1768676981
 GameObject:
   m_ObjectHideFlags: 0
@@ -404,17 +417,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Version: 3
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_LightLayerMask: 1
-  m_RenderingLayers: 1
-  m_CustomShadowLayers: 0
-  m_ShadowLayerMask: 1
-  m_ShadowRenderingLayers: 1
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

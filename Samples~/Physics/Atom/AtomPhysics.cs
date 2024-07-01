@@ -56,12 +56,12 @@ using UnityEngine.Events;
         [SerializeField]
         public DecayMode decayMode;
 
-        [ConditionalVisibility("disregardDecay")]
+        [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
         [Tooltip("Half decay life time of the atom")]
         public float halfLife;
 
-        [ConditionalVisibility("disregardDecay")]
+        [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
         [Tooltip("Elapsed decay time")]
         public float decayTime;
