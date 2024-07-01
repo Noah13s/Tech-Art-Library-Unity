@@ -1,124 +1,120 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using static UnityEditor.Rendering.InspectorCurveEditor;
+
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
+[RequireComponent(typeof(AtomPhysics))]
 public class Visualiser : MonoBehaviour
 {
     private AtomPhysics atom;
-    private List<GameObject> childObjects = new List<GameObject>(); // List to store child objects
-
-    // This script adds child gameobjects based on atom.startData.numberOfNeutrons every time it is called via its subscribed event 
-    // (on validation of another script). This happens in near real-time and the goal of this script is to replicate a slider value in gameobject children.
+    private List<GameObject> childObjects = new List<GameObject>();
 
     private void Init()
     {
         atom = GetComponent<AtomPhysics>();
     }
 
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (!EditorApplication.isPlayingOrWillChangePlaymode)
-        {
-            atom.startDataChanged -= OnStartDataChanged;
-            atom.startDataChanged += OnStartDataChanged;
-        }
-    }
-#endif
-
     private void OnEnable()
     {
-        Init(); // Initialize atom
-        atom.startDataChanged += OnStartDataChanged;
+        Init();
     }
 
-    private void OnDisable()
+    public void UpdateChildObjects()
     {
-        atom.startDataChanged -= OnStartDataChanged;
-    }
+        Init();
+        ClearChildObjects();
 
-    private void OnStartDataChanged()
-    {
-        GameObject nucleus;
-        GameObject protons;
-        GameObject neutrons;
-        GameObject electron;
-#if UNITY_EDITOR
-        // Ensure we are in edit mode and not playing
-        if (!EditorApplication.isPlayingOrWillChangePlaymode)
+        GameObject nucleus = CreateChildObject("Nucleus", transform);
+        GameObject protons = CreateChildObject("Protons", nucleus.transform);
+        GameObject neutrons = CreateChildObject("Neutrons", nucleus.transform);
+        GameObject electrons = CreateChildObject("Electrons", transform);
+        if (atom!=null)
         {
-            UnityEditor.EditorApplication.delayCall += () =>
+            foreach (var proton in CreateChildObjects(atom.atomStatus.nucleus.atomicNumber, protons.transform, "Proton"))
             {
-                ClearChildObjects(childObjects);
-                nucleus = CreateChildObject(transform, "Nucleus");
-                electron = CreateChildObject(transform, "Electrons");
-                protons = CreateChildObject(nucleus.transform, "Protons");
-                neutrons = CreateChildObject(nucleus.transform, "Neutrons");
-
-                CreateChildObjects(atom.atomStatus.nucleus.atomicNumber, protons.transform, "Proton");
-                CreateChildObjects(atom.atomStatus.nucleus.neutronNumber, neutrons.transform, "neutron");
-
-                CreateChildObjects(atom.atomStatus.numberOfElectrons, electron.transform, "Electron");
+                var protonParticle = proton.AddComponent<FundamentalParticle>();
+            };
+            foreach (var neutron in CreateChildObjects(atom.atomStatus.nucleus.neutronNumber, neutrons.transform, "Neutron"))
+            {
+                var neutronParticle = neutron.AddComponent<FundamentalParticle>();
+            };
+            foreach (GameObject electron in CreateChildObjects(atom.atomStatus.numberOfElectrons, electrons.transform, "Electron"))
+            {
+                var electronParticle = electron.AddComponent<FundamentalParticle>();
             };
         }
-        else
+    }
+
+    private List<GameObject> CreateChildObjects(int count, Transform parent, string name)
+    {
+        List<GameObject> children= new List<GameObject>();
+        for (int i = 0; i < count; i++)
         {
-            ClearChildObjects(childObjects);
-            nucleus = CreateChildObject(transform, "Nucleus");
-            electron = CreateChildObject(transform, "Electrons");
-            protons = CreateChildObject(nucleus.transform, "Protons");
-            neutrons = CreateChildObject(nucleus.transform, "Neutrons");
-
-            CreateChildObjects(atom.atomStatus.numberOfElectrons, protons.transform, "Proton");
-            CreateChildObjects(atom.atomStatus.numberOfElectrons, neutrons.transform, "neutron");
-
-            CreateChildObjects(atom.atomStatus.numberOfElectrons, electron.transform, "Electron");
+            GameObject child = new GameObject(name);
+            child.transform.SetParent(parent, false);
+            childObjects.Add(child);
+            children.Add(child);
         }
-#else
-        // In play mode, directly clear and create child objects
-        ClearChildObjects(childObjects);
-        CreateChildObjects(atom.startData.numberOfNeutrons);
-#endif
+        return children;
     }
 
-    private void CreateChildObjects(int numberOfObjects, Transform parent, string name)
+    private GameObject CreateChildObject(string name, Transform parent)
     {
-        for (int i = 0; i < numberOfObjects; i++)
+        GameObject child = new GameObject(name);
+        child.transform.SetParent(parent, false);
+        childObjects.Add(child);
+        return child;
+    }
+
+    private void ClearChildObjects()
+    {
+        List<Transform> children = new List<Transform>();
+
+        foreach (Transform child in transform)
         {
-            GameObject newChild = new GameObject(name);
-            // Customize newChild properties or behavior if needed
-            childObjects.Add(newChild);
-            newChild.transform.SetParent(parent, false);
+            children.Add(child);
         }
-    }
 
-    private GameObject CreateChildObject(Transform parent, string name)
-    {
-        GameObject newChild = new GameObject(name);
-        // Customize newChild properties or behavior if needed
-        childObjects.Add(newChild);
-        newChild.transform.SetParent(parent, false);
-        return newChild;
-    }
-
-    private void ClearChildObjects(List<GameObject> objects)
-    {
-        foreach (GameObject obj in objects)
+        foreach (Transform child in children)
         {
-            if (obj != null)
+            if (child != null)
             {
 #if UNITY_EDITOR
-                // In edit mode, use DestroyImmediate to destroy objects
-                DestroyImmediate(obj);
-#else
-                // In play mode, use Destroy to destroy objects
-                Destroy(obj);
+                if (!Application.isPlaying)
+                {
+                    DestroyImmediate(child.gameObject);
+                }
+                else
 #endif
+                {
+                    Destroy(child.gameObject);
+                }
             }
         }
-        objects.Clear();
+
+        childObjects.Clear();
     }
+
+#if UNITY_EDITOR
+    [CustomEditor(typeof(Visualiser))]
+    public class VisualiserEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+
+            Visualiser visualiser = (Visualiser)target;
+
+            if (GUILayout.Button("Update Atom Visualisation"))
+            {
+                visualiser.UpdateChildObjects();
+            }
+        }
+    }
+#endif
 }

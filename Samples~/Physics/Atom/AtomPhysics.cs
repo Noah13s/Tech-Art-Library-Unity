@@ -113,20 +113,6 @@ public class AtomPhysics : MonoBehaviour
     {
         atomStatus = atomStartData;
 
-        // Ensure the number of electrons is correct based on the charge state
-        switch (atomStatus.chargeState)
-        {
-            case ChargeState.Neutral:
-                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber;
-                break;
-            case ChargeState.Positive:
-                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber - 1; // Example for single positive charge
-                break;
-            case ChargeState.Negative:
-                atomStatus.numberOfElectrons = atomStatus.nucleus.atomicNumber + 1; // Example for single negative charge
-                break;
-        }
-
         atomStartData.nucleus.massNumber = atomStartData.nucleus.neutronNumber + atomStartData.nucleus.atomicNumber;
 
         // Ensure decay time does not exceed half-life
