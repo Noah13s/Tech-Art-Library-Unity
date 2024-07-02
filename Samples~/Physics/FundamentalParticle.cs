@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using static FundamentalParticle;
+using static UnityEngine.GraphicsBuffer;
 
 public class FundamentalParticle : MonoBehaviour
 {
+
     [Serializable]
     public enum Fermion
     {
@@ -64,7 +67,12 @@ public class FundamentalParticle : MonoBehaviour
         Boson,
         Anyon
     }
+    [ReadOnly]
+    public string particleName;
+
     public FundatmentalType type;
+
+    public string Spin;
 
     [EnumConditionalVisibility("type", (int)FundatmentalType.Fermion)]
     public Fermion fermion;
@@ -76,9 +84,7 @@ public class FundamentalParticle : MonoBehaviour
     [EnumConditionalVisibility("boson", (int)Boson.Gauge)]
     public Gauge gauge;
 
-    [EnumConditionalVisibility("type", (int)FundatmentalType.Fermion)]
-    [EnumConditionalVisibility("fermion", (int)Fermion.Quarks)]
-    public QuarkProperties quarkProperties;
+    public QuarkProperties[] quarkProperties;
     // Start is called before the first frame update
     void Start()
     {
@@ -90,4 +96,48 @@ public class FundamentalParticle : MonoBehaviour
     {
         
     }
+
+    // Custom editor class within the same script
+#if UNITY_EDITOR
+    [CustomEditor(typeof(FundamentalParticle))]
+    public class FundamentalParticleEditor : Editor
+    {
+        SerializedProperty typeProperty;
+        SerializedProperty fermionProperty;
+        SerializedProperty quarkPropertiesProperty;
+
+        void OnEnable()
+        {
+            typeProperty = serializedObject.FindProperty("type");
+            fermionProperty = serializedObject.FindProperty("fermion");
+            quarkPropertiesProperty = serializedObject.FindProperty("quarkProperties");
+        }
+
+        public override void OnInspectorGUI()
+        {
+            // Update the serialized object's representation
+            serializedObject.Update();
+
+            // Draw all default inspector fields except for quarkProperties
+            DrawPropertiesExcluding(serializedObject, "quarkProperties");
+
+            // Conditionally show quarkProperties based on type and fermion
+            FundamentalParticle.FundatmentalType selectedType = (FundamentalParticle.FundatmentalType)typeProperty.enumValueIndex;
+            FundamentalParticle.Fermion selectedFermion = (FundamentalParticle.Fermion)fermionProperty.enumValueIndex;
+
+            if (selectedType == FundamentalParticle.FundatmentalType.Fermion &&
+                selectedFermion == FundamentalParticle.Fermion.Quarks)
+            {
+                EditorGUILayout.PropertyField(quarkPropertiesProperty, true);  // Show the quarkProperties array
+            }
+            else if (selectedType == FundamentalParticle.FundatmentalType.Anyon)
+            {
+                EditorGUILayout.PropertyField(quarkPropertiesProperty, true);  // Show the quarkProperties array for Anyon type
+            }
+
+            // Apply any changes to the serializedObject
+            serializedObject.ApplyModifiedProperties();
+        }
+    }
+#endif
 }

@@ -41,14 +41,31 @@ using UnityEngine.Events;
         [Tooltip("")]
         public Nucleus nucleus;
 
+        [MinMax(min:0)]
         [SerializeField]
         [Tooltip("When the charge state of an atom is neutral(ground) then the number of electrons equals the number of protons (atomic number)")]
         public int numberOfElectrons;
+
+
+        [Serializable]
+        public enum Orbitals
+        {
+            sOrbital = 0,
+            pOrbital,
+            dOrbital,
+            fOrbital
+        }
+
+        [SerializeField]
+        [Tooltip("These orbitals define the probability of finding an electron at a particular location. There are different types of orbitals with varying shapes and energies, and the specific type of orbital an electron occupies influences its energy level and behavior.")]
+
+        public Orbitals orbitals;
 
         [SerializeField]
         [Tooltip("Charge state of the atom neutral='ground', positive='cation' and negative='anion'")]
         public ChargeState chargeState;
 
+        [Header("Decay")]
         [SerializeField]
         [Tooltip("Disregard decay of atom")]
         public bool disregardDecay;
@@ -59,16 +76,18 @@ using UnityEngine.Events;
         [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
         [Tooltip("Half decay life time of the atom")]
+        [MinMax(min:0)]
         public float halfLife;
-
+        
         [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
         [Tooltip("Elapsed decay time")]
+        [MinMax(min:0)]
         public float decayTime;
 
-
+        [Header("")]
         [SerializeField]
-        [Tooltip("KineticEnergy of the atom in Joules which is perceived as heat")]
+        [Tooltip("Kinetic energy of the atom in Joules which is perceived as heat")]
         public float kineticEnergy;
 
         // New field to store the start time of the countdown
@@ -76,7 +95,7 @@ using UnityEngine.Events;
         public float startTime;
     }
 [ExecuteAlways]
-public class AtomPhysics : MonoBehaviour
+public class Atom : MonoBehaviour
 {
     [SerializeField]
     private AtomData atomStartData;
@@ -158,26 +177,37 @@ public class AtomPhysics : MonoBehaviour
 
     // Custom editor class within the same script
 #if UNITY_EDITOR
-    [CustomEditor(typeof(AtomPhysics))]
+    [CustomEditor(typeof(Atom))]
     public class MyComponentEditor : Editor
     {
+        SerializedProperty disregardDecayProperty;
+        SerializedProperty testListProperty;
+
+        void OnEnable()
+        {
+            disregardDecayProperty = serializedObject.FindProperty("atomStartData.disregardDecay");
+            testListProperty = serializedObject.FindProperty("atomStartData.test");
+        }
+
         public override void OnInspectorGUI()
         {
-            EditorGUILayout.LabelField("Atom Data", EditorStyles.boldLabel);
-            // Draw the default inspector
+            // Update the serialized object's representation
+            serializedObject.Update();
+
             DrawDefaultInspector();
 
+            // Apply any changes to the serializedObject
+            serializedObject.ApplyModifiedProperties();
 
             // Get a reference to the target object
-            AtomPhysics myComponent = (AtomPhysics)target;
+            Atom myComponent = (Atom)target;
 
-            // Add a button and handle its click event
+            // Add additional buttons or functionality as needed
             if (GUILayout.Button("Check settings validity"))
             {
                 myComponent.CheckAtomValidity();
             }
 
-            // Add a button and handle its click event
             if (GUILayout.Button("Reset decay time"))
             {
                 myComponent.ResetDecayTime();

@@ -8,15 +8,15 @@ using static UnityEditor.Rendering.InspectorCurveEditor;
 using UnityEditor;
 #endif
 
-[RequireComponent(typeof(AtomPhysics))]
+[RequireComponent(typeof(Atom))]
 public class Visualiser : MonoBehaviour
 {
-    private AtomPhysics atom;
+    private Atom atom;
     private List<GameObject> childObjects = new List<GameObject>();
 
     private void Init()
     {
-        atom = GetComponent<AtomPhysics>();
+        atom = GetComponent<Atom>();
     }
 
     private void OnEnable()
@@ -38,14 +38,74 @@ public class Visualiser : MonoBehaviour
             foreach (var proton in CreateChildObjects(atom.atomStatus.nucleus.atomicNumber, protons.transform, "Proton"))
             {
                 var protonParticle = proton.AddComponent<FundamentalParticle>();
+                protonParticle.particleName = "Hadron (baryon)";
+                protonParticle.type = FundamentalParticle.FundatmentalType.Fermion;
+                protonParticle.Spin = "1 / 2";
+                protonParticle.fermion = FundamentalParticle.Fermion.Quarks;
+                // Initialize quarkProperties array with one element
+                protonParticle.quarkProperties = new FundamentalParticle.QuarkProperties[3];
+
+                // Assign values to the single element in quarkProperties
+                protonParticle.quarkProperties[0] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.UpQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Positive2Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Red
+                };
+                // Assign values to the single element in quarkProperties
+                protonParticle.quarkProperties[1] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.UpQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Positive2Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Green
+                };
+                // Assign values to the single element in quarkProperties
+                protonParticle.quarkProperties[2] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.DownQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Negative1Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Blue
+                };
             };
             foreach (var neutron in CreateChildObjects(atom.atomStatus.nucleus.neutronNumber, neutrons.transform, "Neutron"))
             {
                 var neutronParticle = neutron.AddComponent<FundamentalParticle>();
+                neutronParticle.particleName = "Hadron (baryon)";
+                neutronParticle.type = FundamentalParticle.FundatmentalType.Fermion;
+                neutronParticle.Spin = "1 / 2";
+                neutronParticle.fermion = FundamentalParticle.Fermion.Quarks;
+                // Initialize quarkProperties array with one element
+                neutronParticle.quarkProperties = new FundamentalParticle.QuarkProperties[3];
+
+                // Assign values to the single element in quarkProperties
+                neutronParticle.quarkProperties[0] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.DownQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Negative1Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Red
+                };
+                // Assign values to the single element in quarkProperties
+                neutronParticle.quarkProperties[1] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.DownQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Negative1Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Green
+                };
+                // Assign values to the single element in quarkProperties
+                neutronParticle.quarkProperties[2] = new FundamentalParticle.QuarkProperties
+                {
+                    quark = FundamentalParticle.Quark.UpQuark,
+                    quarkCharge = FundamentalParticle.QuarkCharge.Positive2Over3e,
+                    quarkColor = FundamentalParticle.QuarkColor.Blue
+                };
             };
             foreach (GameObject electron in CreateChildObjects(atom.atomStatus.numberOfElectrons, electrons.transform, "Electron"))
             {
                 var electronParticle = electron.AddComponent<FundamentalParticle>();
+                electronParticle.particleName = "Electron";
+                electronParticle.type = FundamentalParticle.FundatmentalType.Fermion;
+                electronParticle.fermion = FundamentalParticle.Fermion.Lepton;
+                electronParticle.Spin = "1 / 2";
             };
         }
     }

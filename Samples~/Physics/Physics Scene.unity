@@ -122,7 +122,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &145131000
+--- !u!1 &98485625
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,8 +130,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 145131001}
-  - component: {fileID: 145131002}
+  - component: {fileID: 98485626}
+  - component: {fileID: 98485627}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -139,41 +139,130 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &145131001
+--- !u!4 &98485626
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 145131000}
+  m_GameObject: {fileID: 98485625}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &145131002
+--- !u!114 &98485627
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 145131000}
+  m_GameObject: {fileID: 98485625}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &122375474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 122375475}
+  m_Layer: 0
+  m_Name: Electrons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &122375475
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 122375474}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 296769013}
+  - {fileID: 1103990794}
+  - {fileID: 1843461871}
+  - {fileID: 1008033560}
+  - {fileID: 850153525}
+  - {fileID: 768621098}
+  m_Father: {fileID: 1719228713}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &156579821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 156579822}
+  m_Layer: 0
+  m_Name: Protons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &156579822
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156579821}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1026904087}
+  - {fileID: 1272950139}
+  - {fileID: 181308198}
+  - {fileID: 263683178}
+  - {fileID: 706445552}
+  - {fileID: 439054178}
+  - {fileID: 1772984865}
+  - {fileID: 1741183030}
+  - {fileID: 1050793000}
+  - {fileID: 98485626}
+  - {fileID: 554040794}
+  - {fileID: 657445886}
+  - {fileID: 1441645857}
+  m_Father: {fileID: 2000421442}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &171164396
 GameObject:
   m_ObjectHideFlags: 0
@@ -266,7 +355,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &228378323
+--- !u!1 &181308197
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -274,60 +363,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 228378324}
-  - component: {fileID: 228378325}
-  m_Layer: 0
-  m_Name: Neutron
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &228378324
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 228378323}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 866411739}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &228378325
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 228378323}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &360964421
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 360964422}
-  - component: {fileID: 360964423}
+  - component: {fileID: 181308198}
+  - component: {fileID: 181308199}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -335,42 +372,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &360964422
+--- !u!4 &181308198
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 360964421}
+  m_GameObject: {fileID: 181308197}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &360964423
+--- !u!114 &181308199
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 360964421}
+  m_GameObject: {fileID: 181308197}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
---- !u!1 &386873812
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &245713747
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -378,215 +423,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 386873813}
-  - component: {fileID: 386873814}
-  m_Layer: 0
-  m_Name: Electron
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &386873813
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386873812}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1540720674}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &386873814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386873812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &440424036
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 440424037}
-  - component: {fileID: 440424038}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &440424037
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 440424036}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &440424038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 440424036}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &651593291
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 651593292}
-  - component: {fileID: 651593293}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &651593292
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 651593291}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &651593293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 651593291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &749412606
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 749412607}
-  - component: {fileID: 749412608}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &749412607
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 749412606}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &749412608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 749412606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &866411738
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 866411739}
+  - component: {fileID: 245713748}
   m_Layer: 0
   m_Name: Neutrons
   m_TagString: Untagged
@@ -594,27 +431,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &866411739
+--- !u!4 &245713748
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 866411738}
+  m_GameObject: {fileID: 245713747}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1283431280}
-  - {fileID: 2055193538}
-  - {fileID: 228378324}
-  - {fileID: 1672712937}
-  - {fileID: 1161720081}
-  m_Father: {fileID: 1652416464}
+  - {fileID: 1398451928}
+  - {fileID: 1079401693}
+  - {fileID: 1840694460}
+  m_Father: {fileID: 2000421442}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &876650617
+--- !u!1 &263683177
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -622,8 +457,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 876650618}
-  - component: {fileID: 876650619}
+  - component: {fileID: 263683178}
+  - component: {fileID: 263683179}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -631,42 +466,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &876650618
+--- !u!4 &263683178
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 876650617}
+  m_GameObject: {fileID: 263683177}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &876650619
+--- !u!114 &263683179
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 876650617}
+  m_GameObject: {fileID: 263683177}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
---- !u!1 &1161720080
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &296769012
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -674,60 +517,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1161720081}
-  - component: {fileID: 1161720082}
-  m_Layer: 0
-  m_Name: Neutron
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1161720081
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161720080}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 866411739}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1161720082
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161720080}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &1170962396
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1170962397}
-  - component: {fileID: 1170962398}
+  - component: {fileID: 296769013}
+  - component: {fileID: 296769014}
   m_Layer: 0
   m_Name: Electron
   m_TagString: Untagged
@@ -735,42 +526,41 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1170962397
+--- !u!4 &296769013
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1170962396}
+  m_GameObject: {fileID: 296769012}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1540720674}
+  m_Father: {fileID: 122375475}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1170962398
+--- !u!114 &296769014
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1170962396}
+  m_GameObject: {fileID: 296769012}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Electron
   type: 0
-  fermion: 0
+  Spin: 1 / 2
+  fermion: 1
   boson: 0
   gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &1283431279
+  quarkProperties: []
+--- !u!1 &439054177
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -778,8 +568,521 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1283431280}
-  - component: {fileID: 1283431281}
+  - component: {fileID: 439054178}
+  - component: {fileID: 439054179}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &439054178
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439054177}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &439054179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439054177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &554040793
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 554040794}
+  - component: {fileID: 554040795}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &554040794
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554040793}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &554040795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554040793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &657445885
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 657445886}
+  - component: {fileID: 657445887}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &657445886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657445885}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &657445887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657445885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &706445551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 706445552}
+  - component: {fileID: 706445553}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &706445552
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706445551}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &706445553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 706445551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &768621097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 768621098}
+  - component: {fileID: 768621099}
+  m_Layer: 0
+  m_Name: Electron
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &768621098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768621097}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 122375475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &768621099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768621097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Electron
+  type: 0
+  Spin: 1 / 2
+  fermion: 1
+  boson: 0
+  gauge: 0
+  quarkProperties: []
+--- !u!1 &850153524
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 850153525}
+  - component: {fileID: 850153526}
+  m_Layer: 0
+  m_Name: Electron
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &850153525
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850153524}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 122375475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &850153526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850153524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Electron
+  type: 0
+  Spin: 1 / 2
+  fermion: 1
+  boson: 0
+  gauge: 0
+  quarkProperties: []
+--- !u!1 &1008033559
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1008033560}
+  - component: {fileID: 1008033561}
+  m_Layer: 0
+  m_Name: Electron
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1008033560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008033559}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 122375475}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1008033561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1008033559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Electron
+  type: 0
+  Spin: 1 / 2
+  fermion: 1
+  boson: 0
+  gauge: 0
+  quarkProperties: []
+--- !u!1 &1026904086
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1026904087}
+  - component: {fileID: 1026904088}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1026904087
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1026904086}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1026904088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1026904086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &1050792999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1050793000}
+  - component: {fileID: 1050793001}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1050793000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050792999}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1050793001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050792999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &1079401692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1079401693}
+  - component: {fileID: 1079401694}
   m_Layer: 0
   m_Name: Neutron
   m_TagString: Untagged
@@ -787,42 +1090,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1283431280
+--- !u!4 &1079401693
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1283431279}
+  m_GameObject: {fileID: 1079401692}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 866411739}
+  m_Father: {fileID: 245713748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1283431281
+--- !u!114 &1079401694
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1283431279}
+  m_GameObject: {fileID: 1079401692}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
-    quarkCharge: 0
+  - quark: 1
+    quarkCharge: 1
     quarkColor: 0
---- !u!1 &1393553087
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 1
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 2
+--- !u!1 &1103990793
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -830,43 +1141,50 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1393553088}
+  - component: {fileID: 1103990794}
+  - component: {fileID: 1103990795}
   m_Layer: 0
-  m_Name: Protons
+  m_Name: Electron
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1393553088
+--- !u!4 &1103990794
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1393553087}
+  m_GameObject: {fileID: 1103990793}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 651593292}
-  - {fileID: 360964422}
-  - {fileID: 876650618}
-  - {fileID: 749412607}
-  - {fileID: 1757117358}
-  - {fileID: 1410248082}
-  - {fileID: 440424037}
-  - {fileID: 1438786263}
-  - {fileID: 145131001}
-  - {fileID: 2080788678}
-  - {fileID: 1813277482}
-  - {fileID: 1543517990}
-  - {fileID: 1483048484}
-  m_Father: {fileID: 1652416464}
+  m_Children: []
+  m_Father: {fileID: 122375475}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1410248081
+--- !u!114 &1103990795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1103990793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Electron
+  type: 0
+  Spin: 1 / 2
+  fermion: 1
+  boson: 0
+  gauge: 0
+  quarkProperties: []
+--- !u!1 &1272950138
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -874,8 +1192,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1410248082}
-  - component: {fileID: 1410248083}
+  - component: {fileID: 1272950139}
+  - component: {fileID: 1272950140}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -883,94 +1201,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1410248082
+--- !u!4 &1272950139
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1410248081}
+  m_GameObject: {fileID: 1272950138}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1410248083
+--- !u!114 &1272950140
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1410248081}
+  m_GameObject: {fileID: 1272950138}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
---- !u!1 &1438786262
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1438786263}
-  - component: {fileID: 1438786264}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1438786263
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438786262}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1438786264
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438786262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
-    quarkColor: 0
---- !u!1 &1483048483
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &1398451927
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -978,179 +1252,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1483048484}
-  - component: {fileID: 1483048485}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1483048484
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1483048483}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1483048485
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1483048483}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &1540720673
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1540720674}
-  m_Layer: 0
-  m_Name: Electrons
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1540720674
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1540720673}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 386873813}
-  - {fileID: 2070657056}
-  - {fileID: 1170962397}
-  m_Father: {fileID: 1719228713}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1543517989
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1543517990}
-  - component: {fileID: 1543517991}
-  m_Layer: 0
-  m_Name: Proton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1543517990
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1543517989}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1543517991
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1543517989}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &1652416463
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1652416464}
-  m_Layer: 0
-  m_Name: Nucleus
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1652416464
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1652416463}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1393553088}
-  - {fileID: 866411739}
-  m_Father: {fileID: 1719228713}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1672712936
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1672712937}
-  - component: {fileID: 1672712938}
+  - component: {fileID: 1398451928}
+  - component: {fileID: 1398451929}
   m_Layer: 0
   m_Name: Neutron
   m_TagString: Untagged
@@ -1158,41 +1261,170 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1672712937
+--- !u!4 &1398451928
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1672712936}
+  m_GameObject: {fileID: 1398451927}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 866411739}
+  m_Father: {fileID: 245713748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1672712938
+--- !u!114 &1398451929
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1672712936}
+  m_GameObject: {fileID: 1398451927}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 0
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 1
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 2
+--- !u!1 &1441645856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1441645857}
+  - component: {fileID: 1441645858}
+  m_Layer: 0
+  m_Name: Proton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1441645857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441645856}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 156579822}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1441645858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1441645856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
+  type: 0
+  Spin: 1 / 2
+  fermion: 0
+  boson: 0
+  gauge: 0
+  quarkProperties:
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &1560759138
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1560759140}
+  - component: {fileID: 1560759139}
+  m_Layer: 0
+  m_Name: Molecule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1560759139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1560759138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86682ba505e998847a29346a84eec173, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  composition:
+  - name: 
+    description: 
+    atomCount: 11
+    atomProperties:
+      nucleus:
+        atomicNumber: 0
+        neutronNumber: 0
+        massNumber: 0
+      numberOfElectrons: 0
+      orbitals: 0
+      chargeState: 0
+      disregardDecay: 0
+      decayMode: 0
+      halfLife: 0
+      decayTime: 0
+      kineticEnergy: 0
+--- !u!4 &1560759140
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1560759138}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -15.602174, y: 159.3979, z: -81.55535}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1719228711
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,28 +1458,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   atomStartData:
     nucleus:
-      atomicNumber: 13
-      neutronNumber: 5
-      massNumber: 18
-    numberOfElectrons: 3
+      atomicNumber: 17
+      neutronNumber: 3
+      massNumber: 20
+    numberOfElectrons: 6
+    orbitals: 0
     chargeState: 0
     disregardDecay: 1
     decayMode: 0
     halfLife: 0
     decayTime: 0
-    kineticEnergy: 0
+    kineticEnergy: 3.9
   atomStatus:
     nucleus:
-      atomicNumber: 13
-      neutronNumber: 5
-      massNumber: 18
-    numberOfElectrons: 3
+      atomicNumber: 17
+      neutronNumber: 3
+      massNumber: 21
+    numberOfElectrons: 6
+    orbitals: 0
     chargeState: 0
     disregardDecay: 1
     decayMode: 0
     halfLife: 0
     decayTime: 0
-    kineticEnergy: 0
+    kineticEnergy: 3.9
 --- !u!4 &1719228713
 Transform:
   m_ObjectHideFlags: 0
@@ -1261,8 +1495,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1652416464}
-  - {fileID: 1540720674}
+  - {fileID: 2000421442}
+  - {fileID: 122375475}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1719228714
@@ -1277,7 +1511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f67bed59d52d103478a9031d173e6f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoIdentify: 0
+  autoIdentify: 1
   csvFile: {fileID: 4900000, guid: 9587296c85dbbc245af2e53ac8a02bf6, type: 3}
 --- !u!114 &1719228715
 MonoBehaviour:
@@ -1291,7 +1525,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95fdec13ed669e24dba8cfd1571bc24c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1757117357
+--- !u!1 &1741183029
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1299,8 +1533,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1757117358}
-  - component: {fileID: 1757117359}
+  - component: {fileID: 1741183030}
+  - component: {fileID: 1741183031}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -1308,41 +1542,49 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1757117358
+--- !u!4 &1741183030
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1757117357}
+  m_GameObject: {fileID: 1741183029}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1757117359
+--- !u!114 &1741183031
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1757117357}
+  m_GameObject: {fileID: 1741183029}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
 --- !u!1 &1768676981
 GameObject:
   m_ObjectHideFlags: 0
@@ -1450,7 +1692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1813277481
+--- !u!1 &1772984864
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1458,8 +1700,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1813277482}
-  - component: {fileID: 1813277483}
+  - component: {fileID: 1772984865}
+  - component: {fileID: 1772984866}
   m_Layer: 0
   m_Name: Proton
   m_TagString: Untagged
@@ -1467,42 +1709,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1813277482
+--- !u!4 &1772984865
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1813277481}
+  m_GameObject: {fileID: 1772984864}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Father: {fileID: 156579822}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1813277483
+--- !u!114 &1772984866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1813277481}
+  m_GameObject: {fileID: 1772984864}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
+  - quark: 0
     quarkCharge: 0
     quarkColor: 0
---- !u!1 &2055193537
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 1
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 2
+--- !u!1 &1840694459
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1510,8 +1760,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2055193538}
-  - component: {fileID: 2055193539}
+  - component: {fileID: 1840694460}
+  - component: {fileID: 1840694461}
   m_Layer: 0
   m_Name: Neutron
   m_TagString: Untagged
@@ -1519,42 +1769,50 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2055193538
+--- !u!4 &1840694460
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2055193537}
+  m_GameObject: {fileID: 1840694459}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 866411739}
+  m_Father: {fileID: 245713748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2055193539
+--- !u!114 &1840694461
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2055193537}
+  m_GameObject: {fileID: 1840694459}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Hadron (baryon)
   type: 0
+  Spin: 1 / 2
   fermion: 0
   boson: 0
   gauge: 0
   quarkProperties:
-    quark: 0
-    quarkCharge: 0
+  - quark: 1
+    quarkCharge: 1
     quarkColor: 0
---- !u!1 &2070657055
+  - quark: 1
+    quarkCharge: 1
+    quarkColor: 1
+  - quark: 0
+    quarkCharge: 0
+    quarkColor: 2
+--- !u!1 &1843461870
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1562,8 +1820,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2070657056}
-  - component: {fileID: 2070657057}
+  - component: {fileID: 1843461871}
+  - component: {fileID: 1843461872}
   m_Layer: 0
   m_Name: Electron
   m_TagString: Untagged
@@ -1571,42 +1829,41 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2070657056
+--- !u!4 &1843461871
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2070657055}
+  m_GameObject: {fileID: 1843461870}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1540720674}
+  m_Father: {fileID: 122375475}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2070657057
+--- !u!114 &1843461872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2070657055}
+  m_GameObject: {fileID: 1843461870}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  particleName: Electron
   type: 0
-  fermion: 0
+  Spin: 1 / 2
+  fermion: 1
   boson: 0
   gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
---- !u!1 &2080788677
+  quarkProperties: []
+--- !u!1 &2000421441
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1614,50 +1871,31 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2080788678}
-  - component: {fileID: 2080788679}
+  - component: {fileID: 2000421442}
   m_Layer: 0
-  m_Name: Proton
+  m_Name: Nucleus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2080788678
+--- !u!4 &2000421442
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2080788677}
+  m_GameObject: {fileID: 2000421441}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1393553088}
+  m_Children:
+  - {fileID: 156579822}
+  - {fileID: 245713748}
+  m_Father: {fileID: 1719228713}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2080788679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2080788677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1f16372bf4ff3047b0236f1738f5be8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 0
-  fermion: 0
-  boson: 0
-  gauge: 0
-  quarkProperties:
-    quark: 0
-    quarkCharge: 0
-    quarkColor: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1665,3 +1903,4 @@ SceneRoots:
   - {fileID: 171164399}
   - {fileID: 1768676983}
   - {fileID: 1719228713}
+  - {fileID: 1560759140}

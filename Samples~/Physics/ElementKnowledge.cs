@@ -8,12 +8,12 @@ using UnityEditor;
 using UnityEngine;
 using System.Text;
 
-[RequireComponent(typeof(AtomPhysics))]
+[RequireComponent(typeof(Atom))]
 public class ElementKnowledge : MonoBehaviour
 {
     public bool autoIdentify;
     public TextAsset csvFile;  // CSV file to be imported
-    private AtomPhysics atom;
+    private Atom atom;
     private List<ElementAsset> elements;
 
     private void OnEnable()
@@ -43,7 +43,7 @@ public class ElementKnowledge : MonoBehaviour
 
     private void Init()
     {
-        atom = GetComponent<AtomPhysics>();
+        atom = GetComponent<Atom>();
         LoadElementsFromCSV();
     }
 
