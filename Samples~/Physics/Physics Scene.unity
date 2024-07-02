@@ -1437,6 +1437,7 @@ GameObject:
   - component: {fileID: 1719228712}
   - component: {fileID: 1719228714}
   - component: {fileID: 1719228715}
+  - component: {fileID: 1719228716}
   m_Layer: 0
   m_Name: Atom
   m_TagString: Untagged
@@ -1468,12 +1469,12 @@ MonoBehaviour:
     decayMode: 0
     halfLife: 0
     decayTime: 0
-    kineticEnergy: 3.9
+    kineticEnergy: 0
   atomStatus:
     nucleus:
       atomicNumber: 17
       neutronNumber: 3
-      massNumber: 21
+      massNumber: 20
     numberOfElectrons: 6
     orbitals: 0
     chargeState: 0
@@ -1481,7 +1482,7 @@ MonoBehaviour:
     decayMode: 0
     halfLife: 0
     decayTime: 0
-    kineticEnergy: 3.9
+    kineticEnergy: 0
 --- !u!4 &1719228713
 Transform:
   m_ObjectHideFlags: 0
@@ -1511,7 +1512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f67bed59d52d103478a9031d173e6f74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  autoIdentify: 1
+  autoIdentify: 0
   csvFile: {fileID: 4900000, guid: 9587296c85dbbc245af2e53ac8a02bf6, type: 3}
 --- !u!114 &1719228715
 MonoBehaviour:
@@ -1523,6 +1524,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95fdec13ed669e24dba8cfd1571bc24c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1719228716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719228711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fffc89863da013c45a6e255e005afc07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1741183029

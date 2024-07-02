@@ -156,12 +156,14 @@ public class ElementKnowledge : MonoBehaviour
         }
     }
 
-    private void CheckStability()
+    private bool CheckStability()
     {
+        bool isStable = false;
+
         if (elements == null || elements.Count == 0)
         {
             Debug.LogError("Element list is empty or not loaded");
-            return;
+            return isStable;
         }
 
         int atomicNumber = atom.atomStatus.nucleus.atomicNumber;
@@ -174,16 +176,19 @@ public class ElementKnowledge : MonoBehaviour
                 if (element.stableIsotopes.Contains(neutronNumber))
                 {
                     Debug.Log($"The isotope of {element.elementName} with {neutronNumber} neutrons is stable.");
+                    isStable = true;
                 }
                 else
                 {
                     Debug.Log($"The isotope of {element.elementName} with {neutronNumber} neutrons is not stable.");
+                    isStable = false;
                 }
-                return;
+                return isStable;
             }
         }
 
         Debug.LogError($"No element found with atomic number {atomicNumber}");
+        return isStable;
     }
 
     // Custom editor class within the same script
