@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -37,3 +38,4 @@ public class StyledStringDrawer : PropertyDrawer
         return EditorGUIUtility.singleLineHeight;
     }
 }
+#endif
