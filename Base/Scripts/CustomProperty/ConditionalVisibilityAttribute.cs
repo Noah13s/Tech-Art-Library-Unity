@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -73,3 +74,4 @@ public class ConditionalVisibilityDrawer : PropertyDrawer
         return property.serializedObject.FindProperty(path);
     }
 }
+#endif

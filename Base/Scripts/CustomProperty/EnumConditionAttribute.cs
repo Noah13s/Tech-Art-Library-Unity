@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using UnityEngine;
 using UnityEditor;
@@ -111,3 +112,4 @@ public class EnumConditionalVisibilityDrawer : PropertyDrawer
         return enumProp;
     }
 }
+#endif
