@@ -6,11 +6,16 @@ using UnityEditor;
 
 public class DynamicGridCubeGenerator : MonoBehaviour
 {
+    [StyledString(20, 1, 0, 0)]
+    public string test="Helloooooooooooooooooo";
+    public string bla;
     public Vector3 zoneSize = new Vector3(10f, 10f, 10f); // Size of the zone to subdivide
     public float cubeSize = 1.0f; // Size of each cube
 
+
     private void OnDrawGizmos()
     {
+        test = bla;
         Vector3 start = transform.position - zoneSize / 2f;
 
         int gridSizeX = Mathf.CeilToInt(zoneSize.x / cubeSize);
