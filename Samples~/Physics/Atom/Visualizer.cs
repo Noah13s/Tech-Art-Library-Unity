@@ -11,8 +11,14 @@ using UnityEditor;
 [RequireComponent(typeof(Atom))]
 public class Visualiser : MonoBehaviour
 {
+    public bool displayRepresentation=false;
     private Atom atom;
     private List<GameObject> childObjects = new List<GameObject>();
+
+    private void DisplayRepresentation(bool showOrHide)
+    {
+
+    }
 
     private void Init()
     {
@@ -102,6 +108,7 @@ public class Visualiser : MonoBehaviour
             foreach (GameObject electron in CreateChildObjects(atom.atomStatus.numberOfElectrons, electrons.transform, "Electron"))
             {
                 var electronParticle = electron.AddComponent<FundamentalParticle>();
+                electron.AddComponent<Electron>();
                 electronParticle.particleName = "Electron";
                 electronParticle.type = FundamentalParticle.FundatmentalType.Fermion;
                 electronParticle.fermion = FundamentalParticle.Fermion.Lepton;
@@ -126,6 +133,11 @@ public class Visualiser : MonoBehaviour
     private GameObject CreateChildObject(string name, Transform parent)
     {
         GameObject child = new GameObject(name);
+        if (displayRepresentation)
+        {
+            child.AddComponent<MeshFilter>();
+            child.AddComponent<MeshRenderer>();
+        }
         child.transform.SetParent(parent, false);
         childObjects.Add(child);
         return child;

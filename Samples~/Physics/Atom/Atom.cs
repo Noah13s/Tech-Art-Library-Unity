@@ -46,20 +46,42 @@ using UnityEngine.Events;
         [Tooltip("When the charge state of an atom is neutral(ground) then the number of electrons equals the number of protons (atomic number)")]
         public int numberOfElectrons;
 
-
         [Serializable]
         public enum Orbitals
         {
-            sOrbital = 0,
-            pOrbital,
-            dOrbital,
-            fOrbital
+            S1,
+            S2,
+            P1,
+            P2,
+            P3,
+            P4,
+            P5,
+            P6,
+            D1,
+            D2,
+            D3,
+            D4,
+            D5,
+            D6,
+            D7,
+            D8,
+            D9,
+            D10,
+            F1,
+            F2,
+            F3,
+            F4,
+            F5,
+            F6,
+            F7,
+            F8,
+            F9,
+            F10,
+            F11,
+            F12,
+            F13,
+            F14
         }
-
-        [SerializeField]
-        [Tooltip("These orbitals define the probability of finding an electron at a particular location. There are different types of orbitals with varying shapes and energies, and the specific type of orbital an electron occupies influences its energy level and behavior.")]
-
-        public Orbitals orbitals;
 
         [SerializeField]
         [Tooltip("Charge state of the atom neutral='ground', positive='cation' and negative='anion'")]
@@ -85,20 +107,22 @@ using UnityEngine.Events;
         [MinMax(min:0)]
         public float decayTime;
 
-        [Header("")]
         [SerializeField]
-        [Tooltip("Kinetic energy of the atom in Joules which is perceived as heat")]
-        public float kineticEnergy;
+        [Tooltip("Kinetic energy of the atom in electron volts (eV) which is perceived as heat")]
+        public float kineticEnergyInEV;
 
+        [SerializeField]
+        [Tooltip("Kinetic energy of the atom in joules (J) which is perceived as heat")]
+        public float kineticEnergyInJoules;
         // New field to store the start time of the countdown
         [NonSerialized]
-        public float startTime;
-    }
+            public float startTime;
+        }
 [ExecuteAlways]
 public class Atom : MonoBehaviour
 {
     [SerializeField]
-    private AtomData atomStartData;
+    public AtomData atomStartData;
     [ReadOnly]
     [SerializeField]
     public AtomData atomStatus;
@@ -110,7 +134,6 @@ public class Atom : MonoBehaviour
     void Start()
     {
         Setup();
-        StartCoroutine(CountDownDecayTime());
     }
 
     private void OnValidate()
@@ -140,29 +163,18 @@ public class Atom : MonoBehaviour
             atomStatus.decayTime = atomStatus.halfLife;
             atomStartData.decayTime = atomStartData.halfLife;
         }
-    }
 
-    // Coroutine to count down decay time
-    private IEnumerator CountDownDecayTime()
-    {
-        atomStatus.startTime = Time.time;
-
-        while (atomStatus.decayTime > 0)
+        // Ensure kinetic energy consistency
+        if (atomStartData.kineticEnergyInEV > 0)
         {
-            if (!atomStartData.disregardDecay && atomStatus.decayMode != AtomData.DecayMode.Stable)
-            {
-                // Calculate elapsed time in milliseconds
-                float elapsedTime = (Time.time - atomStatus.startTime) * 1000f;
-
-                // Calculate remaining time
-                atomStatus.decayTime = Mathf.Max(0, (int)(atomStartData.decayTime - elapsedTime));
-            }
-            yield return null;
+            atomStartData.kineticEnergyInJoules = atomStartData.kineticEnergyInEV * 1.602e-19f;
         }
-
-        // Handle decay completion (e.g., destroy object, apply effects)
-        Debug.Log("Decay completed!");
+        else if (atomStartData.kineticEnergyInJoules > 0)
+        {
+            atomStartData.kineticEnergyInEV = atomStartData.kineticEnergyInJoules / 1.602e-19f;
+        }
     }
+
 
     [ContextMenu("Check atom validity")]
     private void CheckAtomValidity()
@@ -173,6 +185,11 @@ public class Atom : MonoBehaviour
     private void ResetDecayTime()
     {
         atomStartData.decayTime = atomStartData.halfLife;
+    }
+
+    private void ResetNumberOfEletrons()
+    {
+        atomStartData.numberOfElectrons = atomStartData.nucleus.atomicNumber;
     }
 
     // Custom editor class within the same script
@@ -211,6 +228,11 @@ public class Atom : MonoBehaviour
             if (GUILayout.Button("Reset decay time"))
             {
                 myComponent.ResetDecayTime();
+            }
+
+            if (GUILayout.Button("Reset number of electrons"))
+            {
+                myComponent.ResetNumberOfEletrons();
             }
         }
     }
