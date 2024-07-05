@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Master_Scene_Manager : MonoBehaviour
 {
+    [StyledString(12,1,1,1)]
     [SerializeField]
     private string currentScene;
 
