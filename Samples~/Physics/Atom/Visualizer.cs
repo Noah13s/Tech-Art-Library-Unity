@@ -11,6 +11,7 @@ using UnityEditor;
 [RequireComponent(typeof(Atom))]
 public class Visualiser : MonoBehaviour
 {
+    public Mesh mesh;
     public bool displayRepresentation=false;
     private Atom atom;
     private List<GameObject> childObjects = new List<GameObject>();
@@ -135,7 +136,7 @@ public class Visualiser : MonoBehaviour
         GameObject child = new GameObject(name);
         if (displayRepresentation)
         {
-            child.AddComponent<MeshFilter>();
+            child.AddComponent<MeshFilter>().mesh = mesh;
             child.AddComponent<MeshRenderer>();
         }
         child.transform.SetParent(parent, false);
