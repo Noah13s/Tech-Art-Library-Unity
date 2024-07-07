@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class Master_Scene_Manager : MonoBehaviour
 {
+    #if UNITY_EDITOR
     [StyledString(12,1,1,1)]
+    #endif
     [SerializeField]
     private string currentScene;
 

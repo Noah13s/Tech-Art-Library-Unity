@@ -6,7 +6,9 @@ using UnityEditor;
 
 public class DynamicGridCubeGenerator : MonoBehaviour
 {
+    #if UNITY_EDITOR
     [StyledString(20, 1, 0, 0)]
+    #endif
     public string test="Helloooooooooooooooooo";
     public string bla;
     public Vector3 zoneSize = new Vector3(10f, 10f, 10f); // Size of the zone to subdivide
