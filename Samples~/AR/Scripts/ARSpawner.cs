@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class ARSpawner : MonoBehaviour
 {
-    public float scale=1f;
+    public float scale = 1f;
     public UnityEvent onSpawn;
     private ARPlayer player;
+    [NonSerialized]
+    public GameObject spawnedObject;
     private void Awake()
     {
         player = GetComponentInParent<ARPlayer>();
@@ -15,7 +18,8 @@ public class ARSpawner : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(player.camera.transform.position, player.camera.transform.forward, out hit))
         {
-            Instantiate(prefab, hit.point, new Quaternion()).transform.localScale = new Vector3(scale, scale, scale);
+            spawnedObject = Instantiate(prefab, hit.point, new Quaternion());
+            spawnedObject.transform.localScale = new Vector3(scale, scale, scale);
             onSpawn.Invoke();
         }
     }
