@@ -189,8 +189,15 @@ public class ARManipulator : MonoBehaviour
         Vector2 touchDelta = touchPosition - initialTouchPosition;
         if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers.Count == 1)
         {
-            // Move on X and Z axes
-            Vector3 newPosition = initialObjectPosition + new Vector3(touchDelta.x, 0, touchDelta.y) * 0.01f; // Adjust sensitivity
+            // Move on X and Z axes based on camera's forward vector
+            Vector3 forward = player.camera.transform.forward;
+            forward.y = 0; // Ignore vertical component
+            forward.Normalize();
+            Vector3 right = player.camera.transform.right;
+            right.y = 0; // Ignore vertical component
+            right.Normalize();
+
+            Vector3 newPosition = initialObjectPosition + (right * touchDelta.x + forward * touchDelta.y) * 0.01f; // Adjust sensitivity
             targetObject.transform.position = newPosition;
         }
         else if (UnityEngine.InputSystem.EnhancedTouch.Touch.activeFingers.Count == 2)
@@ -203,6 +210,7 @@ public class ARManipulator : MonoBehaviour
             targetObject.transform.position = newPosition;
         }
     }
+
 
     private void RotateObject(Vector2 touchPosition)
     {
