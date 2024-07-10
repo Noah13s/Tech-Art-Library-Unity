@@ -16,6 +16,9 @@ public class OrbitCamera : MonoBehaviour
     public float collisionOffset = 0.2f; // Offset for collision detection
     public bool RightClickMove = true; // Whether moving the camera by right-clicking is allowed
 
+    [NonSerialized]
+    public bool lockCamera = false; // Lock the camera movements
+
     private float currentRotationX = 0f;
     private float currentRotationY = 0f;
     private Vector3 targetPosition;
