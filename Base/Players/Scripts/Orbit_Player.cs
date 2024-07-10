@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class OrbitCamera : MonoBehaviour
@@ -5,10 +6,10 @@ public class OrbitCamera : MonoBehaviour
     public Transform target; // The target object to orbit around
     public Vector3 targetOffset; // Offset for the target position
     public float distance = 10f; // The distance from the target
-    public float sensitivityX = 2f; // Mouse X sensitivity
-    public float sensitivityY = 2f; // Mouse Y sensitivity
+    public float sensitivityX = 1f; // Mouse X sensitivity
+    public float sensitivityY = 1f; // Mouse Y sensitivity
     public bool allowScrolling = true; // Whether scrolling is allowed
-    public float scrollSpeed = 2f; // Scrollwheel sensitivity
+    public float scrollSpeed = 1f; // Scrollwheel sensitivity
     public bool showCursor = true; // Whether to show the cursor
     public float cameraLag = 5f; // Camera lag for target position
     public LayerMask collisionLayer; // Layer mask for collision detection
@@ -18,6 +19,25 @@ public class OrbitCamera : MonoBehaviour
     private float currentRotationX = 0f;
     private float currentRotationY = 0f;
     private Vector3 targetPosition;
+    private PCInputs controls;
+
+    private void Awake()
+    {
+        // Initialize the input controls
+        controls = new PCInputs();
+    }
+
+    private void OnEnable()
+    {
+        // Enable the input controls
+        controls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        // Disable the input controls
+        controls.Disable();
+    }
 
     void Initialize()
     {
@@ -41,18 +61,27 @@ public class OrbitCamera : MonoBehaviour
 
     void Update()
     {
-        if (RightClickMove && Input.GetMouseButton(1))
+        if (RightClickMove)
         {
-            // Rotate the camera based on mouse input
-            currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
-            currentRotationY -= Input.GetAxis("Mouse Y") * sensitivityY;
+            if (controls.Mouse.LeftButton.IsPressed())
+            {
+                // Rotate the camera based on mouse input            
+                currentRotationX += controls.Mouse.MouseXYAxis.ReadValue<Vector2>().x * sensitivityX;
+                currentRotationY -= controls.Mouse.MouseXYAxis.ReadValue<Vector2>().y * sensitivityY;
+                currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
+            }
+        } else
+        {
+            // Rotate the camera based on mouse input            
+            currentRotationX += controls.Mouse.MouseXYAxis.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= controls.Mouse.MouseXYAxis.ReadValue<Vector2>().y * sensitivityY;
             currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
         }
 
         // Zoom in and out using scrollwheel if scrolling is allowed
         if (allowScrolling)
         {
-            distance += Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
+            distance += controls.Mouse.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
             distance = Mathf.Clamp(distance, 1f, Mathf.Infinity); // Clamp distance
         }
 

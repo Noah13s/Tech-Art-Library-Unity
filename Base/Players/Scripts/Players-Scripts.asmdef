@@ -1,0 +1,17 @@
+{
+    "name": "Players-Assembly-Definition",
+    "rootNamespace": "",
+    "references": [
+        "GUID:55b31418decf7b54a8be8f3b67acd250",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
