@@ -60,11 +60,14 @@ public class OrbitCamera : MonoBehaviour
         Initialize();
         // Initialize target position
         targetPosition = target.position + targetOffset;
+
+        // Initialize looking direction 
+        currentRotationX = target.rotation.eulerAngles.y + 180;
     }
 
     void Update()
     {
-        if (RightClickMove)
+        if (RightClickMove && !lockCamera)
         {
             if (controls.Mouse.LeftButton.IsPressed())
             {
