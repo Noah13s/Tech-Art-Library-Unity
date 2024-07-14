@@ -29,7 +29,16 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
             ""id"": ""582292bb-1c2b-4e73-b48a-6b641e5831b7"",
             ""actions"": [
                 {
-                    ""name"": ""MouseXYAxis"",
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""e9b1ed90-a3d8-4da9-8ed9-dc862a4b893f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Delta"",
                     ""type"": ""Value"",
                     ""id"": ""bf849583-bbf3-4afc-bd86-39ff65c8b248"",
                     ""expectedControlType"": """",
@@ -73,7 +82,7 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""MouseXYAxis"",
+                    ""action"": ""Delta"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -109,6 +118,17 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
                     ""action"": ""RightButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""316c4fe7-2e50-4f85-8aab-cbc0b0775324"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -117,7 +137,8 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
 }");
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
-        m_Mouse_MouseXYAxis = m_Mouse.FindAction("MouseXYAxis", throwIfNotFound: true);
+        m_Mouse_Position = m_Mouse.FindAction("Position", throwIfNotFound: true);
+        m_Mouse_Delta = m_Mouse.FindAction("Delta", throwIfNotFound: true);
         m_Mouse_ScrollWheel = m_Mouse.FindAction("ScrollWheel", throwIfNotFound: true);
         m_Mouse_LeftButton = m_Mouse.FindAction("LeftButton", throwIfNotFound: true);
         m_Mouse_RightButton = m_Mouse.FindAction("RightButton", throwIfNotFound: true);
@@ -187,7 +208,8 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
     // Mouse
     private readonly InputActionMap m_Mouse;
     private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
-    private readonly InputAction m_Mouse_MouseXYAxis;
+    private readonly InputAction m_Mouse_Position;
+    private readonly InputAction m_Mouse_Delta;
     private readonly InputAction m_Mouse_ScrollWheel;
     private readonly InputAction m_Mouse_LeftButton;
     private readonly InputAction m_Mouse_RightButton;
@@ -195,7 +217,8 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
     {
         private @PCInputs m_Wrapper;
         public MouseActions(@PCInputs wrapper) { m_Wrapper = wrapper; }
-        public InputAction @MouseXYAxis => m_Wrapper.m_Mouse_MouseXYAxis;
+        public InputAction @Position => m_Wrapper.m_Mouse_Position;
+        public InputAction @Delta => m_Wrapper.m_Mouse_Delta;
         public InputAction @ScrollWheel => m_Wrapper.m_Mouse_ScrollWheel;
         public InputAction @LeftButton => m_Wrapper.m_Mouse_LeftButton;
         public InputAction @RightButton => m_Wrapper.m_Mouse_RightButton;
@@ -208,9 +231,12 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_MouseActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_MouseActionsCallbackInterfaces.Add(instance);
-            @MouseXYAxis.started += instance.OnMouseXYAxis;
-            @MouseXYAxis.performed += instance.OnMouseXYAxis;
-            @MouseXYAxis.canceled += instance.OnMouseXYAxis;
+            @Position.started += instance.OnPosition;
+            @Position.performed += instance.OnPosition;
+            @Position.canceled += instance.OnPosition;
+            @Delta.started += instance.OnDelta;
+            @Delta.performed += instance.OnDelta;
+            @Delta.canceled += instance.OnDelta;
             @ScrollWheel.started += instance.OnScrollWheel;
             @ScrollWheel.performed += instance.OnScrollWheel;
             @ScrollWheel.canceled += instance.OnScrollWheel;
@@ -224,9 +250,12 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(IMouseActions instance)
         {
-            @MouseXYAxis.started -= instance.OnMouseXYAxis;
-            @MouseXYAxis.performed -= instance.OnMouseXYAxis;
-            @MouseXYAxis.canceled -= instance.OnMouseXYAxis;
+            @Position.started -= instance.OnPosition;
+            @Position.performed -= instance.OnPosition;
+            @Position.canceled -= instance.OnPosition;
+            @Delta.started -= instance.OnDelta;
+            @Delta.performed -= instance.OnDelta;
+            @Delta.canceled -= instance.OnDelta;
             @ScrollWheel.started -= instance.OnScrollWheel;
             @ScrollWheel.performed -= instance.OnScrollWheel;
             @ScrollWheel.canceled -= instance.OnScrollWheel;
@@ -255,7 +284,8 @@ public partial class @PCInputs: IInputActionCollection2, IDisposable
     public MouseActions @Mouse => new MouseActions(this);
     public interface IMouseActions
     {
-        void OnMouseXYAxis(InputAction.CallbackContext context);
+        void OnPosition(InputAction.CallbackContext context);
+        void OnDelta(InputAction.CallbackContext context);
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnLeftButton(InputAction.CallbackContext context);
         void OnRightButton(InputAction.CallbackContext context);

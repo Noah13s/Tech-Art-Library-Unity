@@ -6,7 +6,16 @@
             "id": "582292bb-1c2b-4e73-b48a-6b641e5831b7",
             "actions": [
                 {
-                    "name": "MouseXYAxis",
+                    "name": "Position",
+                    "type": "Value",
+                    "id": "e9b1ed90-a3d8-4da9-8ed9-dc862a4b893f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Delta",
                     "type": "Value",
                     "id": "bf849583-bbf3-4afc-bd86-39ff65c8b248",
                     "expectedControlType": "",
@@ -50,7 +59,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseXYAxis",
+                    "action": "Delta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -84,6 +93,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "RightButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "316c4fe7-2e50-4f85-8aab-cbc0b0775324",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

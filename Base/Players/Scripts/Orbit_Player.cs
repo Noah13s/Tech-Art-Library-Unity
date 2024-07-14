@@ -22,24 +22,28 @@ public class OrbitCamera : MonoBehaviour
     private float currentRotationX = 0f;
     private float currentRotationY = 0f;
     private Vector3 targetPosition;
-    private PCInputs controls;
+    private PCInputs PCcontrols;
+    private TouchInputs Touchcontrols;
 
     private void Awake()
     {
         // Initialize the input controls
-        controls = new PCInputs();
+        PCcontrols = new PCInputs();
+        Touchcontrols = new TouchInputs();
     }
 
     private void OnEnable()
     {
         // Enable the input controls
-        controls.Enable();
+        PCcontrols.Enable();
+        Touchcontrols.Enable();
     }
 
     private void OnDisable()
     {
         // Disable the input controls
-        controls.Disable();
+        PCcontrols.Disable();
+        Touchcontrols.Disable();
     }
 
     void Initialize()
@@ -69,25 +73,27 @@ public class OrbitCamera : MonoBehaviour
     {
         if (RightClickMove && !lockCamera)
         {
-            if (controls.Mouse.LeftButton.IsPressed())
+            if (PCcontrols.Mouse.LeftButton.IsPressed())
             {
                 // Rotate the camera based on mouse input            
-                currentRotationX += controls.Mouse.MouseXYAxis.ReadValue<Vector2>().x * sensitivityX;
-                currentRotationY -= controls.Mouse.MouseXYAxis.ReadValue<Vector2>().y * sensitivityY;
+                currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
+                currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
                 currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
             }
         } else
         {
             // Rotate the camera based on mouse input            
-            currentRotationX += controls.Mouse.MouseXYAxis.ReadValue<Vector2>().x * sensitivityX;
-            currentRotationY -= controls.Mouse.MouseXYAxis.ReadValue<Vector2>().y * sensitivityY;
+            currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
+            currentRotationX += Touchcontrols.Touch.Delta.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= Touchcontrols.Touch.Delta.ReadValue<Vector2>().y * sensitivityY;
             currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
         }
 
         // Zoom in and out using scrollwheel if scrolling is allowed
         if (allowScrolling)
         {
-            distance += controls.Mouse.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
+            distance += PCcontrols.Mouse.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
             distance = Mathf.Clamp(distance, 1f, Mathf.Infinity); // Clamp distance
         }
 
