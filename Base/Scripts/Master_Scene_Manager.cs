@@ -40,6 +40,10 @@ public class Master_Scene_Manager : MonoBehaviour
     {
         currentScene = SceneManager.GetActiveScene().name;
     }
+    public void LoadScene(string sceneName)
+    {
+        StartCoroutine(LoadSceneAsync(sceneName));
+    }
 
     public void LoadScene(string sceneName, Transition transition)
     {
