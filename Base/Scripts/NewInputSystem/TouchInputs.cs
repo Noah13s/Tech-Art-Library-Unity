@@ -82,7 +82,7 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""1cce5fc3-8dbe-48b8-b88e-f565280029f9"",
-                    ""path"": ""<Touchscreen>/{fingerCount}"",
+                    ""path"": ""<TouchscreenGestureInputController>/fingerCount"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
