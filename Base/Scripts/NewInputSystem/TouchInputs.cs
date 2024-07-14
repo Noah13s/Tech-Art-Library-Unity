@@ -54,6 +54,15 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Press"",
+                    ""type"": ""Button"",
+                    ""id"": ""488401ec-2969-45c7-8cdc-eabcb2acc5bb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -89,6 +98,17 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
                     ""action"": ""Count"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""744f881b-e3ec-4301-811b-3402edddd858"",
+                    ""path"": ""<Touchscreen>/Press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -100,6 +120,7 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
         m_Touch_Position = m_Touch.FindAction("Position", throwIfNotFound: true);
         m_Touch_Delta = m_Touch.FindAction("Delta", throwIfNotFound: true);
         m_Touch_Count = m_Touch.FindAction("Count", throwIfNotFound: true);
+        m_Touch_Press = m_Touch.FindAction("Press", throwIfNotFound: true);
     }
 
     ~@TouchInputs()
@@ -169,6 +190,7 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
     private readonly InputAction m_Touch_Position;
     private readonly InputAction m_Touch_Delta;
     private readonly InputAction m_Touch_Count;
+    private readonly InputAction m_Touch_Press;
     public struct TouchActions
     {
         private @TouchInputs m_Wrapper;
@@ -176,6 +198,7 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
         public InputAction @Position => m_Wrapper.m_Touch_Position;
         public InputAction @Delta => m_Wrapper.m_Touch_Delta;
         public InputAction @Count => m_Wrapper.m_Touch_Count;
+        public InputAction @Press => m_Wrapper.m_Touch_Press;
         public InputActionMap Get() { return m_Wrapper.m_Touch; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -194,6 +217,9 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
             @Count.started += instance.OnCount;
             @Count.performed += instance.OnCount;
             @Count.canceled += instance.OnCount;
+            @Press.started += instance.OnPress;
+            @Press.performed += instance.OnPress;
+            @Press.canceled += instance.OnPress;
         }
 
         private void UnregisterCallbacks(ITouchActions instance)
@@ -207,6 +233,9 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
             @Count.started -= instance.OnCount;
             @Count.performed -= instance.OnCount;
             @Count.canceled -= instance.OnCount;
+            @Press.started -= instance.OnPress;
+            @Press.performed -= instance.OnPress;
+            @Press.canceled -= instance.OnPress;
         }
 
         public void RemoveCallbacks(ITouchActions instance)
@@ -229,5 +258,6 @@ public partial class @TouchInputs: IInputActionCollection2, IDisposable
         void OnPosition(InputAction.CallbackContext context);
         void OnDelta(InputAction.CallbackContext context);
         void OnCount(InputAction.CallbackContext context);
+        void OnPress(InputAction.CallbackContext context);
     }
 }
