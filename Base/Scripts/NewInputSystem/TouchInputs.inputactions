@@ -1,0 +1,74 @@
+{
+    "name": "TouchInputs",
+    "maps": [
+        {
+            "name": "Touch",
+            "id": "bc077550-ea0a-4b10-9561-fa741ff14247",
+            "actions": [
+                {
+                    "name": "Position",
+                    "type": "Value",
+                    "id": "9ad9db63-d177-4507-ac83-762d12887e8e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Delta",
+                    "type": "Value",
+                    "id": "8782eef9-b974-4650-992b-db0b828aace1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Count",
+                    "type": "Value",
+                    "id": "446ddac3-3cf3-454b-9b9c-727b36cc69ca",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "1f1bca06-54e9-4445-a766-e7c33cf441ca",
+                    "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9a88079e-2f83-4304-86dd-2681171cbd31",
+                    "path": "<Touchscreen>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1cce5fc3-8dbe-48b8-b88e-f565280029f9",
+                    "path": "<Touchscreen>/{fingerCount}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Count",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
