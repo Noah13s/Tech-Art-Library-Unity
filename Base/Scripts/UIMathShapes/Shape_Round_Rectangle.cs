@@ -12,6 +12,9 @@ public class GenerateUIRoundedRect : MonoBehaviour
     public Color shapeColor = Color.red;
     public bool autoPixelResolution = true;
     public int manualResolution = 100;
+    public bool addOutline = false;
+    public Color outlineColor = Color.black;
+    public float outlineSize = 5f; // Size of the outline
 
     private Image image;
 
@@ -40,6 +43,11 @@ public class GenerateUIRoundedRect : MonoBehaviour
 
         Color[] pixels = new Color[resolution * resolution];
 
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+        float innerRoundness = roundness;
+        float outlineRoundness = roundness - outlineSize;
+
         for (int y = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++)
@@ -47,23 +55,17 @@ public class GenerateUIRoundedRect : MonoBehaviour
                 float normalizedX = (x / (float)resolution - 0.5f) * width;
                 float normalizedY = (y / (float)resolution - 0.5f) * height;
 
-                bool inside = false;
+                bool insideShape = IsInside(normalizedX, normalizedY, halfWidth, halfHeight, innerRoundness);
+                bool insideOutline = IsInside(normalizedX, normalizedY, halfWidth - outlineSize, halfHeight - outlineSize, outlineRoundness);
 
-                if (Mathf.Abs(normalizedX) <= width / 2 - roundness && Mathf.Abs(normalizedY) <= height / 2 - roundness)
+                if (insideShape)
                 {
-                    inside = true;
+                    pixels[y * resolution + x] = insideOutline ? outlineColor : new Color(1, 1, 1, 1);
                 }
-                else if (Mathf.Abs(normalizedX) <= width / 2 && Mathf.Abs(normalizedY) <= height / 2)
+                else
                 {
-                    float cornerX = Mathf.Max(Mathf.Abs(normalizedX) - (width / 2 - roundness), 0);
-                    float cornerY = Mathf.Max(Mathf.Abs(normalizedY) - (height / 2 - roundness), 0);
-                    if (cornerX * cornerX + cornerY * cornerY <= roundness * roundness)
-                    {
-                        inside = true;
-                    }
+                    pixels[y * resolution + x] = new Color(0, 0, 0, 0);
                 }
-
-                pixels[y * resolution + x] = inside ? new Color(1, 1, 1, 1) : new Color(0, 0, 0, 0);
             }
         }
 
@@ -73,6 +75,24 @@ public class GenerateUIRoundedRect : MonoBehaviour
         Rect rect = new Rect(0, 0, resolution, resolution);
         Vector2 pivot = new Vector2(0.5f, 0.5f);
         return Sprite.Create(texture, rect, pivot, pixelsPerUnit: resolution / Mathf.Max(width, height));
+    }
+
+    bool IsInside(float x, float y, float halfWidth, float halfHeight, float roundness)
+    {
+        if (Mathf.Abs(x) <= halfWidth - roundness && Mathf.Abs(y) <= halfHeight - roundness)
+        {
+            return true;
+        }
+        if (Mathf.Abs(x) <= halfWidth && Mathf.Abs(y) <= halfHeight)
+        {
+            float cornerX = Mathf.Max(Mathf.Abs(x) - (halfWidth - roundness), 0);
+            float cornerY = Mathf.Max(Mathf.Abs(y) - (halfHeight - roundness), 0);
+            if (cornerX * cornerX + cornerY * cornerY <= roundness * roundness)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     void OnDestroy()
