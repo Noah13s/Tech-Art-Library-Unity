@@ -32,13 +32,13 @@ public class GenerateUIRoundedRect : MonoBehaviour
 
         // Generate rounded rectangle sprite
         image.sprite = GenerateRoundedRectSprite(width, height, roundness, textureResolution);
-        image.color = shapeColor;
+        image.color = Color.white;
     }
 
     Sprite GenerateRoundedRectSprite(float width, float height, float roundness, int resolution)
     {
         Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
-        texture.filterMode = FilterMode.Point;  // Ensure pixel-perfect rendering
+        texture.filterMode = FilterMode.Bilinear;  // Use bilinear filtering
         texture.wrapMode = TextureWrapMode.Clamp;
 
         Color[] pixels = new Color[resolution * resolution];
@@ -56,15 +56,23 @@ public class GenerateUIRoundedRect : MonoBehaviour
                 float normalizedY = (y / (float)resolution - 0.5f) * height;
 
                 bool insideShape = IsInside(normalizedX, normalizedY, halfWidth, halfHeight, innerRoundness);
-                bool insideOutline = IsInside(normalizedX, normalizedY, halfWidth - outlineSize, halfHeight - outlineSize, outlineRoundness);
+                bool insideOutline = addOutline && IsInside(normalizedX, normalizedY, halfWidth - outlineSize, halfHeight - outlineSize, outlineRoundness);
 
                 if (insideShape)
                 {
-                    pixels[y * resolution + x] = insideOutline ? outlineColor : new Color(1, 1, 1, 1);
+                    // Apply outline color if inside outline area and addOutline is true
+                    if (insideOutline)
+                    {
+                        pixels[y * resolution + x] = outlineColor;
+                    }
+                    else
+                    {
+                        pixels[y * resolution + x] = shapeColor; // Apply shape color
+                    }
                 }
                 else
                 {
-                    pixels[y * resolution + x] = new Color(0, 0, 0, 0);
+                    pixels[y * resolution + x] = new Color(0, 0, 0, 0); // Transparent
                 }
             }
         }
