@@ -67,21 +67,26 @@ public class FundamentalParticle : MonoBehaviour
         Boson,
         Anyon
     }
+#if UNITY_EDITOR
     [ReadOnly]
+#endif
     public string particleName;
 
     public FundatmentalType type;
 
     public string Spin;
-
+#if UNITY_EDITOR
     [EnumConditionalVisibility("type", (int)FundatmentalType.Fermion)]
+#endif
     public Fermion fermion;
-
+#if UNITY_EDITOR
     [EnumConditionalVisibility("type", (int)FundatmentalType.Boson)]
+#endif
     public Boson boson;
-
+#if UNITY_EDITOR
     [EnumConditionalVisibility("type", (int)FundatmentalType.Boson)]
     [EnumConditionalVisibility("boson", (int)Boson.Gauge)]
+#endif
     public Gauge gauge;
 
     public QuarkProperties[] quarkProperties;

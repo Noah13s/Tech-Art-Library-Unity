@@ -9,10 +9,13 @@ public class Electron : MonoBehaviour
     public AtomData.Orbitals orbitals;
 
     public float speed;
-
+#if UNITY_EDITOR
     [ReadOnly]
+#endif
     public float energyContributionInEV;
+#if UNITY_EDITOR
     [ReadOnly]
+#endif
     public float energyContributionInJoules;
 
     // Method to update energy contributions based on provided energy in eV and J

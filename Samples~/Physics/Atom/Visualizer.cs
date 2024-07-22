@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using static UnityEditor.Rendering.InspectorCurveEditor;
 
 
 #if UNITY_EDITOR

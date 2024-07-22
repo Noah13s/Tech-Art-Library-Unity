@@ -31,19 +31,21 @@ using UnityEngine.Events;
             [SerializeField]
             [Tooltip("Number of neutrons in the nuclei")]
             public int neutronNumber;
-
+#if UNITY_EDITOR
             [ReadOnly]
             [SerializeField]
             [Tooltip("The total number of protons and neutrons in the nucleus. It's often found written next to the element symbol")]
+#endif
             public int massNumber;
         }
         [SerializeField]
         [Tooltip("")]
         public Nucleus nucleus;
-
+#if UNITY_EDITOR
         [MinMax(min:0)]
         [SerializeField]
         [Tooltip("When the charge state of an atom is neutral(ground) then the number of electrons equals the number of protons (atomic number)")]
+#endif
         public int numberOfElectrons;
 
         [Serializable]
@@ -94,17 +96,19 @@ using UnityEngine.Events;
         
         [SerializeField]
         public DecayMode decayMode;
-
+#if UNITY_EDITOR
         [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
         [Tooltip("Half decay life time of the atom")]
         [MinMax(min:0)]
+#endif
         public float halfLife;
-        
+#if UNITY_EDITOR
         [ConditionalVisibility("disregardDecay", true)]
         [SerializeField]
-        [Tooltip("Elapsed decay time")]
         [MinMax(min:0)]
+        [Tooltip("Elapsed decay time")]
+#endif
         public float decayTime;
 
         [SerializeField]
@@ -123,7 +127,9 @@ public class Atom : MonoBehaviour
 {
     [SerializeField]
     public AtomData atomStartData;
+#if UNITY_EDITOR
     [ReadOnly]
+#endif
     [SerializeField]
     public AtomData atomStatus;
 
