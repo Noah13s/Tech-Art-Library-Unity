@@ -18,7 +18,7 @@ public class GenerateUIRoundedRect : MonoBehaviour
 
     private Image image;
 
-    void OnValidate()
+    void Awake()
     {
         // Ensure the GameObject has an Image component
         image = GetComponent<Image>();
@@ -26,18 +26,19 @@ public class GenerateUIRoundedRect : MonoBehaviour
         // Set the size of the RectTransform
         RectTransform rectTransform = GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(width, height);
+    }
 
-        // Calculate texture resolution
+    void Start()
+    {
+        // Generate and apply the rounded rectangle sprite
         int textureResolution = autoPixelResolution ? Mathf.CeilToInt(Mathf.Max(width, height)) : manualResolution;
-
-        // Generate rounded rectangle sprite
         image.sprite = GenerateRoundedRectSprite(width, height, roundness, textureResolution);
         image.color = Color.white;
     }
 
     Sprite GenerateRoundedRectSprite(float width, float height, float roundness, int resolution)
     {
-        Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+        Texture2D texture = new Texture2D(resolution, resolution, TextureFormat.ARGB32, false);
         texture.filterMode = FilterMode.Bilinear;  // Use bilinear filtering
         texture.wrapMode = TextureWrapMode.Clamp;
 
@@ -108,8 +109,8 @@ public class GenerateUIRoundedRect : MonoBehaviour
         // Cleanup sprite texture
         if (image != null && image.sprite != null)
         {
-            DestroyImmediate(image.sprite.texture);
-            DestroyImmediate(image.sprite);
+            Destroy(image.sprite.texture);
+            Destroy(image.sprite);
         }
     }
 }
