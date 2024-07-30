@@ -7,7 +7,6 @@ public class GenerateUIRoundedRect : MonoBehaviour
 {
     public float width = 200f;    // Width of the rectangle
     public float height = 100f;   // Height of the rectangle
-    [Range(0f, 100f)]
     public float roundness = 20f; // Radius of the rounded corners
     public Color shapeColor = Color.red;
     public bool autoPixelResolution = true;
@@ -109,8 +108,15 @@ public class GenerateUIRoundedRect : MonoBehaviour
         // Cleanup sprite texture
         if (image != null && image.sprite != null)
         {
-            Destroy(image.sprite.texture);
-            Destroy(image.sprite);
+            if (Application.isPlaying)
+            {
+                Destroy(image.sprite.texture);
+                Destroy(image.sprite);
+            } else
+            {
+                DestroyImmediate(image.sprite.texture);
+                DestroyImmediate(image.sprite);
+            }
         }
     }
 }

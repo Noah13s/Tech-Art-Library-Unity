@@ -1,8 +1,8 @@
 using System;
 #if UNITY_EDITOR
-using UnityEngine;
-#endif
 using UnityEditor;
+#endif
+using UnityEngine;
 
 public class ConditionalVisibilityAttribute : PropertyAttribute
 {
