@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 public class MinMaxAttribute : PropertyAttribute
@@ -18,7 +19,7 @@ public class MinMaxAttribute : PropertyAttribute
     }
 }
 
-
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(MinMaxAttribute))]
 public class MinMaxDrawer : PropertyDrawer
 {

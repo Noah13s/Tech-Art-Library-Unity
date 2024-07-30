@@ -1,6 +1,7 @@
-#if UNITY_EDITOR
 using System;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 public class StyledStringAttribute : PropertyAttribute
@@ -14,6 +15,8 @@ public class StyledStringAttribute : PropertyAttribute
         this.color = new Color(r, g, b);
     }
 }
+
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(StyledStringAttribute))]
 public class StyledStringDrawer : PropertyDrawer
 {

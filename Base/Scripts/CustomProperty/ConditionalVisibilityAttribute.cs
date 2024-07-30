@@ -1,6 +1,7 @@
-#if UNITY_EDITOR
 using System;
+#if UNITY_EDITOR
 using UnityEngine;
+#endif
 using UnityEditor;
 
 public class ConditionalVisibilityAttribute : PropertyAttribute
@@ -15,6 +16,7 @@ public class ConditionalVisibilityAttribute : PropertyAttribute
     }
 }
 
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(ConditionalVisibilityAttribute))]
 public class ConditionalVisibilityDrawer : PropertyDrawer
 {
