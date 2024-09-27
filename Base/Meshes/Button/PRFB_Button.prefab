@@ -1,0 +1,196 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &4712321554818226088
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.222249
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00000047683716
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.06834793
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      propertyPath: m_Name
+      value: Button
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4733921413064257912}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 779377977235729497}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5019177363406380613}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3393607425073751399}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7953474559247841159}
+  m_SourcePrefab: {fileID: 100100000, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+--- !u!1 &5594859065279146745 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 860af7844201f7546859f0d542287cb6, type: 3}
+  m_PrefabInstance: {fileID: 4712321554818226088}
+  m_PrefabAsset: {fileID: 0}
+--- !u!111 &4733921413064257912
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594859065279146745}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
+--- !u!114 &779377977235729497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594859065279146745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e198605642da58b4182e91bf64dcaabd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventA:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3393607425073751399}
+        m_TargetAssemblyTypeName: LegacyAnimationHandler, Assembly
+        m_MethodName: PlayAnimationClip
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 7400000, guid: 11364d3587067494a897add0d65fd547, type: 2}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AnimationClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  eventB:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3393607425073751399}
+        m_TargetAssemblyTypeName: AnimationHandler, Assembly
+        m_MethodName: PlayAnimationClip
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 7400000, guid: 349dd76d7a93a5a4989fa69c2969dc24, type: 2}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.AnimationClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &5019177363406380613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594859065279146745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 910caaf3d6ce2b24997d7c8b1d8b5237, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 779377977235729497}
+        m_TargetAssemblyTypeName: PingPongEvent, Assembly
+        m_MethodName: TriggerPingPong
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &3393607425073751399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594859065279146745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb9c91853591b034aac091472120bdaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &7953474559247841159
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5594859065279146745}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2, y: 0.51672477, z: 2}
+  m_Center: {x: 0, y: 0.25836238, z: 0}
