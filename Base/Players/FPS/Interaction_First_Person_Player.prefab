@@ -116,7 +116,7 @@ GameObject:
   - component: {fileID: -4866731212021555117}
   m_Layer: 0
   m_Name: Interaction_First_Person_Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -206,6 +206,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   debugMode: 0
+  onInteractionKeyPressed:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractionKeyReleased:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractionPossible:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractionUnavailable:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7400280194832373516
 GameObject:
   m_ObjectHideFlags: 0
