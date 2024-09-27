@@ -72,6 +72,7 @@ public class FPSPlayerInteraction : MonoBehaviour
         {
             isInteracting = false;
             onInteractionKeyReleased?.Invoke(); // Invoke the event when the interaction key is released
+            CheckInteractionAvailability(); // Recheck interaction availability on key release
         }
     }
 #endif
@@ -103,7 +104,7 @@ public class FPSPlayerInteraction : MonoBehaviour
         {
             // Check if the object hit has an InteractiveObject component
             InteractiveObject interactiveObject = hit.collider.GetComponent<InteractiveObject>();
-            if (interactiveObject != null)
+            if (interactiveObject != null && interactiveObject.IsActive) // Check if the script is active
             {
                 interactiveObject.Interact();  // Call the object's Interact method
             }
@@ -120,14 +121,21 @@ public class FPSPlayerInteraction : MonoBehaviour
         if (currentAvailability)
         {
             InteractiveObject interactiveObject = hit.collider.GetComponent<InteractiveObject>();
-            if (interactiveObject != null && !isInteractionAvailable)
+            if (interactiveObject != null && interactiveObject.IsActive) // Check if the script is active
             {
-                isInteractionAvailable = true;
-                onInteractionPossible?.Invoke(); // Invoke when interaction becomes possible
+                if (true) // Used to only invoke if the state has changed but removed that 
+                {
+                    isInteractionAvailable = true;
+                    onInteractionPossible?.Invoke(); // Invoke when interaction becomes possible
+                }
+            }
+            else if (isInteractionAvailable) // Check if we were previously available
+            {
+                isInteractionAvailable = false; // Set to unavailable
+                onInteractionUnavailable?.Invoke(); // Invoke when interaction becomes unavailable
             }
         }
-        // If interaction is unavailable
-        else if (isInteractionAvailable)
+        else if (isInteractionAvailable) // If no object is hit and was previously available
         {
             isInteractionAvailable = false;
             onInteractionUnavailable?.Invoke(); // Invoke when interaction becomes unavailable
