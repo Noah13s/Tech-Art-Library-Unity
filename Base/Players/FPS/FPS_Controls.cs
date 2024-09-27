@@ -99,6 +99,15 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interaction"",
+                    ""type"": ""Button"",
+                    ""id"": ""c5b6ddab-c68f-4250-be48-a1c0389ccee3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -189,6 +198,17 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5083dd48-f4b3-4f88-bc83-08df2125d6fb"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interaction"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -205,6 +225,7 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
         m_FPS_Action_Map_Sideways = m_FPS_Action_Map.FindAction("Sideways", throwIfNotFound: true);
         m_FPS_Action_Map_Jump = m_FPS_Action_Map.FindAction("Jump", throwIfNotFound: true);
         m_FPS_Action_Map_Look = m_FPS_Action_Map.FindAction("Look", throwIfNotFound: true);
+        m_FPS_Action_Map_Interaction = m_FPS_Action_Map.FindAction("Interaction", throwIfNotFound: true);
     }
 
     ~@FPS_Controls()
@@ -279,6 +300,7 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_FPS_Action_Map_Sideways;
     private readonly InputAction m_FPS_Action_Map_Jump;
     private readonly InputAction m_FPS_Action_Map_Look;
+    private readonly InputAction m_FPS_Action_Map_Interaction;
     public struct FPS_Action_MapActions
     {
         private @FPS_Controls m_Wrapper;
@@ -291,6 +313,7 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
         public InputAction @Sideways => m_Wrapper.m_FPS_Action_Map_Sideways;
         public InputAction @Jump => m_Wrapper.m_FPS_Action_Map_Jump;
         public InputAction @Look => m_Wrapper.m_FPS_Action_Map_Look;
+        public InputAction @Interaction => m_Wrapper.m_FPS_Action_Map_Interaction;
         public InputActionMap Get() { return m_Wrapper.m_FPS_Action_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -324,6 +347,9 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @Interaction.started += instance.OnInteraction;
+            @Interaction.performed += instance.OnInteraction;
+            @Interaction.canceled += instance.OnInteraction;
         }
 
         private void UnregisterCallbacks(IFPS_Action_MapActions instance)
@@ -352,6 +378,9 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @Interaction.started -= instance.OnInteraction;
+            @Interaction.performed -= instance.OnInteraction;
+            @Interaction.canceled -= instance.OnInteraction;
         }
 
         public void RemoveCallbacks(IFPS_Action_MapActions instance)
@@ -379,5 +408,6 @@ public partial class @FPS_Controls: IInputActionCollection2, IDisposable
         void OnSideways(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+        void OnInteraction(InputAction.CallbackContext context);
     }
 }
