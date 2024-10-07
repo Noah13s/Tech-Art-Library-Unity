@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -235,3 +236,4 @@ public class SaveManager : MonoBehaviour
         public List<GameObjectInfo> gameObjects;
     }
 }
+#endif
