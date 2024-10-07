@@ -4,23 +4,32 @@ using UnityEngine;
 
 public class Master_Counter : MonoBehaviour
 {
-    [System.Serializable]
-    public struct TransformSpawnPoints
+    #if UNITY_EDITOR
+        [StyledString(12,1,1,1)]
+    #endif
+    [SerializeField]
+    private string counterValueStrg;
+
+    private int counterValue;
+    private void OnDrawGizmos()
     {
-        [SerializeField]
-        private Transform transformSpawnPoint;
-        [SerializeField]
-        public Vector2 initialVelocity;
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        counterValueStrg = counterValue.ToString();
     }
 
-    // Update is called once per frame
-    void Update()
+    [ContextMenu("IncrementCounter")]
+    public void IncrementCounter()
     {
-        
+        counterValue++;
+    }
+
+    [ContextMenu("DecrementCounter")]
+    public void DecrementCounter()
+    {
+        counterValue--;
+    }
+
+    public void SetCounterValue(int newCounterValue)
+    {
+        counterValue = newCounterValue;
     }
 }
