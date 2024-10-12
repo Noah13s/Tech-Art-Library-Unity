@@ -173,22 +173,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4672257671779067464}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 411654401c7ad7d479924321fd134482, type: 3}
+  m_Script: {fileID: 11500000, guid: 716fd9de2d11c3349b842e95c1e3d1ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showCursor: 0
+  showCursor: 1
   airControl: 0
   enableSlideBounce: 0
-  decelerationFactor: 2
+  decelerationFactor: 30
   bounceMultiplier: 0.5
-  bounceThreshold: 5
+  bounceThreshold: 10
   walkSpeed: 5
   runSpeed: 10
-  jumpForce: 5
+  jumpForce: 10
   gravity: 20
   lookSpeed: 2
   lookXLimit: 80
-  joystick: {fileID: 1559067275640156471}
 --- !u!1 &7400280194832373516
 GameObject:
   m_ObjectHideFlags: 0
@@ -495,14 +494,3 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7490756229285043028, guid: 35e1a2824d6ae9c4590327a6f267e8b3, type: 3}
   m_PrefabInstance: {fileID: 7105461429408760442}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1559067275640156471 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8590969143729173325, guid: 35e1a2824d6ae9c4590327a6f267e8b3, type: 3}
-  m_PrefabInstance: {fileID: 7105461429408760442}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6e4005b28a7a594489522de70201b66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
