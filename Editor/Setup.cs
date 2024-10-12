@@ -42,7 +42,7 @@ public class Setup
                 text.AppendLine($"{package.name}: {package.version} [{package.resolvedPath}]");
             }
         }
-        Debug.Log(text.ToString());
+        //Debug.Log(text.ToString()); Prints the detected packages
     }
 
     public static async Task ListSamples(string packageName)
@@ -140,7 +140,7 @@ public class Setup
         }
         else
         {
-            Debug.Log("Package added successfully: " + packageUrl);
+            //Debug.Log("Package added successfully: " + packageUrl);
         }
     }
 

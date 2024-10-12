@@ -41,10 +41,13 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
         if (touchPress > 0)
         {
             var touchPosition = touchInputs.Touch.Position.ReadValue<Vector2>();
-            if (isTouching || IsTouchWithinBounds(touchPosition))
+
+            if (!IsPointerOverUI(touchPosition) && (isTouching || IsTouchWithinBounds(touchPosition)))
             {
                 MoveTouch(touchPosition);
             }
+        } else {
+            isTouching = false;
         }
     }
 #endif
@@ -55,7 +58,8 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
         if (Input.GetMouseButton(0))
         {
             Vector2 mousePosition = Input.mousePosition;
-            if (isTouching || IsTouchWithinBounds(mousePosition))
+
+            if (!IsPointerOverUI(mousePosition) && (isTouching || IsTouchWithinBounds(mousePosition)))
             {
                 MoveTouch(mousePosition);
             }
@@ -65,8 +69,21 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
     // Check if the touch/mouse is within the bounds (can customize for UI elements)
     private bool IsTouchWithinBounds(Vector2 position)
     {
-        // You can customize this to fit your specific UI bounds check
+        // Customize this based on your specific needs for the touch area
         return true; // Always return true if no specific bounds are required
+    }
+
+    // Check if the pointer is over any UI element
+    private bool IsPointerOverUI(Vector2 screenPosition)
+    {
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = screenPosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+        return results.Count > 0;
     }
 
     // Move touch logic (similar to joystick move logic)
@@ -83,14 +100,17 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
     // Called when the user touches or clicks the UI
     public void OnPointerDown(PointerEventData eventData)
     {
-        OnDrag(eventData); // Start dragging immediately
+        if (!IsPointerOverUI(eventData.position)) // Check if pointer is over UI
+        {
+            OnDrag(eventData); // Start dragging immediately if not over UI
+        }
     }
 
     // Called when the user drags the touch/mouse
     public void OnDrag(PointerEventData eventData)
     {
         Vector2 touchPosition = eventData.position;
-        if (IsTouchWithinBounds(touchPosition))
+        if (!IsPointerOverUI(touchPosition) && IsTouchWithinBounds(touchPosition))
         {
             MoveTouch(touchPosition);
         }
