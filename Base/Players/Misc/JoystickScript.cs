@@ -1,9 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
+using UnityEngine.InputSystem.Utilities;
 #endif
 
 public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
@@ -14,25 +16,19 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
 
     private Vector2 inputVector;          // Normalized input vector from the joystick
     private Vector2 joystickCenter;       // Center position of the outer joystick
-    private float outerJoystickRadius;    // Radius of the outer joystick
     private bool isJoystickActive = false; // Flag to track if joystick is being used
+    private int dragTouchId = -1;        // Track which touch ID is dragging the joystick
 
-#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
-    private TouchInputs touchInputs;      // New Input System touch controls
-#endif
+    public UnityEvent onDragStart;        // Event for when dragging starts
+    public UnityEvent onDragging;         // Event for during dragging
+    public UnityEvent onDragEnd;          // Event for when dragging ends
+
+    public int[] authorisedFingerIds;     // Array of authorized touch IDs
 
     void Start()
     {
-        // Store the center of the outer joystick
-        joystickCenter = outerJoystick.position;
-
-        // Calculate the radius of the outer joystick based on its size
-        outerJoystickRadius = outerJoystick.sizeDelta.x / 2f;
-
-#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
-        touchInputs = new TouchInputs();
-        touchInputs.Touch.Enable();
-#endif
+        joystickCenter = outerJoystick.position; // Store the center of the outer joystick
+        EnhancedTouchSupport.Enable();            // Enable Enhanced Touch Support
     }
 
     void Update()
@@ -45,108 +41,156 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     }
 
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
-    // Handle new input system (Unity's Input System Package)
     private void HandleNewInputSystem()
     {
-        var touchPress = touchInputs.Touch.Press.ReadValue<float>();
-        if (touchPress > 0)
+        ReadOnlyArray<UnityEngine.InputSystem.EnhancedTouch.Touch> activeTouches = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches;
+
+        // Check if there are any active touches
+        if (activeTouches.Count > 0)
         {
-            var touchPosition = touchInputs.Touch.Position.ReadValue<Vector2>();
-            if (isJoystickActive || IsWithinJoystickBounds(touchPosition)) // Allow tracking once activated
+            for (int i = 0; i < activeTouches.Count; i++)
             {
-                MoveJoystick(touchPosition);
+                var touch = activeTouches[i];
+
+                // Check if the current touch ID is authorized
+                if (IsAuthorizedFinger(touch.touchId))
+                {
+                    if (isJoystickActive && touch.touchId == dragTouchId)
+                    {
+                        // Continue moving the joystick if it's active
+                        MoveJoystick(touch.screenPosition);
+                    }
+                    else if (!isJoystickActive && IsWithinJoystickBounds(touch.screenPosition))
+                    {
+                        // Start dragging if within bounds
+                        MoveJoystick(touch.screenPosition);
+                        dragTouchId = touch.touchId; // Track the dragging touch ID
+                        onDragStart?.Invoke(); // Trigger onDragStart event
+                        isJoystickActive = true; // Mark joystick as active
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Reset joystick position when no active touches
+            if (isJoystickActive) // Only reset if joystick was active
+            {
+                ResetJoystick(); // Call reset when no active touches
             }
         }
     }
 #endif
 
-    // Handle legacy input system (Unity's old Input Manager)
+#if !ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
     private void HandleLegacyInputSystem()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.touchCount > 0) // Check if there are any active touches
         {
-            Vector2 mousePosition = Input.mousePosition;
-            if (isJoystickActive || IsWithinJoystickBounds(mousePosition)) // Allow tracking once activated
+            for (int i = 0; i < Input.touchCount; i++)
             {
-                MoveJoystick(mousePosition);
+                var touch = Input.touches[i];
+                // Check if the current touch ID is authorized
+                if (IsAuthorizedFinger(touch.fingerId))
+                {
+                    if (isJoystickActive && touch.fingerId == dragTouchId)
+                    {
+                        // Continue moving the joystick if it's active
+                        MoveJoystick(touch.position);
+                    }
+                    else if (!isJoystickActive && IsWithinJoystickBounds(Input.mousePosition))
+                    {
+                        // Start dragging if within bounds
+                        MoveJoystick(Input.mousePosition);
+                        dragTouchId = touch.fingerId; // Track the dragging touch ID
+                        onDragStart?.Invoke(); // Trigger onDragStart event
+                        isJoystickActive = true; // Mark joystick as active
+                    }
+                }
+            } 
+        } 
+        else
+        {
+            // Reset joystick position when no active touches
+            if (isJoystickActive) // Only reset if joystick was active
+            {
+                ResetJoystick(); // Call reset when no active touches
             }
         }
     }
+#endif
 
-    // Check if the touch/mouse position is within the outer joystick bounds
-    private bool IsWithinJoystickBounds(Vector2 position)
+    private bool IsAuthorizedFinger(int touchId)
     {
-        // Calculate the distance from the touch position to the joystick center
-        float distanceFromCenter = Vector2.Distance(position, joystickCenter);
+        if (authorisedFingerIds == null || authorisedFingerIds.Length == 0)
+        {
+            return true; // Authorize any finger if no specific IDs are provided
+        }
 
-        // Check if the distance is within the outer joystick's radius
-        return distanceFromCenter <= outerJoystickRadius;
+        // Check if the touch ID exists in the authorized finger IDs array
+        foreach (int authorizedId in authorisedFingerIds)
+        {
+            if (authorizedId == touchId)
+            {
+                return true; // Return true if the touch ID is authorized
+            }
+        }
+        return false; // Return false if not authorized
     }
 
-    // Joystick movement logic
     private void MoveJoystick(Vector2 position)
     {
-        // Set joystick active flag
-        isJoystickActive = true;
+        Vector2 direction = position - joystickCenter; // Calculate direction
+        float distance = Mathf.Min(direction.magnitude, maxDistance); // Clamp distance
+        inputVector = direction.normalized * (distance / maxDistance); // Normalize and scale input vector
+        innerJoystick.position = joystickCenter + direction.normalized * distance; // Move the inner joystick
 
-        // Calculate direction from the center of the joystick to the touch position
-        Vector2 direction = position - joystickCenter;
-
-        // Clamp the distance to within the max radius of the outer joystick
-        float distance = Mathf.Min(direction.magnitude, maxDistance);
-
-        // Normalize the direction and multiply by the clamped distance
-        inputVector = direction.normalized * (distance / maxDistance);
-
-        // Move the inner joystick within the bounds of the outer joystick
-        innerJoystick.position = joystickCenter + direction.normalized * distance;
+        onDragging?.Invoke(); // Trigger onDragging event during movement
     }
 
-    // Called when the user touches or clicks the joystick
+    private bool IsWithinJoystickBounds(Vector2 position)
+    {
+        float distanceFromCenter = Vector2.Distance(position, joystickCenter);
+        return distanceFromCenter <= (outerJoystick.sizeDelta.x / 2f);
+    }
+
+    private void ResetJoystick()
+    {
+        innerJoystick.position = joystickCenter; // Reset inner joystick position
+        inputVector = Vector2.zero;              // Reset input vector
+        isJoystickActive = false;                // Mark joystick as inactive
+        dragTouchId = -1;                        // Reset drag touch ID
+        onDragEnd?.Invoke();                     // Trigger onDragEnd event when released
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
-        OnDrag(eventData); // Start dragging immediately
-    }
-
-    // Called when the user drags the joystick
-    public void OnDrag(PointerEventData eventData)
-    {
-        Vector2 touchPosition = eventData.position;
-        if (IsWithinJoystickBounds(touchPosition)) // Start tracking if within bounds
+        // Check if the pointer is an authorized finger
+        if (IsAuthorizedFinger(eventData.pointerId))
         {
-            MoveJoystick(touchPosition);
+            MoveJoystick(eventData.position); // Start moving the joystick immediately
+            dragTouchId = eventData.pointerId; // Track the dragging touch ID
+            isJoystickActive = true; // Mark joystick as active
+            onDragStart?.Invoke(); // Trigger onDragStart event
         }
     }
 
-    // Called when the user releases the joystick
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (isJoystickActive)
+        {
+            MoveJoystick(eventData.position); // Update joystick position while dragging
+        }
+    }
+
     public void OnPointerUp(PointerEventData eventData)
     {
-        // Reset the inner joystick back to the center of the outer joystick
-        innerJoystick.position = joystickCenter;
-
-        // Reset input vector to zero
-        inputVector = Vector2.zero;
-
-        // Reset joystick active flag
-        isJoystickActive = false;
+        if (isJoystickActive) // Ensure it's active before resetting
+        {
+            ResetJoystick(); // Reset the joystick position when the pointer is released
+        }
     }
 
-    // Get the horizontal input (-1 to 1)
-    public float GetHorizontal()
-    {
-        return inputVector.x;
-    }
-
-    // Get the vertical input (-1 to 1)
-    public float GetVertical()
-    {
-        return inputVector.y;
-    }
-
-    void OnDisable()
-    {
-#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
-        touchInputs.Touch.Disable();
-#endif
-    }
+    public float GetHorizontal() => inputVector.x; // Get horizontal input
+    public float GetVertical() => inputVector.y;   // Get vertical input
 }

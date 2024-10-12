@@ -37,6 +37,11 @@ public class First_Person_Player : MonoBehaviour
     [SerializeField]
     private float lookXLimit = 80.0f;
 
+    // New fields for optional joystick and touch input
+    [Header("Touch & Joystick (Optional)")]
+    public JoystickControl joystick;        // Optional joystick control
+    public UITouchControl touchControl;     // Optional touch control
+
     private CharacterController characterController;
     private Vector3 moveDirection = Vector3.zero;
     private float rotationX = 0;
@@ -49,8 +54,6 @@ public class First_Person_Player : MonoBehaviour
     private InputAction leftAction;
     private InputAction jumpAction;
     private InputAction lookAction;
-    private InputAction frontBackAxis;
-    private InputAction sideAxis;
 #endif
 
     void Initalise()
@@ -69,8 +72,6 @@ public class First_Person_Player : MonoBehaviour
         leftAction = controls.FPS_Action_Map.Left;
         jumpAction = controls.FPS_Action_Map.Jump;
         lookAction = controls.FPS_Action_Map.Look;
-        frontBackAxis = controls.FPS_Action_Map.FrontBack;
-        sideAxis = controls.FPS_Action_Map.Sideways;
 #endif
     }
 
@@ -100,9 +101,21 @@ public class First_Person_Player : MonoBehaviour
     // Handle input from the new Input System
     private void HandleNewInputSystem()
     {
-        // Movement input based on individual forward/backward/left/right actions
-        float forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
-        float rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
+        // Movement input based on joystick or keyboard actions
+        float forwardMovement = 0;
+        float rightMovement = 0;
+
+        // Use joystick input if available
+        if (joystick != null)
+        {
+            forwardMovement = joystick.GetVertical();
+            rightMovement = joystick.GetHorizontal();
+        }
+        else
+        {
+            forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
+            rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
+        }
 
         // Movement speed based on whether the player is running or walking
         float moveSpeed = Keyboard.current.leftShiftKey.isPressed ? runSpeed : walkSpeed;
@@ -163,19 +176,35 @@ public class First_Person_Player : MonoBehaviour
         // Apply gravity
         moveDirection.y -= gravity * Time.deltaTime;
 
-        // Camera rotation (looking around)
-        Vector2 lookInput = lookAction.ReadValue<Vector2>(); // Reading mouse look from input system
-        float rotationY = lookInput.x * lookSpeed;
-        rotationX -= lookInput.y * lookSpeed;
-        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        // Camera rotation (looking around) with touch input
+        Vector2 lookInput = Vector2.zero;
 
-        transform.Rotate(0, rotationY, 0);
-        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        // Use touch input if touchControl is active
+        if (touchControl != null && touchControl.IsTouching())
+        {
+            lookInput = touchControl.GetTouchDelta();
+        }
+        // Fallback to mouse/keyboard if touch input is not available
+        else
+        {
+            lookInput = lookAction.ReadValue<Vector2>();
+        }
+
+        // Update rotation based on touch input
+        rotationX -= lookInput.y * lookSpeed; // Invert y-axis for a more natural look
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        float rotationY = lookInput.x * lookSpeed;
+
+        // Apply rotation
+        transform.Rotate(0, rotationY, 0); // Add the X rotation to the current rotation
+        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0); // Set the local rotation
+
 
         // Move the character
         characterController.Move(moveDirection * Time.deltaTime);
     }
 #endif
+
 
 #if ENABLE_LEGACY_INPUT_MANAGER
     // Handle input from the old Input Manager
@@ -183,11 +212,25 @@ public class First_Person_Player : MonoBehaviour
     {
         // Calculate movement
         float moveSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
-        float horizontalMovement = Input.GetAxis("Horizontal") * moveSpeed;
-        float verticalMovement = Input.GetAxis("Vertical") * moveSpeed;
+
+        // Movement input based on joystick or keyboard actions
+        float forwardMovement = 0;
+        float rightMovement = 0;
+
+        // Use joystick input if available
+        if (joystick != null)
+        {
+            forwardMovement = joystick.GetVertical();
+            rightMovement = joystick.GetHorizontal();
+        }
+        else
+        {
+            forwardMovement = Input.GetAxis("Vertical") * moveSpeed;
+            rightMovement = Input.GetAxis("Horizontal") * moveSpeed;
+        }
 
         // Desired movement vector
-        Vector3 desiredMovement = transform.TransformDirection(new Vector3(horizontalMovement, 0, verticalMovement));
+        Vector3 desiredMovement = transform.TransformDirection(new Vector3(rightMovement, 0, forwardMovement));
 
         // Check if the player is grounded
         if (characterController.isGrounded)
