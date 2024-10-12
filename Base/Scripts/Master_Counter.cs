@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Master_Counter : MonoBehaviour
 {
@@ -10,7 +12,9 @@ public class Master_Counter : MonoBehaviour
     [SerializeField]
     private string counterValueStrg;
 
-    private int counterValue;
+    public GameObject textToUpdate;
+
+    private int counterValue = 0;
     private void OnDrawGizmos()
     {
         counterValueStrg = counterValue.ToString();
@@ -31,5 +35,9 @@ public class Master_Counter : MonoBehaviour
     public void SetCounterValue(int newCounterValue)
     {
         counterValue = newCounterValue;
+    }
+
+    public int GetCounterValue() { 
+        return counterValue;
     }
 }
