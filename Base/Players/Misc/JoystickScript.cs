@@ -51,9 +51,8 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             for (int i = 0; i < activeTouches.Count; i++)
             {
                 var touch = activeTouches[i];
-
                 // Check if the current touch ID is authorized
-                if (IsAuthorizedFinger(touch.touchId))
+                if (IsAuthorizedFinger(activeTouches.Count))
                 {
                     if (isJoystickActive && touch.touchId == dragTouchId)
                     {
