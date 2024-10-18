@@ -21,7 +21,13 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
     public UnityEvent onTouching;         // Event for during dragging
     public UnityEvent onTouchEnd;          // Event for when dragging ends
 
-    //public int[] authorisedFingerIds;     // Array of authorized touch IDs
+#if !ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+#if UNITY_EDITOR
+    [StyledString(12, 1, 1, 0)]
+#endif
+    [SerializeField]
+    private string Warning = "In legacy input the finger ids include 0 (0=1finger, 1=2fingers...)";
+#endif
     [SerializeField]
     public List<int> authorisedFingerIds;
 
