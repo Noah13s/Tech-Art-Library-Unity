@@ -23,12 +23,22 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     public UnityEvent onDragging;         // Event for during dragging
     public UnityEvent onDragEnd;          // Event for when dragging ends
 
+#if !ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+#if UNITY_EDITOR
+    [StyledString(12, 1, 1, 0)]
+#endif
+    [SerializeField]
+    private string Warning = "In legacy input the finger ids include 0 (0=1finger, 1=2fingers...)";
+#endif
+
     public int[] authorisedFingerIds;     // Array of authorized touch IDs
 
     void Start()
     {
         joystickCenter = outerJoystick.position; // Store the center of the outer joystick
-        EnhancedTouchSupport.Enable();            // Enable Enhanced Touch Support
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        EnhancedTouchSupport.Enable();    // Enable Enhanced Touch Support
+#endif
     }
 
     void Update()
@@ -89,6 +99,7 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             for (int i = 0; i < Input.touchCount; i++)
             {
                 var touch = Input.touches[i];
+
                 // Check if the current touch ID is authorized
                 if (IsAuthorizedFinger(touch.fingerId))
                 {

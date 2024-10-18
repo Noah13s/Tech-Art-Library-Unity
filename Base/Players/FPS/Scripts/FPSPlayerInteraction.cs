@@ -77,9 +77,10 @@ public class FPSPlayerInteraction : MonoBehaviour
     }
 #endif
 
-#if ENABLE_LEGACY_INPUT_MANAGER
+#if ENABLE_LEGACY_INPUT_MANAGER 
     private void HandleLegacyInput()
     {
+#if !UNITY_ANDROID
         if (Input.GetButtonDown("Fire1"))  // Left mouse button as the interaction key
         {
             isInteracting = true;
@@ -91,8 +92,14 @@ public class FPSPlayerInteraction : MonoBehaviour
             isInteracting = false;
             onInteractionKeyReleased?.Invoke(); // Invoke the event when the interaction key is released
         }
+#endif
     }
 #endif
+
+    public void ExternalInteractionCall()
+    {
+        TryInteract();
+    }
 
     // Perform a raycast to check if the player is looking at an interactive object
     private void TryInteract()

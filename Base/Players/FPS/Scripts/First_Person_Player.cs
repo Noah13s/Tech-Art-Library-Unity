@@ -282,13 +282,30 @@ public class First_Person_Player : MonoBehaviour
             moveDirection.z = desiredMovement.z;
         }
 
-        // Camera rotation (looking around)
-        float rotationY = Input.GetAxis("Mouse X") * lookSpeed;
-        rotationX -= Input.GetAxis("Mouse Y") * lookSpeed;
-        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        // Camera rotation (looking around) with touch input
+        Vector2 lookInput = Vector2.zero;
+        // Use touch input if touchControl is active
+        if (touchControl != null && touchControl.IsTouching())
+        {
+            lookInput = touchControl.GetTouchDelta();
+        }
+        // Fallback to mouse/keyboard if touch input is not available
+        else
+        {
+            // Camera rotation (looking around)
+            lookInput.x -= Input.GetAxis("Mouse Y");
+            lookInput.y = Input.GetAxis("Mouse X");
 
-        transform.Rotate(0, rotationY, 0);
-        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        }
+        // Update rotation based on touch input
+        rotationX -= lookInput.y * lookSpeed; // Invert y-axis for a more natural look
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        float rotationY = lookInput.x * lookSpeed;
+
+        // Apply rotation
+        transform.Rotate(0, rotationY, 0); // Add the X rotation to the current rotation
+        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0); // Set the local rotation
+
 
         // Apply gravity
         moveDirection.y -= gravity * Time.deltaTime;

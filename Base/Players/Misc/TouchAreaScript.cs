@@ -25,9 +25,8 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
     [SerializeField]
     public List<int> authorisedFingerIds;
 
-#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
     private int activeFingerId = -1;      // Track the active touch finger ID
-#endif
+
 
     void Start()
     {
@@ -100,28 +99,49 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
 #if !ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
     private void HandleLegacyInputSystem()
     {
-        if (Input.GetMouseButton(0))
-        {
-            Vector2 mousePosition = Input.mousePosition;
 
-            if (!IsPointerOverUI(mousePosition) && (isTouching || IsTouchWithinBounds(mousePosition)))
-            {
-                if (!isTouching)
-                {
-                    lastTouchPosition = mousePosition; // Initialize lastTouchPosition on first click
-                }
-                MoveTouch(mousePosition);
-            }
-        }
-        else
+        if (Input.touchCount > 0) // Check if there are any active touches
         {
-            // Reset on mouse release
-            if (isTouching && Input.GetMouseButtonUp(0))
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                var touch = Input.touches[i];
+                Debug.Log(IsAuthorizedFinger(touch.fingerId));
+                // Check if the current touch ID is authorized
+                if ((activeFingerId == -1 || activeFingerId == touch.fingerId) && IsAuthorizedFinger(touch.fingerId) && !IsPointerOverUI(touch.position))
+                {
+                    if (!isTouching)
+                    {
+                        activeFingerId = touch.fingerId;
+                    }
+                    MoveTouch(touch.position);
+                }
+            }
+            // Detect if the active finger was released
+            bool activeFingerReleased = true;
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                if (Input.touches[i].fingerId == activeFingerId && Input.touches[i].phase != UnityEngine.TouchPhase.Ended && Input.touches[i].phase != UnityEngine.TouchPhase.Canceled)
+                {
+                    activeFingerReleased = false;
+                    break;
+                }
+            }
+
+            if (activeFingerReleased && isTouching)
             {
                 ResetTouch();
             }
         }
-    }
+        else
+        {
+            // Reset joystick position when no active touches
+            if (isTouching) // Only reset if joystick was active
+            {
+                ResetTouch(); // Call reset when no active touches
+            }
+        }
+    
+}
 #endif
 
     private bool IsTouchWithinBounds(Vector2 position)
