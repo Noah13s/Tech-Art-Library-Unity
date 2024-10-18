@@ -113,11 +113,10 @@ public class First_Person_Player : MonoBehaviour
             forwardMovement = joystick.GetVertical();
             rightMovement = joystick.GetHorizontal();
         }
-        else
-        {
-            forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
-            rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
-        }
+
+        forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
+        rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
+        
 
         // Movement speed based on whether the player is running or walking
         float moveSpeed = Keyboard.current.leftShiftKey.isPressed ? runSpeed : walkSpeed;
@@ -187,11 +186,9 @@ public class First_Person_Player : MonoBehaviour
         {
             lookInput = touchControl.GetTouchDelta();
         }
-        // Fallback to mouse/keyboard if touch input is not available
-        else
-        {
-            lookInput = lookAction.ReadValue<Vector2>();
-        }
+
+        lookInput = lookAction.ReadValue<Vector2>();
+        
 
         // Update rotation based on touch input
         rotationX -= lookInput.y * lookSpeed; // Invert y-axis for a more natural look
