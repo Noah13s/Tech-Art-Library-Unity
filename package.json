@@ -44,6 +44,11 @@
 			"displayName": "Physics",
 			"description": "This sample contains Physics related content",
 			"path": "Samples~/Physics"
+		},
+		{
+			"displayName": "Multiplayer",
+			"description": "This sample contains Multiplayer related content",
+			"path": "Samples~/Multiplayer"
 		}
 	  ]
 }
