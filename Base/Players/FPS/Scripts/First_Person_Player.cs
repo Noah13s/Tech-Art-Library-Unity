@@ -56,6 +56,8 @@ public class First_Person_Player : MonoBehaviour
     private InputAction lookAction;
 #endif
 
+    private bool externalJump;
+
     void Initalise()
     {
         characterController = GetComponent<CharacterController>();
@@ -141,9 +143,10 @@ public class First_Person_Player : MonoBehaviour
                 }
 
                 // Jumping logic
-                if (jumpAction.triggered)
+                if (jumpAction.triggered || externalJump == true)
                 {
                     moveDirection.y = jumpForce;
+                    externalJump = false;
                 }
 
                 // Handle bouncing if enabled
@@ -250,9 +253,10 @@ public class First_Person_Player : MonoBehaviour
                 }
 
                 // Jumping logic
-                if (Input.GetButton("Jump"))
+                if (Input.GetButton("Jump") || externalJump == true)
                 {
                     moveDirection.y = jumpForce;
+                    externalJump = false;
                 }
 
                 // Handle bouncing if enabled
@@ -314,4 +318,9 @@ public class First_Person_Player : MonoBehaviour
         characterController.Move(moveDirection * Time.deltaTime);
     }
 #endif
+
+    public void ExternalJumpAction()
+    {
+        externalJump = true;
+    }
 }
