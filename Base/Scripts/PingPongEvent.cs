@@ -29,4 +29,20 @@ public class PingPongEvent : MonoBehaviour
         // Flip the toggle for the next invocation
         toggle = !toggle;
     }
+
+    public void TriggerA()
+    {
+        if (eventA != null)
+        {
+            eventA.Invoke();
+        }
+    }
+
+    public void TriggerB()
+    {
+        if (eventB != null)
+        {
+            eventB.Invoke();
+        }
+    }
 }
