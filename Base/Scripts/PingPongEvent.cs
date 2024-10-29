@@ -45,4 +45,14 @@ public class PingPongEvent : MonoBehaviour
             eventB.Invoke();
         }
     }
+
+    public void SetToggleA()
+    {
+        toggle = true;
+    }
+
+    public void SettoggleB()
+    {
+        toggle = false;
+    }
 }
