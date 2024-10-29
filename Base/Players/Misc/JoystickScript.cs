@@ -45,7 +45,7 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     {
 #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
         HandleNewInputSystem();
-#else
+#elif !ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
         HandleLegacyInputSystem();
 #endif
     }
