@@ -71,8 +71,8 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Forward/BackwardsSpeed
     m_Mirror: 0
-  m_BlendParameter: Right/LeftSpeed
-  m_BlendParameterY: Forward/BackwardsSpeed
+  m_BlendParameter: VelocityX
+  m_BlendParameterY: VelocityY
   m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 1
@@ -134,7 +134,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Forward/BackwardsSpeed
     m_Mirror: 0
-  m_BlendParameter: Forward/BackwardsSpeed
+  m_BlendParameter: VelocityY
   m_BlendParameterY: Forward/BackwardsSpeed
   m_MinThreshold: -3
   m_MaxThreshold: 3
@@ -221,13 +221,13 @@ AnimatorController:
   m_Name: Animator ControllerV2
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Forward/BackwardsSpeed
+  - m_Name: VelocityY
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: Right/LeftSpeed
+  - m_Name: VelocityX
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -271,7 +271,7 @@ AnimatorState:
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
-  m_TimeParameter: Forward/BackwardsSpeed
+  m_TimeParameter: VelocityY
 --- !u!206 &3183855098813517839
 BlendTree:
   m_ObjectHideFlags: 1
@@ -283,7 +283,7 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: -6832106447996616399}
     m_Threshold: 0.76388884
-    m_Position: {x: 0, y: 0}
+    m_Position: {x: 0, y: 1}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: Forward/BackwardsSpeed
@@ -291,13 +291,13 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: 8612125069208361381}
     m_Threshold: 0.83333325
-    m_Position: {x: 0, y: 0}
+    m_Position: {x: 1, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: Right/LeftSpeed
     m_Mirror: 0
-  m_BlendParameter: Right/LeftSpeed
-  m_BlendParameterY: Forward/BackwardsSpeed
+  m_BlendParameter: VelocityX
+  m_BlendParameterY: VelocityY
   m_MinThreshold: 0.76388884
   m_MaxThreshold: 0.83333325
   m_UseAutomaticThresholds: 1
@@ -329,7 +329,7 @@ AnimatorState:
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
-  m_TimeParameter: Forward/BackwardsSpeed
+  m_TimeParameter: VelocityY
 --- !u!206 &5860944134956172054
 BlendTree:
   m_ObjectHideFlags: 1
@@ -426,7 +426,7 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Forward/BackwardsSpeed
     m_Mirror: 0
-  m_BlendParameter: Right/LeftSpeed
+  m_BlendParameter: VelocityX
   m_BlendParameterY: Forward/BackwardsSpeed
   m_MinThreshold: -2
   m_MaxThreshold: 2
