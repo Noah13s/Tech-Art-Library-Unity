@@ -19,10 +19,7 @@ public class ConveyorBelt : MonoBehaviour
             // Calculate the alignment between the object's velocity and the conveyor direction
             float alignment = Vector3.Dot(objectVelocityDirection, conveyorDirection);
 
-            // Apply conveyor force in the conveyor direction
-            rb.AddForce(conveyorDirection * conveyorForce, ForceMode.Force);
-
-            // If the alignment is below a threshold (e.g., moving opposite to the conveyor)
+            // Adjust drag based on alignment
             if (alignment < 0.5f)  // Adjust the threshold as needed
             {
                 // Apply additional drag if moving against conveyor direction
@@ -32,6 +29,13 @@ public class ConveyorBelt : MonoBehaviour
             {
                 // Reset to default drag when aligned with conveyor
                 rb.drag = 0;
+            }
+
+            // Apply force at each contact point to simulate conveyor movement
+            foreach (ContactPoint contact in collision.contacts)
+            {
+                // Apply conveyor force at each contact point in the conveyor's direction
+                rb.AddForceAtPosition(conveyorDirection * conveyorForce, contact.point, ForceMode.Force);
             }
         }
     }
