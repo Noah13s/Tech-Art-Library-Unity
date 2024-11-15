@@ -24,17 +24,17 @@ Material:
   m_Shader: {fileID: -6465566751694194690, guid: 7ea5cf5f8dbd3084ea12efe9cf2e450c, type: 3}
   m_Parent: {fileID: 2100000, guid: 727c10f64e1a42c49bd4063b47b854cc, type: 2}
   m_ModifiedSerializedProperties: 16
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _ALPHAPREMULTIPLY_ON
   - _ALPHATEST_ON
   - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: 3000
   stringTagMap:
-    RenderType: Transparent
+    RenderType: Opaque
   disabledShaderPasses:
   - DepthOnly
   m_LockedProperties: 
@@ -45,6 +45,7 @@ Material:
     m_Floats:
     - _AlphaClip: 1
     - _AlphaToMask: 0
+    - _BUILTIN_QueueControl: 1
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _DstBlend: 10
