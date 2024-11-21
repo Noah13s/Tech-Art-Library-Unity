@@ -1603,6 +1603,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 433689939459663530, guid: 45f2b26df20af2f43bd73aa4fbb14e91, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 894740507021069946, guid: 45f2b26df20af2f43bd73aa4fbb14e91, type: 3}
       propertyPath: debugMode
       value: 1
@@ -1657,6 +1661,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5441256817759367370, guid: 45f2b26df20af2f43bd73aa4fbb14e91, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5730002493391471400, guid: 45f2b26df20af2f43bd73aa4fbb14e91, type: 3}
+      propertyPath: m_CollisionDetection
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8782743317972324662, guid: 45f2b26df20af2f43bd73aa4fbb14e91, type: 3}
@@ -1932,7 +1940,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
