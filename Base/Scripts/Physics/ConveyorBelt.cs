@@ -95,7 +95,9 @@ public class ConveyorBelt : MonoBehaviour
     {
         Rigidbody rb = collision.rigidbody;
         if (rb != null) {
-            rb.sleepThreshold = rb.velocity.sqrMagnitude * 0.5f;
+            rb.sleepThreshold = 0.005f;
+            rb.WakeUp();
+            rb.drag = 0;
         }
     }
 }
