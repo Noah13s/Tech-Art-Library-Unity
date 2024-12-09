@@ -11,10 +11,6 @@ public class Third_Person_Player : MonoBehaviour
 
     [Header("Navigation")]
     [SerializeField]
-    private float walkSpeed = 5.0f;
-    [SerializeField]
-    private float runSpeed = 10.0f;
-    [SerializeField]
     private float jumpForce = 10f;
     [SerializeField]
     private float gravity = 20f;
@@ -93,6 +89,7 @@ public class Third_Person_Player : MonoBehaviour
         animator.SetFloat("VelocityY", forwardMovement);
         animator.SetFloat("VelocityX", rightMovement);
 
+
         // Check if there is any movement input
         Vector3 inputDirection = new Vector3(rightMovement, 0, forwardMovement).normalized;
         if (inputDirection.magnitude > 0)
@@ -104,8 +101,6 @@ public class Third_Person_Player : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * lookSpeed);
         }
 
-        // Move the character
-        Vector3 movement = inputDirection * walkSpeed * Time.deltaTime;
     }
 #endif
 
