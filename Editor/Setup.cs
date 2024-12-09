@@ -8,6 +8,7 @@ using UnityEditor.PackageManager;
 
 public class Setup
 {
+
     [InitializeOnLoadMethod]
     private static async void InstallDependencies()
     {
@@ -117,6 +118,12 @@ public class Setup
                     break;                    
                 case "SerialPort":
                     // These samples are already imported, no action needed
+                    break;
+                case "Multiplayer":
+                    if (isImported)
+                    {
+                        await ImportPackage("com.unity.netcode.gameobjects", sample.displayName);
+                    }
                     break;
                 default:
                     Debug.Log($"Unknown sample '{sample.displayName}'. No action taken.");

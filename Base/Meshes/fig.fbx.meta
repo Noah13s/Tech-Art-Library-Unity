@@ -16,7 +16,8 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
+    rigImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
+      human bone 'Hips' not found\n"
     rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
@@ -24,7 +25,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -82,7 +83,57 @@ ModelImporter:
   humanDescription:
     serializedVersion: 3
     human: []
-    skeleton: []
+    skeleton:
+    - name: fig(Clone)
+      parentName: 
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Part.0
+      parentName: fig(Clone)
+      position: {x: -0, y: 1.6064001, z: 0.00000007021798}
+      rotation: {x: -0.000000037748947, y: 0, z: -0, w: 1}
+      scale: {x: 10.040001, y: 10.040001, z: 10.040001}
+    - name: Part.1
+      parentName: fig(Clone)
+      position: {x: 0.40160003, y: 1.1244801, z: 0.00000004915258}
+      rotation: {x: -0.000000037748947, y: 0, z: -0, w: 1}
+      scale: {x: 10.040001, y: 10.040001, z: 10.040001}
+    - name: Part.2
+      parentName: fig(Clone)
+      position: {x: -0.40160003, y: 1.1244801, z: 0.00000004915258}
+      rotation: {x: -0.000000037748947, y: 0, z: -0, w: 1}
+      scale: {x: 10.040001, y: 10.040001, z: 10.040001}
+    - name: Part.3
+      parentName: fig(Clone)
+      position: {x: -0, y: 1.6064001, z: 0.00000007021798}
+      rotation: {x: -0.000000037748947, y: 0, z: -0, w: 1}
+      scale: {x: 10.040001, y: 10.040001, z: 10.040001}
+    - name: Part.4
+      parentName: fig(Clone)
+      position: {x: 0.629006, y: 2.5089962, z: 0.00000010967171}
+      rotation: {x: 0.38120165, y: 0.033680424, z: 0.08131026, w: 0.9202932}
+      scale: {x: 10.040022, y: 10.040004, z: 10.040002}
+    - name: Part.5
+      parentName: fig(Clone)
+      position: {x: 1.0300038, y: 1.4026884, z: 0.4006965}
+      rotation: {x: 0.49850917, y: 0.044051316, z: 0.07618794, w: 0.86240566}
+      scale: {x: 10.040004, y: 10.039952, z: 10.039951}
+    - name: Part.6
+      parentName: fig(Clone)
+      position: {x: -0.629006, y: 2.5089962, z: 0.00000010967171}
+      rotation: {x: 0.38120165, y: -0.033680424, z: -0.08131026, w: 0.9202932}
+      scale: {x: 10.040022, y: 10.040004, z: 10.040002}
+    - name: Part.7
+      parentName: fig(Clone)
+      position: {x: -1.0300038, y: 1.4026884, z: 0.4006965}
+      rotation: {x: 0.49850917, y: -0.044051316, z: -0.07618794, w: 0.86240566}
+      scale: {x: 10.040004, y: 10.039952, z: 10.039951}
+    - name: Part.8
+      parentName: fig(Clone)
+      position: {x: -0, y: 2.8915203, z: 0.00000012639237}
+      rotation: {x: -0.000000037748947, y: 0, z: -0, w: 1}
+      scale: {x: 10.040001, y: 10.040001, z: 10.040001}
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
@@ -93,11 +144,11 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1

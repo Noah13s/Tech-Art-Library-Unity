@@ -94,6 +94,32 @@ public class Master_Event_Trigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        switch (TriggerType)
+        {
+            case TriggerType.Tag:
+                foreach (var tag in Tags)
+                {
+                    if (other.gameObject.CompareTag(tag))
+                    {
+                        FireEvents();
+                        break;
+                    }
+                }
+                break;
+            case TriggerType.Gameobject:
+                foreach (var gameObject in GameObjects)
+                {
+                    if (other.gameObject == gameObject)
+                    {
+                        FireEvents();
+                        break;
+                    }
+                }
+                break;
+            case TriggerType.Any:
+                FireEvents();
+                break;
+        }
         Debug.Log("TriggerEvent");
     }
     #endregion
