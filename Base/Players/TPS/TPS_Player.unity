@@ -228,6 +228,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &62680167 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8672012777576573238, guid: a6cc448d1fd6a1f4fb196a5e13ea0080, type: 3}
+  m_PrefabInstance: {fileID: 5167211222480714331}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &62680173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62680167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7368747f4747b5a4287b72d881891d62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  showVelocity: 1
+  showAppliedForce: 1
+  showContactPoints: 1
+  averageForceMode: 1
+  velocityColor: {r: 0, g: 0, b: 1, a: 1}
+  appliedForceColor: {r: 1, g: 0, b: 0, a: 1}
+  contactPointColor: {r: 0, g: 1, b: 0, a: 1}
+  vectorScale: 0.5
 --- !u!1001 &358215059
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1565,6 +1591,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7011826874131084804, guid: a6cc448d1fd6a1f4fb196a5e13ea0080, type: 3}
+      propertyPath: groundLayer.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 7327602477983880898, guid: a6cc448d1fd6a1f4fb196a5e13ea0080, type: 3}
       propertyPath: m_Center.y
       value: 0.88
@@ -1616,7 +1646,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8672012777576573238, guid: a6cc448d1fd6a1f4fb196a5e13ea0080, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 62680173}
   m_SourcePrefab: {fileID: 100100000, guid: a6cc448d1fd6a1f4fb196a5e13ea0080, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
