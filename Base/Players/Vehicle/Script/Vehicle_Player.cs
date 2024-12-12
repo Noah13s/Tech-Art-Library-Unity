@@ -5,36 +5,9 @@ using UnityEngine.InputSystem;
 
 public class Vehicle_Player : MonoBehaviour
 {
-    [System.Serializable]
-    public struct WheelData
-    {
-        [Tooltip("The Transform representing the visual model of the wheel.")]
-        public Transform wheelMesh;
-
-        [Tooltip("The WheelCollider handling the physics of the wheel.")]
-        public WheelCollider wheelCollider;
-
-        [Tooltip("If true, this wheel will be used for steering.")]
-        public bool isSteering;
-
-        [Tooltip("If true, this wheel will be used for applying motor force.")]
-        public bool isDrive;
-
-        [Tooltip("If true, the steering direction for this wheel is inverted.")]
-        public bool invertSteering;
-
-        [Tooltip("If true, this wheel is capable of applying braking force.")]
-        public bool canBrake;
-
-        [Tooltip("The maximum braking force applied by this wheel (in Nm).")]
-        public float brakeForce;
-
-        [Tooltip("The TrailRenderer used to show skidmarks for this wheel.")]
-        public TrailRenderer skidTrail;
-    }
 
     [Tooltip("Array of wheel data for all wheels on the vehicle.")]
-    public WheelData[] wheels;
+    public Vehicle_Wheel[] wheels;
 
     [Header("Vehicle Settings")]
     [Tooltip("The motor force applied to drive wheels (in Nm).")]
@@ -58,10 +31,13 @@ public class Vehicle_Player : MonoBehaviour
     private InputAction rightAction;
     private InputAction leftAction;
     private InputAction handbrakeAction;
+    private InputAction fullThrottleAction;
 #endif
 
     private Rigidbody rb;
     private bool isHandbraking = false;
+    private float currentSteeringAngle = 0f; // Store the current steering angle for gradual changes
+    private float steeringSpeed = 5f; // Speed of steering transition (higher value means faster)
 
     void Initialize()
     {
@@ -81,6 +57,7 @@ public class Vehicle_Player : MonoBehaviour
         rightAction = controls.Vehicle_Action_Map.Right;
         leftAction = controls.Vehicle_Action_Map.Left;
         handbrakeAction = controls.Vehicle_Action_Map.Handbrake;
+        fullThrottleAction = controls.Vehicle_Action_Map.FullThrottle;
 #endif
     }
 
@@ -107,49 +84,62 @@ public class Vehicle_Player : MonoBehaviour
         float backward = backwardAction.ReadValue<float>();
         float turn = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
         isHandbraking = handbrakeAction.IsPressed();
+        bool isFullThrottle = fullThrottleAction.IsPressed();
 
         // Apply movement
-        Drive(forward - backward, turn, isHandbraking);
+        Drive(forward - backward, turn, isHandbraking, isFullThrottle);
     }
 #endif
 
-    private void Drive(float forwardInput, float turnInput, bool handbrake)
+    private void Drive(float forwardInput, float turnInput, bool handbrake, bool isFullThrottle)
     {
-        float motor = handbrake ? 0f : forwardInput * motorForce; // Disable motor torque during handbrake
-        float steering = turnInput * steeringAngle;
-
-        foreach (WheelData wheel in wheels)
+        // Adjust throttle based on shift key press
+        float throttle = forwardInput;
+        if (forwardInput > 0)
         {
+            // If moving forward, set throttle to 50% by default, or 100% if Shift is pressed
+            throttle = isFullThrottle ? 1f : 0.5f;
+        }
+
+        float motor = handbrake ? 0f : throttle * motorForce; // Disable motor torque during handbrake // Apply motor force based on throttle value
+        float targetSteeringAngle = turnInput * steeringAngle;
+
+        // Gradually change the current steering angle towards the target angle
+        currentSteeringAngle = Mathf.Lerp(currentSteeringAngle, targetSteeringAngle, Time.deltaTime * steeringSpeed);
+
+        foreach (Vehicle_Wheel wheel in wheels)
+        {
+            var wheeldata = wheel.wheelData;
             // Apply steering
-            if (wheel.isSteering)
+            if (wheeldata.isSteering)
             {
-                float finalSteering = steering * (wheel.invertSteering ? -1 : 1);
-                wheel.wheelCollider.steerAngle = finalSteering;
+                float finalSteering = currentSteeringAngle * (wheeldata.invertSteering ? -1 : 1);
+                wheeldata.wheelCollider.steerAngle = finalSteering;
             }
 
             // Apply motor force or handbrake
-            if (wheel.isDrive)
+            if (wheeldata.isDrive)
             {
                 if (handbrake)
                 {
-                    wheel.wheelCollider.motorTorque = 0f; // Disable motor during handbrake
+                    wheeldata.wheelCollider.motorTorque = 0f; // Disable motor during handbrake
                 }
                 else
                 {
-                    wheel.wheelCollider.motorTorque = motor;
+                    wheeldata.wheelCollider.motorTorque = motor;
                 }
             }
 
             // Apply braking force
-            if (wheel.canBrake)
+            if (wheeldata.canBrake)
             {
                 if (handbrake)
                 {
-                    wheel.wheelCollider.brakeTorque = wheel.brakeForce; // Apply custom brake force
+                    wheeldata.wheelCollider.brakeTorque = wheeldata.brakeForce; // Apply custom brake force
                 }
                 else
                 {
-                    wheel.wheelCollider.brakeTorque = 0f; // Release brake when not handbraking
+                    wheeldata.wheelCollider.brakeTorque = 0f; // Release brake when not handbraking
                 }
             }
         }
@@ -157,10 +147,11 @@ public class Vehicle_Player : MonoBehaviour
 
     private void UpdateWheelVisuals()
     {
-        foreach (WheelData wheel in wheels)
+        foreach (Vehicle_Wheel wheel in wheels)
         {
-            WheelCollider collider = wheel.wheelCollider;
-            Transform mesh = wheel.wheelMesh;
+            var wheeldata = wheel.wheelData;
+            WheelCollider collider = wheeldata.wheelCollider;
+            Transform mesh = wheeldata.wheelMesh;
 
             // Update wheel mesh position and rotation
             collider.GetWorldPose(out Vector3 position, out Quaternion rotation);
@@ -181,38 +172,39 @@ public class Vehicle_Player : MonoBehaviour
 
     private void HandleSkidmarks()
     {
-        foreach (WheelData wheel in wheels)
+        foreach (Vehicle_Wheel wheel in wheels)
         {
+            var wheeldata = wheel.wheelData;
             // Check if the wheel is slipping and whether we should display skidmarks
-            if (wheel.wheelCollider.isGrounded)
+            if (wheeldata.wheelCollider.isGrounded)
             {
                 WheelHit hit;
-                wheel.wheelCollider.GetGroundHit(out hit);
+                wheeldata.wheelCollider.GetGroundHit(out hit);
 
                 // Simple check for skidding (based on wheel slip)
                 if (Mathf.Abs(hit.sidewaysSlip) > 0.5f || Mathf.Abs(hit.forwardSlip) > 0.5f)
                 {
                     // Enable the skid mark by enabling the TrailRenderer
-                    if (wheel.skidTrail != null)
+                    if (wheeldata.skidTrail != null)
                     {
-                        wheel.skidTrail.emitting = true;
+                        wheeldata.skidTrail.emitting = true;
                     }
                 }
                 else
                 {
                     // Disable the skid mark when not skidding
-                    if (wheel.skidTrail != null)
+                    if (wheeldata.skidTrail != null)
                     {
-                        wheel.skidTrail.emitting = false;
+                        wheeldata.skidTrail.emitting = false;
                     }
                 }
             }
             else
             {
                 // Ensure the skid mark is turned off when the wheel is not grounded
-                if (wheel.skidTrail != null)
+                if (wheeldata.skidTrail != null)
                 {
-                    wheel.skidTrail.emitting = false;
+                    wheeldata.skidTrail.emitting = false;
                 }
             }
         }

@@ -107,6 +107,15 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FullThrottle"",
+                    ""type"": ""Button"",
+                    ""id"": ""877d443c-2e2a-4597-b7ba-074b74b3a2d9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -208,6 +217,17 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                     ""action"": ""Interact"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bbd930d0-3541-4ef6-9af8-f0697882e384"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FullThrottle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -225,6 +245,7 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
         m_Vehicle_Action_Map_Handbrake = m_Vehicle_Action_Map.FindAction("Handbrake", throwIfNotFound: true);
         m_Vehicle_Action_Map_Look = m_Vehicle_Action_Map.FindAction("Look", throwIfNotFound: true);
         m_Vehicle_Action_Map_Interact = m_Vehicle_Action_Map.FindAction("Interact", throwIfNotFound: true);
+        m_Vehicle_Action_Map_FullThrottle = m_Vehicle_Action_Map.FindAction("FullThrottle", throwIfNotFound: true);
     }
 
     ~@Vehicle_Controls()
@@ -300,6 +321,7 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Vehicle_Action_Map_Handbrake;
     private readonly InputAction m_Vehicle_Action_Map_Look;
     private readonly InputAction m_Vehicle_Action_Map_Interact;
+    private readonly InputAction m_Vehicle_Action_Map_FullThrottle;
     public struct Vehicle_Action_MapActions
     {
         private @Vehicle_Controls m_Wrapper;
@@ -313,6 +335,7 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
         public InputAction @Handbrake => m_Wrapper.m_Vehicle_Action_Map_Handbrake;
         public InputAction @Look => m_Wrapper.m_Vehicle_Action_Map_Look;
         public InputAction @Interact => m_Wrapper.m_Vehicle_Action_Map_Interact;
+        public InputAction @FullThrottle => m_Wrapper.m_Vehicle_Action_Map_FullThrottle;
         public InputActionMap Get() { return m_Wrapper.m_Vehicle_Action_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -349,6 +372,9 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @FullThrottle.started += instance.OnFullThrottle;
+            @FullThrottle.performed += instance.OnFullThrottle;
+            @FullThrottle.canceled += instance.OnFullThrottle;
         }
 
         private void UnregisterCallbacks(IVehicle_Action_MapActions instance)
@@ -380,6 +406,9 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @FullThrottle.started -= instance.OnFullThrottle;
+            @FullThrottle.performed -= instance.OnFullThrottle;
+            @FullThrottle.canceled -= instance.OnFullThrottle;
         }
 
         public void RemoveCallbacks(IVehicle_Action_MapActions instance)
@@ -408,5 +437,6 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
         void OnHandbrake(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
+        void OnFullThrottle(InputAction.CallbackContext context);
     }
 }
