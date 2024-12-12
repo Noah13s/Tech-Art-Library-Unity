@@ -24,6 +24,22 @@ public class Vehicle_Player : MonoBehaviour
     [Tooltip("Current speed of the vehicle in miles per hour (mph).")]
     public float speedMPH { get; private set; }
 
+    [Header("Engine Sound Settings")]
+    [Tooltip("AudioSource component for the engine sound.")]
+    public AudioSource engineAudioSource;
+
+    [Tooltip("Minimum pitch of the engine sound.")]
+    public float minPitch = 1.0f;
+
+    [Tooltip("Maximum pitch of the engine sound.")]
+    public float maxPitch = 3.0f;
+
+    [Tooltip("Minimum volume of the engine sound.")]
+    public float minVolume = 0.2f;
+
+    [Tooltip("Maximum volume of the engine sound.")]
+    public float maxVolume = 1.0f;
+
 #if ENABLE_INPUT_SYSTEM
     private Vehicle_Controls controls;
     private InputAction forwardAction;
@@ -74,6 +90,7 @@ public class Vehicle_Player : MonoBehaviour
         UpdateWheelVisuals();
         UpdateSpeed();
         HandleSkidmarks();
+        UpdateEngineSound();
     }
 
 #if ENABLE_INPUT_SYSTEM
@@ -208,5 +225,18 @@ public class Vehicle_Player : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void UpdateEngineSound()
+    {
+        if (engineAudioSource == null) return;
+
+        // Use speed or throttle to adjust the engine sound pitch and volume
+        float normalizedSpeed = Mathf.Clamp01(speedKMH / 200f); // Assuming 200 km/h is max speed
+        float pitch = Mathf.Lerp(minPitch, maxPitch, normalizedSpeed);
+        float volume = Mathf.Lerp(minVolume, maxVolume, normalizedSpeed);
+
+        engineAudioSource.pitch = pitch;
+        engineAudioSource.volume = volume;
     }
 }
