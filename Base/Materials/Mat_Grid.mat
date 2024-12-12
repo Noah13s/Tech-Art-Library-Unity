@@ -74,6 +74,6 @@ Material:
     - _Size: 1
     - _WorldAligned: 1
     m_Colors:
-    - _BackgroundColor: {r: 1, g: 1, b: 1, a: 0}
+    - _BackgroundColor: {r: 0.40511084, g: 0.509434, b: 0, a: 0}
     - _EdgesColor: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
