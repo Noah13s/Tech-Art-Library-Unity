@@ -117,8 +117,10 @@ public class AssemblyLineObject : MonoBehaviour
                 // Destroy the child GameObject
                 if (Application.isEditor)
                 {
+#if UNITY_EDITOR
                     // If in the Editor, use Undo to make it undoable
                     UnityEditor.Undo.DestroyObjectImmediate(child.gameObject);
+#endif
                 }
                 else
                 {

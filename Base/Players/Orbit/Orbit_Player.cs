@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 public class OrbitCamera : MonoBehaviour
@@ -86,21 +88,22 @@ public class OrbitCamera : MonoBehaviour
         if (RightClickMove)
         {
 #if ENABLE_INPUT_SYSTEM
-            if (PCcontrols.Mouse.LeftButton.IsPressed())
+            if (PCcontrols.Mouse.LeftButton.IsPressed() && IsCursorOverGameWindow())
             {
                 // Rotate the camera based on mouse input            
                 currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
                 currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
             }
 #else
-            if (Input.GetMouseButton(1))
+            if (Input.GetMouseButton(1) && IsCursorOverGameWindow())
             {
                 // Rotate the camera based on mouse input            
                 currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
                 currentRotationY -= Input.GetAxis("Mouse Y") * sensitivityY;
             }
 #endif
-        } else
+        }
+        else
         {
 #if ENABLE_INPUT_SYSTEM
             // Rotate the camera based on mouse input            
@@ -117,7 +120,7 @@ public class OrbitCamera : MonoBehaviour
         currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
 
         // Zoom in and out using scrollwheel if scrolling is allowed
-        if (allowScrolling)
+        if (allowScrolling && IsCursorOverGameWindow())
         {
 #if ENABLE_INPUT_SYSTEM
             distance += PCcontrols.Mouse.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
@@ -159,5 +162,34 @@ public class OrbitCamera : MonoBehaviour
 
         // Set the camera's rotation
         transform.rotation = rotation;
+    }
+
+    bool IsCursorOverGameWindow()
+    {
+        // Check if EventSystem is used (for UI detection)
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return true;
+        }
+
+        // Check cursor position using the Legacy Input System or New Input System
+        Vector2 mousePosition = Vector2.zero;
+
+#if ENABLE_INPUT_SYSTEM
+        // New Input System
+        mousePosition = PCcontrols.Mouse.Position.ReadValue<Vector2>();
+#else
+        // Legacy Input System
+        mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+#endif
+
+        // Check if the cursor is within screen bounds
+        if (mousePosition.x >= 0 && mousePosition.x <= Screen.width &&
+            mousePosition.y >= 0 && mousePosition.y <= Screen.height)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
