@@ -23,10 +23,10 @@ public class Plane_UI : MonoBehaviour
     {
         if (vehicle != null)
         {
-            UpdateSpeedometer();
+            //UpdateSpeedometer();
         }
     }
-
+    /*
     void UpdateSpeedometer()
     {
         if (altitude != null) { altitude.text = (MathF.Round(vehicle.altitudeMeters/10f)*10).ToString(); }
@@ -37,5 +37,5 @@ public class Plane_UI : MonoBehaviour
             float zRotation = Mathf.Lerp(0, -240, normalizedSpeed); // Map speed to rotation range
             speedometerArrow.GetComponent<RectTransform>().rotation = Quaternion.Euler(0, 0, zRotation);
         }
-    }
+    }*/
 }

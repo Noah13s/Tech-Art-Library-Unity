@@ -1,182 +1,170 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Plane_Player : MonoBehaviour
 {
-    [Header("Plane Settings")]
-    public float maxSpeed = 300f;
-    public float thrustForce = 1000f;
-    public float maxRotationalSpeed = 60f;
-    public float liftFactor = 1.2f;
-    public float dragCoefficient = 0.05f;
-
-    [Header("Audio Settings")]
-    public AudioSource engineAudioSource;
-    public float minPitch = 1.0f;
-    public float maxPitch = 3.0f;
-    public float minVolume = 0.2f;
-    public float maxVolume = 1.0f;
-
-    [field: Header("Vehicle Metrics")]
-    [Tooltip("Current speed of the vehicle in kilometers per hour (km/h).")]
-    public float speedKMH { get; private set; }
-
-    [Tooltip("Current speed of the vehicle in miles per hour (mph).")]
-    public float speedMPH { get; private set; }
-
-    [Tooltip("Current altitude of the vehicle above ground level in meters.")]
-    public float altitudeMeters { get; private set; }
+    public float gravityForce = 9.8f;        // Simulated gravity force
+    public float alignmentSpeed = 2f;        // Speed at which the plane aligns to its velocity vector
+    public float maxThrust = 1000f;          // Maximum thrust force
+    public float pitchSpeed = 50f;           // Speed at which the plane pitches (rotates around X-axis)
+    public float gizmoRadius = 0.2f;        // Radius of the gizmo sphere
+    public float liftCoefficient = 1.2f; // Coefficient controlling lift strength
+    public float wingArea = 20f;        // Wing area in square meters
+    public float airDensity = 1.225f;  // Air density at sea level in kg/m³
 
 #if ENABLE_INPUT_SYSTEM
     private Plane_Controls controls;
-    private InputAction pitchUpAction;
-    private InputAction pitchDownAction;
-    private InputAction rollRightAction;
-    private InputAction rollLeftAction;
-    private InputAction yawRightAction;
-    private InputAction yawLeftAction;
+    private InputAction pitchUp;
+    private InputAction pitchDown;
     private InputAction throttleAction;
 #endif
 
     private Rigidbody rb;
-    private float currentThrottle = 0f;
-    private float currentPitch = 0f;
-    private float currentYaw = 0f;
-    private float currentRoll = 0f;
+    private float currentThrust = 0f;         // Current thrust based on input
 
-    void Initialize()
+
+    void Start()
     {
+        // Get the Rigidbody component
         rb = GetComponent<Rigidbody>();
         if (rb == null)
         {
-            Debug.LogError("Rigidbody component is missing!");
+            Debug.LogError("No Rigidbody found on the plane!");
             return;
         }
 
-        rb.useGravity = false; // We'll simulate gravity ourselves
-
 #if ENABLE_INPUT_SYSTEM
+        // Initialize the input actions for the new Input System
         controls = new Plane_Controls();
         controls.Enable();
-
-        pitchUpAction = controls.Plane_Action_Map.PitchUp;
-        pitchDownAction = controls.Plane_Action_Map.PitchDown;
-        rollRightAction = controls.Plane_Action_Map.RollRight;
-        rollLeftAction = controls.Plane_Action_Map.RollLeft;
-        yawRightAction = controls.Plane_Action_Map.YawRight;
-        yawLeftAction = controls.Plane_Action_Map.YawLeft;
+        pitchUp = controls.Plane_Action_Map.PitchUp;
+        pitchDown = controls.Plane_Action_Map.PitchDown;
         throttleAction = controls.Plane_Action_Map.Throttle;
 #endif
     }
 
-    void Start()
+    void FixedUpdate()
     {
-        Initialize();
+        if (rb == null) return;
+
+        // Apply gravity
+        SimulateGravity();
+
+        // Apply constant forward motion
+        SimulateForwardMotion();
+
+        // Apply thrust (throttle)
+        HandleThrottle();
+
+        // Align the plane to its velocity vector
+        AlignToVelocity();
+
+        // Apply pitch control affecting velocity and rotation
+        HandlePitchControl();
+
+        // Apply lift
+        ApplyLift();
     }
 
-    void Update()
+    private void SimulateGravity()
     {
-#if ENABLE_INPUT_SYSTEM
-        HandleNewInputSystem();
-#endif
-        UpdateMetrics();
-        UpdateEngineSound();
+        Vector3 gravity = Vector3.down * gravityForce;
+        rb.AddForce(gravity, ForceMode.Acceleration);
     }
 
-#if ENABLE_INPUT_SYSTEM
-    private void HandleNewInputSystem()
+    private void SimulateForwardMotion()
     {
-        float throttleInput = throttleAction.ReadValue<float>();
-        float pitchInput = pitchUpAction.ReadValue<float>() - pitchDownAction.ReadValue<float>();
-        float yawInput = yawRightAction.ReadValue<float>() - yawLeftAction.ReadValue<float>();
-        float rollInput = rollRightAction.ReadValue<float>() - rollLeftAction.ReadValue<float>();
+        // Apply a constant forward force in the plane's current forward direction
+        rb.AddForce(transform.forward * currentThrust, ForceMode.Force);
 
-        ControlPlane(throttleInput, pitchInput, yawInput, rollInput);
     }
-#endif
 
-    private void ControlPlane(float throttle, float pitch, float yaw, float roll)
+    private void HandleThrottle()
     {
-        // Update throttle and apply forward thrust
-        currentThrottle = Mathf.Clamp01(throttle);
-        float thrust = currentThrottle * thrustForce;
-        rb.AddForce(transform.forward * thrust);
+        // Read the throttle input (e.g., from a trigger or axis input)
+        currentThrust = throttleAction.ReadValue<float>() * maxThrust;
 
-        // Calculate velocity and its magnitude
+        // Ensure the thrust is within bounds
+        currentThrust = Mathf.Clamp(currentThrust, 0f, maxThrust);
+    }
+    private void AlignToVelocity()
+    {
+        float yVelocityMagnitude = Mathf.Abs(rb.velocity.y);
+        // Check if the velocity magnitude is significant
+        if (yVelocityMagnitude > 10f)
+        {
+            // Calculate the target rotation based on the velocity vector
+            Quaternion targetRotation = Quaternion.LookRotation(rb.velocity.normalized, Vector3.up);
+
+            // Smoothly rotate the plane to align with the velocity vector
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, alignmentSpeed * Time.fixedDeltaTime);
+        }
+    }
+
+    private void ApplyLift()
+    {
+        // Get the velocity vector
         Vector3 velocity = rb.velocity;
+
+        // Calculate the speed (magnitude of the velocity vector)
         float speed = velocity.magnitude;
-        Vector3 forward = transform.forward;
 
-        // Calculate angle of attack (AoA) between forward direction and velocity
-        float angleOfAttack = 0f;
-        if (speed > 0.1f)
+        // Calculate the angle between the velocity vector and the plane's forward vector
+        float angleOfAttack = Vector3.Dot(velocity.normalized, transform.forward);
+
+        // Ensure the angle of attack is between 0 and 1 (clamped)
+        // This simulates how much the orientation contributes to lift generation
+        angleOfAttack = Mathf.Clamp01(angleOfAttack);
+
+        // Calculate lift force using speed and angle of attack
+        float liftForceMagnitude = 0.5f * liftCoefficient * airDensity * speed * speed * wingArea * angleOfAttack;
+
+        // Apply lift force upwards relative to the plane
+        Vector3 liftForce = transform.up * liftForceMagnitude;
+        rb.AddForce(liftForce, ForceMode.Force);
+    }
+
+    private void HandlePitchControl()
+    {
+        float yVelocityMagnitude = Mathf.Abs(rb.velocity.y);
+        // Get pitch inputs (positive for up, negative for down)
+        float pitchInput = pitchUp.ReadValue<float>() - pitchDown.ReadValue<float>();
+
+        // If there is input, apply pitch control by rotating around the local X-axis (the pitch axis)
+        if (pitchInput != 0 && rb.velocity.magnitude > 10f)
         {
-            angleOfAttack = Vector3.Angle(forward, velocity.normalized);
-        }
+            // Rotate the plane around its local X-axis based on pitch input
+            transform.Rotate(Vector3.right * pitchInput * pitchSpeed * Time.fixedDeltaTime);
 
-        // Convert AoA to radians
-        float angleOfAttackRad = Mathf.Deg2Rad * angleOfAttack;
-
-        // Calculate lift: Lift is proportional to speed² * cos(AoA)
-        float lift = liftFactor * speed * speed * Mathf.Cos(angleOfAttackRad);
-        Vector3 liftForce = Vector3.up * lift;
-
-        // Apply lift force
-        rb.AddForce(liftForce);
-
-        // Apply drag (aerodynamic resistance)
-        Vector3 drag = -velocity.normalized * (dragCoefficient * speed * speed); // Linear drag
-        float inducedDrag = Mathf.Sin(angleOfAttackRad) * lift; // Induced drag from lift
-        rb.AddForce(drag + velocity.normalized * -inducedDrag);
-
-        // Simulate gravity manually to balance lift
-        Vector3 gravityForce = Vector3.down * 9.81f * rb.mass;
-        rb.AddForce(gravityForce);
-
-        // Apply rotational controls (roll, pitch, yaw)
-        float rollRotation = roll * maxRotationalSpeed * Time.deltaTime;
-        float yawRotation = yaw * maxRotationalSpeed * Time.deltaTime;
-        float pitchRotation = pitch * maxRotationalSpeed * Time.deltaTime;
-
-        transform.Rotate(Vector3.forward, -rollRotation); // Roll
-        transform.Rotate(Vector3.up, yawRotation);        // Yaw
-        transform.Rotate(Vector3.right, pitchRotation);   // Pitch
-
-        // Adjust velocity direction when pitching down or up
-        if (throttle == 0f) // When gliding
-        {
-            Vector3 gravityAcceleration = gravityForce / rb.mass;
-            Vector3 forwardGravityComponent = Vector3.Project(gravityAcceleration, forward);
-            rb.AddForce(forwardGravityComponent, ForceMode.Acceleration);
+            // Adjust the velocity direction to reflect the new rotation
+            // This ensures the plane's forward direction is updated after the pitch rotation
+            rb.velocity = transform.forward * rb.velocity.magnitude;
         }
     }
 
-    private void UpdateMetrics()
+    void OnDisable()
     {
-        // Speed Calculation
-        float speedMS = rb.velocity.magnitude; // Speed in meters per second
-        speedKMH = speedMS * 3.6f;             // Convert to kilometers per hour
-        speedMPH = speedMS * 2.23694f;         // Convert to miles per hour
-
-        // Altitude Calculation
-        altitudeMeters = transform.position.y - altitudeMeters;
+        // Disable the controls when the script is disabled
+#if ENABLE_INPUT_SYSTEM
+        controls.Disable();
+#endif
     }
 
 
-
-    private void UpdateEngineSound()
+    // Gizmo to visualize the center of mass
+    void OnDrawGizmos()
     {
-        if (engineAudioSource == null) return;
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            // Get the position of the center of mass relative to the plane's transform
+            Vector3 centerOfMassPosition = transform.position + transform.rotation * rb.centerOfMass;
 
-        float normalizedThrottle = Mathf.Clamp01(currentThrottle);
-        float normalizedSpeed = Mathf.Clamp01(rb.velocity.magnitude / maxSpeed);
+            // Set the color of the Gizmo
+            Gizmos.color = Color.red;
 
-        float pitch = Mathf.Lerp(minPitch, maxPitch, normalizedThrottle + normalizedSpeed);
-        float volume = Mathf.Lerp(minVolume, maxVolume, normalizedThrottle);
-
-        engineAudioSource.pitch = pitch;
-        engineAudioSource.volume = volume;
+            // Draw a sphere at the center of mass position
+            Gizmos.DrawSphere(centerOfMassPosition, gizmoRadius);
+        }
     }
 }
