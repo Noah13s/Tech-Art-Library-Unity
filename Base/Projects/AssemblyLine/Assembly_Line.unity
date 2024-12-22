@@ -487,6 +487,58 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &985587626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985587628}
+  - component: {fileID: 985587627}
+  m_Layer: 0
+  m_Name: FractalTreeGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &985587627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985587626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1988d2aa5d8611b41a96d534a51dba63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  branchPrefab: {fileID: 5797722791619223175, guid: e247a1622671d354594628d730d808c3, type: 3}
+  leafPrefab: {fileID: 919132149155446097, guid: 633a0591cad0edf45a1dfe46774876b7, type: 3}
+  branchLength: 5
+  maxDepth: 8
+  branchReduction: 0.8
+  angleVariation: 30
+  scaleReduction: 1
+  leafThreshold: 2
+--- !u!4 &985587628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985587626}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1051955934
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1395,3 +1447,4 @@ SceneRoots:
   - {fileID: 1278401535}
   - {fileID: 662515762}
   - {fileID: 1981580193}
+  - {fileID: 985587628}
