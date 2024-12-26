@@ -18,8 +18,7 @@ public class ARSpawner : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(player.camera.transform.position, player.camera.transform.forward, out hit))
         {
-            spawnedObject = Instantiate(prefab, hit.point, new Quaternion());
-            spawnedObject.transform.localScale = new Vector3(scale, scale, scale);
+            Instantiate(prefab, hit.point, new Quaternion()).transform.localScale = new Vector3(scale, scale, scale);
             onSpawn.Invoke();
         }
     }

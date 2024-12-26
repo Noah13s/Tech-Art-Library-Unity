@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: ReferenceImageLibrary
+  m_EditorClassIdentifier: 
+  m_GuidLow: 5599429987597062180
+  m_GuidHigh: 4612473777724911259
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5500711363699346726
+      m_GuidHigh: 5507583031203285645
+    m_SerializedTextureGuid:
+      m_GuidLow: 17160092717770134708
+      m_GuidHigh: 1883104403739291514
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: augmented-images-earth
+    m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5619625992128588574
+      m_GuidHigh: 7521369575744045211
+    m_SerializedTextureGuid:
+      m_GuidLow: 7328609173154100405
+      m_GuidHigh: 14875379745639825913
+    m_Size: {x: 0.104775, y: 0.104775}
+    m_SpecifySize: 1
+    m_Name: QRCode
+    m_Texture: {fileID: 2800000, guid: df84f4b5733665b4f901e7c510f76fce, type: 3}
