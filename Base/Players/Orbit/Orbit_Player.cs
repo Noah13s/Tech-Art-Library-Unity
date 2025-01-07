@@ -27,6 +27,7 @@ public class OrbitCamera : MonoBehaviour
     private Vector3 targetPosition;
 #if ENABLE_INPUT_SYSTEM
     private PCInputs PCcontrols;
+    private ControllerInputs ControllerControls;
     private TouchInputs Touchcontrols;
 #endif
 
@@ -36,6 +37,7 @@ public class OrbitCamera : MonoBehaviour
         // Initialize the new input system controls
 #if ENABLE_INPUT_SYSTEM
         PCcontrols = new PCInputs();
+        ControllerControls = new ControllerInputs();
         Touchcontrols = new TouchInputs();
 #endif
     }
@@ -45,6 +47,7 @@ public class OrbitCamera : MonoBehaviour
         // Enable the input controls
 #if ENABLE_INPUT_SYSTEM
         PCcontrols.Enable();
+        ControllerControls.Enable();
         Touchcontrols.Enable();
 #endif
     }
@@ -54,6 +57,7 @@ public class OrbitCamera : MonoBehaviour
         // Disable the input controls
 #if ENABLE_INPUT_SYSTEM
         PCcontrols.Disable();
+        ControllerControls.Disable();
         Touchcontrols.Disable();
 #endif
     }
@@ -106,7 +110,9 @@ public class OrbitCamera : MonoBehaviour
         else
         {
 #if ENABLE_INPUT_SYSTEM
-            // Rotate the camera based on mouse input            
+            // Rotate the camera based on input
+            currentRotationX += ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().y * sensitivityY;
             currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
             currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
             currentRotationX += Touchcontrols.Touch.Delta.ReadValue<Vector2>().x * sensitivityX;

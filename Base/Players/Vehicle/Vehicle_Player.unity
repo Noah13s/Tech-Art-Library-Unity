@@ -143,6 +143,10 @@ PrefabInstance:
       value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 3024716815526781517, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+      propertyPath: RightClickMove
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3024716815526781517, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
       propertyPath: collisionLayer.m_Bits
       value: 4294967295
       objectReference: {fileID: 0}

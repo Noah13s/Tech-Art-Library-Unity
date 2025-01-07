@@ -1657,6 +1657,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1825151587764541110, guid: fdfcbe7ab9da9d54386717a0b96526b3, type: 3}
+      propertyPath: lookSpeed
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2167041117485101286, guid: fdfcbe7ab9da9d54386717a0b96526b3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -1768,6 +1772,10 @@ PrefabInstance:
     - target: {fileID: 5567493788391790987, guid: fdfcbe7ab9da9d54386717a0b96526b3, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6389322227611850113, guid: fdfcbe7ab9da9d54386717a0b96526b3, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3824699050
       objectReference: {fileID: 0}
     - target: {fileID: 6511148588797611793, guid: fdfcbe7ab9da9d54386717a0b96526b3, type: 3}
       propertyPath: m_Name

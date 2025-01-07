@@ -132,6 +132,17 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""833449bc-a171-4b64-a75e-6687105bf935"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Forward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""5ba30651-0e48-4de5-82a7-d9f660df4042"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
@@ -154,8 +165,30 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""df47fe18-4182-428c-b74d-6c5dd16abe34"",
+                    ""path"": ""<Gamepad>/dpad/right"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""45dda3e7-b1e0-4e8a-8da5-962205ae8a77"",
                     ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""942350b4-0393-46d0-982b-9ec1ce70de49"",
+                    ""path"": ""<Gamepad>/dpad/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -198,6 +231,17 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""ce3e85a8-e5f1-4709-9f64-bf83e4b28a3e"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Handbrake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""e4d11cef-9497-4070-882a-d08c597d7c5e"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
@@ -222,6 +266,17 @@ public partial class @Vehicle_Controls: IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""bbd930d0-3541-4ef6-9af8-f0697882e384"",
                     ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FullThrottle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c0d9d586-cb6f-46fe-ba82-f23607b371d2"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

@@ -54,6 +54,7 @@ public class First_Person_Player : MonoBehaviour
     private InputAction leftAction;
     private InputAction jumpAction;
     private InputAction lookAction;
+    private InputAction moveAction;
 #endif
 
     private bool externalJump;
@@ -74,6 +75,7 @@ public class First_Person_Player : MonoBehaviour
         leftAction = controls.FPS_Action_Map.Left;
         jumpAction = controls.FPS_Action_Map.Jump;
         lookAction = controls.FPS_Action_Map.Look;
+        moveAction = controls.FPS_Action_Map.Move;
 #endif
     }
 
@@ -116,7 +118,9 @@ public class First_Person_Player : MonoBehaviour
 
         forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
         rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
-        
+
+        forwardMovement += moveAction.ReadValue<Vector2>().y;
+        rightMovement += moveAction.ReadValue<Vector2>().x;
 
         // Movement speed based on whether the player is running or walking
         float moveSpeed = Keyboard.current.leftShiftKey.isPressed ? runSpeed : walkSpeed;
