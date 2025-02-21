@@ -11,7 +11,7 @@ public class Vehicle_Player : MonoBehaviour
 {
 #region Variables
     [Tooltip("Array of wheel data for all wheels on the vehicle.")]
-    public Vehicle_Wheel[] wheels;
+    public Vehicle_Wheel[] wheels = new Vehicle_Wheel[0];
 
     [Header("Vehicle Settings")]
     [Tooltip("The motor force applied to drive wheels (in Nm).")]
@@ -215,6 +215,7 @@ public class Vehicle_Player : MonoBehaviour
                 // Simple check for skidding (based on wheel slip)
                 if (Mathf.Abs(hit.sidewaysSlip) > 0.5f || Mathf.Abs(hit.forwardSlip) > 0.5f)
                 {
+                    wheeldata.isSkidding = true;
                     // Enable the skid mark by enabling the TrailRenderer
                     if (wheeldata.skidTrail != null)
                     {
@@ -223,6 +224,7 @@ public class Vehicle_Player : MonoBehaviour
                 }
                 else
                 {
+                    wheeldata.isSkidding = false;
                     // Disable the skid mark when not skidding
                     if (wheeldata.skidTrail != null)
                     {
@@ -232,6 +234,7 @@ public class Vehicle_Player : MonoBehaviour
             }
             else
             {
+                wheeldata.isSkidding = false;
                 // Ensure the skid mark is turned off when the wheel is not grounded
                 if (wheeldata.skidTrail != null)
                 {
@@ -259,20 +262,21 @@ public class Vehicle_Player : MonoBehaviour
         UpdateDebugVisuals();
     }
 
+
+    Color baseColor = new(255, 255, 255, 0.5f);
+
     private void UpdateDebugVisuals()
     {
         if (!debugMode) { return; }
         //  Setup + Var declaration
-        Handles.color = new(255, 255, 255, 0.5f);
-        float customSteeringAngle = steeringAngle + 20;//   Investigate why an offset is needed to get the correct wheels rotation
+        Handles.color = baseColor;
 
         // Create a 1x1 texture
-        Texture2D backgroundColoredTexture = new Texture2D(1, 1);
-
+        Texture2D backgroundColoredTexture = new(1, 1);
         // Set the color with alpha (e.g., semi-transparent red)
         backgroundColoredTexture.SetPixel(0, 0, debugLabelsBgColor); // RGBA, where 0.5f is 50% transparency
-
         backgroundColoredTexture.Apply();
+
         GUIStyle style = new()
         {
             fontSize = debugLabelsSize,
@@ -298,22 +302,26 @@ public class Vehicle_Player : MonoBehaviour
             //  Draws a label for each wheels
             if (debugWheelsLabels)
             {
-                string wheelLabel = $"Speed: {wheel.wheelData.wheelCollider.rpm} RPM\nSteering angle: {wheel.wheelData.wheelCollider.steerAngle}°\nMass supported: {wheel.wheelData.wheelCollider.sprungMass} Kg";
+                string wheelLabel = $"Speed: {wheel.wheelData.wheelCollider.rpm} RPM\nSteering angle: {wheel.wheelData.wheelCollider.steerAngle}°\nSkidding: {wheel.wheelData.isSkidding}";
                 Handles.Label(new Vector3(wheel.transform.position.x, wheel.wheelData.wheelCollider.bounds.max.y, wheel.transform.position.z), wheelLabel, style);
             }
 
 
             if (wheel.wheelData.isSteering)
             {
+                Handles.color = baseColor;
                 //  Draws debug for steerable wheels
                 Handles.DrawSolidArc(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), transform.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 1f);
-                Handles.DrawLine(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z) + (Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward * 10));
+                Handles.color = Color.green;
+                Handles.DrawLine(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z) + (Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward * 1f),5f);
             }
+
         }
 
         #region Single Wedge for Wheel Turn Angle Debug
+        Handles.color = baseColor;
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, new(255, 255, 255, 0.5f));        // Draw front wheel angle
+        DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, baseColor);        // Draw front wheel angle
         //  Draws the center of the two front wheel angle meetup point 
         Handles.color = Color.blue;
         Handles.DrawWireCube(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2), new Vector3(0.1f, 0.1f, 0.1f));
@@ -328,6 +336,25 @@ public class Vehicle_Player : MonoBehaviour
         
         if (debugGlobalLabel)
             Handles.Label(new Vector3(transform.position.x, GetComponentInChildren<MeshCollider>().bounds.max.y, transform.position.z), globalLabel, style);
+
+        #region Vehicle turning pivot debug
+        // Get front and rear axle midpoints correctly
+        Vector3 frontAxleMiddle = (wheels[0].transform.position + wheels[1].transform.position) * 0.5f;
+        Vector3 rearAxleMiddle = (wheels[2].transform.position + wheels[3].transform.position) * 0.5f;
+
+        // Calculate the vehicle's forward direction
+        Vector3 vehicleForward = (frontAxleMiddle - rearAxleMiddle).normalized;
+
+        // Wheelbase length
+        float wheelBase = Vector3.Distance(frontAxleMiddle, rearAxleMiddle);
+
+        // Get the steering pivot point
+        Vector3 pivot = CalculateSteeringPivot(rearAxleMiddle, vehicleForward, wheelBase, -currentSteeringAngle);
+
+        // Draw the pivot point
+        Handles.color = Color.yellow;
+        Handles.DrawWireCube(pivot, new Vector3(0.1f, 0.1f, 0.1f));
+        #endregion
     }
     void DrawFilledWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
     {
@@ -430,7 +457,6 @@ public class Vehicle_Player : MonoBehaviour
             Gizmos.DrawLine(corners[i], corners[i + 4]);
     }
 
-
     void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius)
     {
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
@@ -479,7 +505,19 @@ public class Vehicle_Player : MonoBehaviour
         return C;
     }
 
+    // Updated function to consider vehicle orientation
+    Vector3 CalculateSteeringPivot(Vector3 rearAxleMidpoint, Vector3 vehicleForward, float wheelbase, float steeringAngle)
+    {
+        if (Mathf.Abs(steeringAngle) < 0.001f)
+            return Vector3.positiveInfinity; // No pivot when steering is 0
 
+        float turningRadius = wheelbase / Mathf.Tan(steeringAngle * Mathf.Deg2Rad);
+
+        // Pivot offset is perpendicular to the vehicle's forward direction
+        Vector3 pivotOffset = Quaternion.AngleAxis(90, Vector3.up) * vehicleForward * turningRadius;
+
+        return rearAxleMidpoint - pivotOffset;
+    }
 }
 
 #region Custom Editor
@@ -490,10 +528,13 @@ public class CustomEditorVehicle_Player : Editor
 
     public override void OnInspectorGUI()
     {
+        ValidateVehicleSetup();
         base.OnInspectorGUI();
         Vehicle_Player playerScript = (Vehicle_Player)target;
 
         GUILayout.Space(10);
+
+
         playerScript.debugMode = GUILayout.Toggle(playerScript.debugMode, playerScript.debugMode ? "Disable debug tools" : "Enable debug tools");
         if (playerScript.debugMode)
         {
@@ -504,6 +545,71 @@ public class CustomEditorVehicle_Player : Editor
             playerScript.debugGlobalLabel = GUILayout.Toggle(playerScript.debugGlobalLabel, playerScript.debugGlobalLabel ? "Disable global debug labels" : "Enable global debug labels");
             playerScript.debugWheelsLabels = GUILayout.Toggle(playerScript.debugWheelsLabels, playerScript.debugWheelsLabels ? "Disable wheels debug labels" : "Enable wheels debug labels");
             EditorGUILayout.EndHorizontal();
+        }
+    }
+
+    void ValidateVehicleSetup()
+    {
+        Vehicle_Player playerScript = (Vehicle_Player)target;
+        bool noWheelsCanBrake = true;
+        bool noWheelsReferenced = true;
+        bool noWheelsCanSteer = true;
+        bool noWheelsCanDrive = true;
+        if (playerScript.wheels.Length <= 0) 
+            return;
+
+        if (playerScript.wheels.Length > 0 && playerScript.wheels.Length%2==1)
+        {
+            EditorGUILayout.HelpBox("An odd number of wheels has been setup.", MessageType.Warning);
+        }
+
+        foreach (var wheel in playerScript.wheels)
+        {
+            if (wheel)//  If wheel script is referenced 
+            {
+                noWheelsReferenced = false;
+                if (!wheel.wheelData.wheelCollider | !wheel.wheelData.wheelMesh)
+                {
+                    EditorGUILayout.HelpBox($"This wheel: ({wheel.name}) has a wrong setup.", MessageType.Error);
+                }
+                if (wheel.wheelData.canBrake)
+                {
+                    noWheelsCanBrake = false;
+                }
+                if (wheel.wheelData.isSteering)
+                {
+                    noWheelsCanSteer = false;
+                }
+                if (wheel.wheelData.isDrive)
+                {
+                    noWheelsCanDrive = false;
+                }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox($"A wheel entry has no reference!", MessageType.Error);
+            }
+        }
+        if (noWheelsReferenced)//  If no wheel script is referenced there is no use displaying all the other messages so return
+        {
+            EditorGUILayout.HelpBox("No wheels scripts have been referenced!", MessageType.Error);
+            return;
+        }
+
+
+        if (noWheelsCanBrake)//  No wheels can brake
+        {
+            EditorGUILayout.HelpBox("No wheels have braking enabled!", MessageType.Warning);
+        }
+
+        if (noWheelsCanSteer)//  No wheels can steer
+        {
+            EditorGUILayout.HelpBox("No wheels have steering enabled!", MessageType.Warning);
+        }
+
+        if (noWheelsCanDrive)//  No wheels can drive
+        {
+            EditorGUILayout.HelpBox("No wheels have drive enabled!", MessageType.Warning);
         }
     }
 }

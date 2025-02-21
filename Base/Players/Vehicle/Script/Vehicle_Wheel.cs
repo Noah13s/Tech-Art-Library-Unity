@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +33,9 @@ public class Vehicle_Wheel : MonoBehaviour
 
         [Tooltip("The TrailRenderer used to show skidmarks for this wheel.")]
         public TrailRenderer skidTrail;
+
+        [Tooltip("If true, this wheel is skidding.")]
+        [NonSerialized] public bool isSkidding;
     }
 
     public WheelData wheelData;
