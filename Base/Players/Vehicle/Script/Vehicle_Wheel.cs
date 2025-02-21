@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(WheelCollider))]
 public class Vehicle_Wheel : MonoBehaviour
 {
 

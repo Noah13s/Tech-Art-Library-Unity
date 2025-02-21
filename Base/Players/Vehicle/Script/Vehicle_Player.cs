@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,6 +27,10 @@ public class Vehicle_Player : MonoBehaviour
     [field: Header("Vehicle Speed")]
     [Tooltip("Current speed of the vehicle in miles per hour (mph).")]
     public float speedMPH { get; private set; }
+
+    [field: Header("Vehicle Throttle")]
+    [Tooltip("Current throttle of the vehicle in 0 to 1.")]
+    public float currentThrottle { get; private set; }
 
     [Header("Engine Sound Settings")]
     [Tooltip("AudioSource component for the engine sound.")]
@@ -56,8 +61,14 @@ public class Vehicle_Player : MonoBehaviour
     private bool isHandbraking = false; // Tracks handbrake state
     private float currentSteeringAngle = 0f; // Store the current steering angle for gradual changes
     private readonly float steeringSpeed = 5f; // Speed of steering transition (higher value means faster)
+    //  Debug
     [NonSerialized] public bool debugMode = false;
-#endregion
+    [NonSerialized] public bool debugGlobalLabel = false;
+    [NonSerialized] public bool debugWheelsLabels = false;
+    [NonSerialized] public int debugLabelsSize = 10;
+    [NonSerialized] public Color debugLabelsTextColor = Color.black;
+    [NonSerialized] public Color debugLabelsBgColor = Color.white;
+    #endregion
 
     void Initialize()
     {
@@ -121,6 +132,7 @@ public class Vehicle_Player : MonoBehaviour
             // If moving forward, set throttle to 50% by default, or 100% if Shift is pressed
             throttle = isFullThrottle ? 1f : 0.5f;
         }
+        currentThrottle = throttle;//   Set global current throttle to actual value
 
         float motor = handbrake ? 0f : throttle * motorForce; // Disable motor torque during handbrake // Apply motor force based on throttle value
         float targetSteeringAngle = turnInput * steeringAngle;
@@ -176,8 +188,7 @@ public class Vehicle_Player : MonoBehaviour
 
             // Update wheel mesh position and rotation
             collider.GetWorldPose(out Vector3 position, out Quaternion rotation);
-            mesh.position = position;
-            mesh.rotation = rotation;
+            mesh.SetPositionAndRotation(position, rotation);
         }
     }
 
@@ -199,8 +210,7 @@ public class Vehicle_Player : MonoBehaviour
             // Check if the wheel is slipping and whether we should display skidmarks
             if (wheeldata.wheelCollider.isGrounded)
             {
-                WheelHit hit;
-                wheeldata.wheelCollider.GetGroundHit(out hit);
+                wheeldata.wheelCollider.GetGroundHit(out WheelHit hit);
 
                 // Simple check for skidding (based on wheel slip)
                 if (Mathf.Abs(hit.sidewaysSlip) > 0.5f || Mathf.Abs(hit.forwardSlip) > 0.5f)
@@ -255,6 +265,23 @@ public class Vehicle_Player : MonoBehaviour
         //  Setup + Var declaration
         Handles.color = new(255, 255, 255, 0.5f);
         float customSteeringAngle = steeringAngle + 20;//   Investigate why an offset is needed to get the correct wheels rotation
+
+        // Create a 1x1 texture
+        Texture2D backgroundColoredTexture = new Texture2D(1, 1);
+
+        // Set the color with alpha (e.g., semi-transparent red)
+        backgroundColoredTexture.SetPixel(0, 0, debugLabelsBgColor); // RGBA, where 0.5f is 50% transparency
+
+        backgroundColoredTexture.Apply();
+        GUIStyle style = new()
+        {
+            fontSize = debugLabelsSize,
+            normal = new GUIStyleState()
+        };
+        style.normal.textColor = debugLabelsTextColor;
+        style.normal.background = backgroundColoredTexture;
+        string globalLabel = $"Speed: {speedKMH} Km/h\nSteering angle: {currentSteeringAngle}°\nThrottle: {currentThrottle}";
+
         #region Average Wheel Height Calculation
         float averageWheelsHeight = 0;
         // Calculate the average wheel height for the best wheel angle debug placement
@@ -265,25 +292,43 @@ public class Vehicle_Player : MonoBehaviour
         averageWheelsHeight = averageWheelsHeight/wheels.Length;
         #endregion
 
-        //  Draw wheel turn angle for eahch tunable wheel
+        //  Draw debug tools for each wheels
         foreach (var wheel in wheels)
         {
-            if(wheel.wheelData.isSteering)
-                Handles.DrawSolidArc(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), transform.up, Quaternion.Euler(0, -customSteeringAngle / 2, 0) * transform.forward, customSteeringAngle, 2f);
+            //  Draws a label for each wheels
+            if (debugWheelsLabels)
+            {
+                string wheelLabel = $"Speed: {wheel.wheelData.wheelCollider.rpm} RPM\nSteering angle: {wheel.wheelData.wheelCollider.steerAngle}°\nMass supported: {wheel.wheelData.wheelCollider.sprungMass} Kg";
+                Handles.Label(new Vector3(wheel.transform.position.x, wheel.wheelData.wheelCollider.bounds.max.y, wheel.transform.position.z), wheelLabel, style);
+            }
+
+
+            if (wheel.wheelData.isSteering)
+            {
+                //  Draws debug for steerable wheels
+                Handles.DrawSolidArc(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), transform.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 1f);
+                Handles.DrawLine(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z) + (Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward * 10));
+            }
         }
 
-        #region Single Wedge Wheel Turn Angle Debug
+        #region Single Wedge for Wheel Turn Angle Debug
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, customSteeringAngle).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, customSteeringAngle).z), Vector3.up, Quaternion.Euler(0, -customSteeringAngle / 2, 0) * transform.forward, customSteeringAngle, 0f, 4f, 6f, new(255, 255, 255, 0.5f));        // Draw front wheel angle
+        DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, new(255, 255, 255, 0.5f));        // Draw front wheel angle
         //  Draws the center of the two front wheel angle meetup point 
         Handles.color = Color.blue;
-        Handles.DrawWireCube(CalculateC(wheels[0].transform.position, wheels[1].transform.position, customSteeringAngle), new Vector3(0.1f, 0.1f, 0.1f));
-        #endregion
-
+        Handles.DrawWireCube(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2), new Vector3(0.1f, 0.1f, 0.1f));
+        //  Draws the vehicle direction
         Handles.color = Color.green;
-        Handles.DrawLine(new Vector3(transform.position.x, averageWheelsHeight, transform.position.z), new Vector3(transform.position.x, averageWheelsHeight, transform.position.z) + (Quaternion.Euler(0, currentSteeringAngle, 0)*transform.forward*10));
+        Vector3 p1 = new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z);
+        Vector3 p2 = new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z) + (Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward * 6);
+        Vector3 p3 = p2 - p1;// p3 is p1 but adjusted with an offset
+        p3 = (p1 + (p3.normalized * 4));//  (A + ({offset} * AB))
+        Handles.DrawLine(p3, p2,5);//   Draws a green line on the wedge to indicate the direction
+        #endregion
+        
+        if (debugGlobalLabel)
+            Handles.Label(new Vector3(transform.position.x, GetComponentInChildren<MeshCollider>().bounds.max.y, transform.position.z), globalLabel, style);
     }
-
     void DrawFilledWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
     {
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
@@ -434,6 +479,7 @@ public class Vehicle_Player : MonoBehaviour
         return C;
     }
 
+
 }
 
 #region Custom Editor
@@ -441,8 +487,6 @@ public class Vehicle_Player : MonoBehaviour
 [CustomEditor(typeof(Vehicle_Player))]
 public class CustomEditorVehicle_Player : Editor
 {
-    bool debugMode = false;// Tracks if in debug mode or not
-    string eventToExecute;//  Stores the string of the event the user wants to execute
 
     public override void OnInspectorGUI()
     {
@@ -450,19 +494,16 @@ public class CustomEditorVehicle_Player : Editor
         Vehicle_Player playerScript = (Vehicle_Player)target;
 
         GUILayout.Space(10);
-        debugMode = playerScript.debugMode;
-        playerScript.debugMode = GUILayout.Toggle(debugMode, debugMode ? "Disable debug tools" : "Enable debug tools");
-        if (debugMode)
+        playerScript.debugMode = GUILayout.Toggle(playerScript.debugMode, playerScript.debugMode ? "Disable debug tools" : "Enable debug tools");
+        if (playerScript.debugMode)
         {
-
-            eventToExecute = EditorGUILayout.TextField(new GUIContent("Event to execute", "Enter the event name to execute here"), eventToExecute);
+            playerScript.debugLabelsSize = EditorGUILayout.IntField("Debug labels size: ", playerScript.debugLabelsSize);
+            playerScript.debugLabelsTextColor = EditorGUILayout.ColorField("Labels text color", playerScript.debugLabelsTextColor);
+            playerScript.debugLabelsBgColor = EditorGUILayout.ColorField("Labels background color", playerScript.debugLabelsBgColor);
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(new GUIContent("Execute", "Be careful executing events manually especially in editor out of play mode !")))
-            {
-                //script.TriggerEvent(eventToExecute);
-            }
+            playerScript.debugGlobalLabel = GUILayout.Toggle(playerScript.debugGlobalLabel, playerScript.debugGlobalLabel ? "Disable global debug labels" : "Enable global debug labels");
+            playerScript.debugWheelsLabels = GUILayout.Toggle(playerScript.debugWheelsLabels, playerScript.debugWheelsLabels ? "Disable wheels debug labels" : "Enable wheels debug labels");
             EditorGUILayout.EndHorizontal();
-
         }
     }
 }
