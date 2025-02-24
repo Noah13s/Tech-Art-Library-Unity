@@ -319,12 +319,19 @@ public class Vehicle_Player : MonoBehaviour
             }
             else
             {
-                foreach (var points in PredictTrajectory(wheel.transform.position, transform.forward, -currentSteeringAngle, Vector3.Distance(wheels[0].transform.position, wheels[2].transform.position), 20, -0.5f))
-                {
-                    Handles.color = Color.red;
-                    Handles.DrawWireCube(points, new Vector3(0.1f, 0.1f, 0.1f));
-                }
             }
+        }
+
+        foreach (var points in PredictTrajectory(wheels[2].transform.position, transform.forward, -currentSteeringAngle, Vector3.Distance(wheels[2].transform.position, wheels[3].transform.position), 20, -0.5f))
+        {
+            Handles.color = Color.red;
+            Handles.DrawWireCube(points, new Vector3(0.1f, 0.1f, 0.1f));
+        }
+
+        foreach (var points in PredictTrajectory(wheels[3].transform.position, transform.forward, -currentSteeringAngle, Vector3.Distance(wheels[2].transform.position, wheels[3].transform.position), 20, -0.5f))
+        {
+            Handles.color = Color.red;
+            Handles.DrawWireCube(points, new Vector3(0.1f, 0.1f, 0.1f));
         }
 
         #region Single Wedge for Wheel Turn Angle Debug
@@ -534,7 +541,7 @@ public class Vehicle_Player : MonoBehaviour
 
     public List<Vector3> PredictTrajectory(Vector3 rearWheelPosition, Vector3 forwardDirection, float steeringAngle, float wheelbase, int numPoints, float stepDistance)
     {
-        List<Vector3> trajectory = new List<Vector3>();
+        List<Vector3> trajectory = new();
         trajectory.Add(rearWheelPosition); // Start trajectory from the rear wheel position
 
         float angleRad = steeringAngle * Mathf.Deg2Rad;
@@ -544,7 +551,7 @@ public class Vehicle_Player : MonoBehaviour
         {
             for (int i = 1; i < numPoints; i++)
             {
-                rearWheelPosition += forwardDirection.normalized * stepDistance;
+                rearWheelPosition -= forwardDirection.normalized * stepDistance;
                 trajectory.Add(rearWheelPosition);
             }
             return trajectory;
