@@ -555,6 +555,7 @@ public class CustomEditorVehicle_Player : Editor
         bool noWheelsReferenced = true;
         bool noWheelsCanSteer = true;
         bool noWheelsCanDrive = true;
+
         if (playerScript.wheels.Length <= 0) 
             return;
 

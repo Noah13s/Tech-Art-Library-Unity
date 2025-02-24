@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(WheelCollider))]
@@ -40,3 +41,32 @@ public class Vehicle_Wheel : MonoBehaviour
 
     public WheelData wheelData;
 }
+
+#region Custom Editor
+#if UNITY_EDITOR
+[CustomEditor(typeof(Vehicle_Wheel))]
+public class CustomEditorVehicle_Wheel : Editor
+{
+
+    public override void OnInspectorGUI()
+    {
+        ValidateWheelSetup();
+        base.OnInspectorGUI();
+        Vehicle_Wheel playerScript = (Vehicle_Wheel)target;
+
+        GUILayout.Space(10);
+
+    }
+
+    void ValidateWheelSetup()
+    {
+        Vehicle_Wheel playerScript = (Vehicle_Wheel)target;
+
+        if (!playerScript.wheelData.wheelCollider | !playerScript.wheelData.wheelMesh)
+        {
+            EditorGUILayout.HelpBox($"This wheel has a wrong setup.", MessageType.Error);
+        }
+    }
+}
+#endif
+#endregion
