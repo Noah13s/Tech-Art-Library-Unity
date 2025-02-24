@@ -178,6 +178,11 @@ public class Vehicle_Player : MonoBehaviour
         }
     }
 
+    public void SetDrive(float forwardInput, float turnInput, bool handbrake, bool isFullThrottle)
+    {
+        Drive(forwardInput, turnInput, handbrake, isFullThrottle);
+    }
+
     private void UpdateWheelVisuals()
     {
         foreach (Vehicle_Wheel wheel in wheels)
@@ -215,7 +220,7 @@ public class Vehicle_Player : MonoBehaviour
                 // Simple check for skidding (based on wheel slip)
                 if (Mathf.Abs(hit.sidewaysSlip) > 0.5f || Mathf.Abs(hit.forwardSlip) > 0.5f)
                 {
-                    wheeldata.isSkidding = true;
+                    wheel.isSkidding = true;
                     // Enable the skid mark by enabling the TrailRenderer
                     if (wheeldata.skidTrail != null)
                     {
@@ -224,7 +229,7 @@ public class Vehicle_Player : MonoBehaviour
                 }
                 else
                 {
-                    wheeldata.isSkidding = false;
+                    wheel.isSkidding = false;
                     // Disable the skid mark when not skidding
                     if (wheeldata.skidTrail != null)
                     {
@@ -234,7 +239,7 @@ public class Vehicle_Player : MonoBehaviour
             }
             else
             {
-                wheeldata.isSkidding = false;
+                wheel.isSkidding = false;
                 // Ensure the skid mark is turned off when the wheel is not grounded
                 if (wheeldata.skidTrail != null)
                 {
@@ -289,11 +294,8 @@ public class Vehicle_Player : MonoBehaviour
         #region Average Wheel Height Calculation
         float averageWheelsHeight = 0;
         // Calculate the average wheel height for the best wheel angle debug placement
-        foreach (var wheel in wheels)
-        {
-            averageWheelsHeight += wheel.transform.position.y;
-        }
-        averageWheelsHeight = averageWheelsHeight/wheels.Length;
+        foreach (var wheel in wheels) { averageWheelsHeight += wheel.transform.position.y; }
+        averageWheelsHeight /= wheels.Length;
         #endregion
 
         //  Draw debug tools for each wheels
@@ -302,7 +304,7 @@ public class Vehicle_Player : MonoBehaviour
             //  Draws a label for each wheels
             if (debugWheelsLabels)
             {
-                string wheelLabel = $"Speed: {wheel.wheelData.wheelCollider.rpm} RPM\nSteering angle: {wheel.wheelData.wheelCollider.steerAngle}°\nSkidding: {wheel.wheelData.isSkidding}";
+                string wheelLabel = $"Speed: {wheel.wheelData.wheelCollider.rpm} RPM\nSteering angle: {wheel.wheelData.wheelCollider.steerAngle}°\nSkidding: {wheel.isSkidding}";
                 Handles.Label(new Vector3(wheel.transform.position.x, wheel.wheelData.wheelCollider.bounds.max.y, wheel.transform.position.z), wheelLabel, style);
             }
 
@@ -315,7 +317,14 @@ public class Vehicle_Player : MonoBehaviour
                 Handles.color = Color.green;
                 Handles.DrawLine(new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z), new Vector3(wheel.transform.position.x, averageWheelsHeight, wheel.transform.position.z) + (Quaternion.Euler(0, currentSteeringAngle, 0) * transform.forward * 1f),5f);
             }
-
+            else
+            {
+                foreach (var points in PredictTrajectory(wheel.transform.position, transform.forward, -currentSteeringAngle, Vector3.Distance(wheels[0].transform.position, wheels[2].transform.position), 20, -0.5f))
+                {
+                    Handles.color = Color.red;
+                    Handles.DrawWireCube(points, new Vector3(0.1f, 0.1f, 0.1f));
+                }
+            }
         }
 
         #region Single Wedge for Wheel Turn Angle Debug
@@ -355,6 +364,10 @@ public class Vehicle_Player : MonoBehaviour
         Handles.color = Color.yellow;
         Handles.DrawWireCube(pivot, new Vector3(0.1f, 0.1f, 0.1f));
         #endregion
+
+        float trackWidth = Vector3.Distance(wheels[2].transform.position, wheels[3].transform.position);
+
+
     }
     void DrawFilledWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
     {
@@ -517,6 +530,50 @@ public class Vehicle_Player : MonoBehaviour
         Vector3 pivotOffset = Quaternion.AngleAxis(90, Vector3.up) * vehicleForward * turningRadius;
 
         return rearAxleMidpoint - pivotOffset;
+    }
+
+    public List<Vector3> PredictTrajectory(Vector3 rearWheelPosition, Vector3 forwardDirection, float steeringAngle, float wheelbase, int numPoints, float stepDistance)
+    {
+        List<Vector3> trajectory = new List<Vector3>();
+        trajectory.Add(rearWheelPosition); // Start trajectory from the rear wheel position
+
+        float angleRad = steeringAngle * Mathf.Deg2Rad;
+
+        // Straight movement case
+        if (Mathf.Abs(angleRad) < 0.001f)
+        {
+            for (int i = 1; i < numPoints; i++)
+            {
+                rearWheelPosition += forwardDirection.normalized * stepDistance;
+                trajectory.Add(rearWheelPosition);
+            }
+            return trajectory;
+        }
+
+        // Compute turning radius
+        float turningRadius = wheelbase / Mathf.Tan(angleRad);
+
+        // Find center of rotation
+        Vector3 rotationCenter = rearWheelPosition - Quaternion.Euler(0, 90, 0) * forwardDirection.normalized * turningRadius;
+
+        float currentAngle = 0f;
+        float stepAngle = stepDistance / turningRadius;
+
+        for (int i = 1; i < numPoints; i++)
+        {
+            currentAngle += stepAngle;
+            Vector3 offset = new Vector3(
+                Mathf.Sin(currentAngle) * turningRadius,
+                0,
+                Mathf.Cos(currentAngle) * turningRadius
+            );
+
+            // Compute next point by rotating around the center
+            Vector3 nextPoint = rotationCenter + Quaternion.Euler(0, Mathf.Rad2Deg * currentAngle, 0) * (rearWheelPosition - rotationCenter);
+            trajectory.Add(nextPoint);
+        }
+
+        return trajectory;
     }
 }
 

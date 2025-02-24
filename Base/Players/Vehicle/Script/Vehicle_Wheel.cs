@@ -33,13 +33,14 @@ public class Vehicle_Wheel : MonoBehaviour
         public float brakeForce;
 
         [Tooltip("The TrailRenderer used to show skidmarks for this wheel.")]
-        public TrailRenderer skidTrail;
-
-        [Tooltip("If true, this wheel is skidding.")]
-        [NonSerialized] public bool isSkidding;
+        public TrailRenderer skidTrail;        
     }
 
-    public WheelData wheelData;
+    public WheelData wheelData = new()
+    {
+    };
+    [Tooltip("If true, this wheel is skidding.")]
+    [NonSerialized] public bool isSkidding;
 }
 
 #region Custom Editor
