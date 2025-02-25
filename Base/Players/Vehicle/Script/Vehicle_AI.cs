@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Vehicle_AI : MonoBehaviour
 {
@@ -11,11 +12,20 @@ public class Vehicle_AI : MonoBehaviour
     [SerializeField] float step = 1f;
     [NonSerialized] public bool shouldGeneratePath = false;
     [NonSerialized] public bool isRealTime = false;
+    [NonSerialized] public bool controlVehicle = false;
+    [NonSerialized] public bool displayAiTarget = false;
 
     [NonSerialized] public Vector3 cachedStartPostion = Vector3.zero;
     [NonSerialized] public Vector3 cachedStartDirection = Vector3.zero;
     [NonSerialized] public List<Vector3> cachedPath = null;
 
+    [Header("AI parameters")]
+    [SerializeField] float maxSpeedKMH = 10f; // Maximum speed in km/h
+    [SerializeField] float waypointThreshold = 1.0f; // Distance threshold to consider when reaching a point
+    [SerializeField] float smoothingSpeed = 5f; // Control smoothing speed
+
+    private int currentPathIndex = 0; // Index to track the current target point on the path
+    private float turnInput;
     // Start is called before the first frame update
     void Start()
     {
@@ -44,101 +54,26 @@ public class Vehicle_AI : MonoBehaviour
             GeneratePath();
         }
         DisplayPath();
+        VehicleControl();
+
     }
 
-    public void GeneratePath(Vector3 startPosition, Vector3 targetPosition, Vector3 startDirection, Vector3 endDirection, float maxAngle, float pointSpacing)
+    public static float GetDirectionalOffset(Vector3 objectForward, Vector3 objectPosition, Vector3 targetPosition)
     {
-        if (shouldGeneratePath)
-        {
-            #region Layout + Variables
-            Texture2D backgroundColoredTexture = new(1, 1);
-            backgroundColoredTexture.SetPixel(0, 0, Color.grey);
-            backgroundColoredTexture.Apply();
-            GUIStyle style = new()
-            {
-                fontSize = 10,
-                normal = new GUIStyleState()
-            };
-            style.normal.textColor = Color.black;
-            style.normal.background = backgroundColoredTexture;
-            startPosition.y = targetPosition.y; // Keep same height
-            float distance = Vector3.Distance(startPosition, targetPosition);
-            #endregion
+        // Get the direction to the target
+        Vector3 toTarget = (targetPosition - objectPosition).normalized;
 
-            List<Vector3> pathPoints = new() { startPosition };
-            Vector3 currentDirection = startDirection.normalized;
-            Vector3 currentPosition = startPosition;
-            Vector3 toTarget = (targetPosition - currentPosition).normalized;
+        // Project to horizontal plane (assuming Y-up world)
+        objectForward.y = 0;
+        toTarget.y = 0;
+        objectForward.Normalize();
+        toTarget.Normalize();
 
-            // Calculate minimum required steps based on spacing
-            int minSteps = Mathf.CeilToInt(distance / pointSpacing);
+        // Get the signed angle between forward and target direction
+        float angle = Vector3.SignedAngle(objectForward, toTarget, Vector3.up);
 
-            // Calculate angles for direction constraints
-            float startToEndAngle = Vector3.Angle(startDirection.normalized, endDirection.normalized);
-            float initialToTargetAngle = Vector3.Angle(startDirection.normalized, toTarget);
-
-            // Steps needed to rotate from start to end direction in the last 30% of the path
-            int stepsNeededForEndRotation = Mathf.CeilToInt(startToEndAngle / (0.3f * maxAngle));
-            int angleSteps = Mathf.CeilToInt(Mathf.Max(initialToTargetAngle, startToEndAngle) / maxAngle);
-
-            // Determine the number of steps ensuring all constraints
-            int steps = Mathf.Max(minSteps, stepsNeededForEndRotation, angleSteps * 2);
-
-            float blendParameter = 1.0f / steps;
-
-            for (int i = 0; i < steps; i++)
-            {
-                float t = (i + 1) / (float)steps;
-                toTarget = (targetPosition - currentPosition).normalized;
-
-                // Determine target direction based on current progress
-                Vector3 targetDirection;
-                if (t < 0.7f)
-                {
-                    targetDirection = toTarget;
-                }
-                else
-                {
-                    // Directly target end direction in the last 30% of steps
-                    targetDirection = endDirection.normalized;
-                }
-
-                // Rotate towards the target direction within max angle
-                Vector3 newDirection = Vector3.RotateTowards(currentDirection, targetDirection, Mathf.Deg2Rad * maxAngle, 0f).normalized;
-
-                // Calculate remaining distance and adjust step distance
-                float remainingDistance = Vector3.Distance(currentPosition, targetPosition);
-                float moveDistance = pointSpacing;
-                if (remainingDistance < moveDistance)
-                    moveDistance = remainingDistance;
-
-                // Update position and direction
-                currentPosition += newDirection * moveDistance;
-                pathPoints.Add(currentPosition);
-                currentDirection = newDirection;
-
-                // Exit loop if reached target
-                if (remainingDistance <= Mathf.Epsilon)
-                    break;
-            }
-
-            // Ensure the last point is exactly at the target position
-            pathPoints[pathPoints.Count - 1] = targetPosition;
-
-            // Draw path and directions
-            Handles.color = Color.green;
-            foreach (var point in pathPoints)
-            {
-                Handles.DrawWireCube(point, new Vector3(0.1f, 0.1f, 0.1f));
-            }
-
-            Handles.color = Color.blue;
-            Handles.DrawLine(startPosition, startPosition + startDirection.normalized * 0.5f);
-            Handles.DrawLine(targetPosition, targetPosition + endDirection.normalized * 0.5f);
-
-            Handles.Label(Vector3.Lerp(startPosition, targetPosition, 0.5f) + Vector3.up * 0.2f,
-                        $"Distance: {distance}\nSteps: {steps}", style);
-        }
+        // Normalize the value to be in range [-1, 1]
+        return Mathf.Clamp(angle / 30f, -1f, 1f);
     }
 
     public void UpdateStartPosition()
@@ -170,7 +105,7 @@ public class Vehicle_AI : MonoBehaviour
             startAngle: startAngleRadians,
             end: new Vector2(transform.position.x, transform.position.z),
             endAngle: endAngleRadians,
-            radius: calculatedRadius,
+            radius: radius,
             stepSize: step);
     }
 
@@ -184,6 +119,88 @@ public class Vehicle_AI : MonoBehaviour
                 Handles.DrawWireCube(point, new Vector3(0.1f, 0.1f, 0.1f));
             }
         }
+    }
+
+    public void VehicleControl()
+    {
+        if (!controlVehicle || cachedPath.Count == 0) return;
+
+        float forwardInput;
+        bool handbrake;
+        // Find the first waypoint that is far enough from the vehicle
+        currentPathIndex = cachedPath.FindIndex(point =>
+            Vector3.Distance(targetVehicle.transform.position, point) > waypointThreshold);
+
+        // If no suitable point found, use the last point
+        if (currentPathIndex == -1)
+            currentPathIndex = cachedPath.Count - 1;
+
+        // Remove points before the current index
+        if (currentPathIndex > 0)
+        {
+            cachedPath.RemoveRange(0, currentPathIndex);
+            currentPathIndex = 0;
+        }
+
+        // Get the current target position
+        Vector3 currentTarget = cachedPath[0]; // Always use the first remaining point
+
+        // Display AI target if enabled
+        if (displayAiTarget)
+        {
+            Handles.color = Color.red;
+            Handles.DrawWireCube(currentTarget, Vector3.one * 0.2f);
+        }
+        if (cachedPath.Count <= 1)
+        {
+            forwardInput = 0f;
+            handbrake = true;
+        } else
+        {
+            // Determine forward input based on speed
+            forwardInput = (targetVehicle.speedKMH > maxSpeedKMH) ? 0f : 1f;
+            handbrake = false;
+        }
+
+        // Compute axle positions
+        Vector3 frontAxleMiddle = (targetVehicle.wheels[0].transform.position + targetVehicle.wheels[1].transform.position) * 0.5f;
+        Vector3 rearAxleMiddle = (targetVehicle.wheels[2].transform.position + targetVehicle.wheels[3].transform.position) * 0.5f;
+
+        // Compute vehicle's forward direction
+        Vector3 vehicleForward = (frontAxleMiddle - rearAxleMiddle).normalized;
+
+        // Calculate turn input
+        float turnInput = GetDirectionalOffset(targetVehicle.transform.forward, targetVehicle.transform.position, currentTarget);
+
+        Debug.Log($"Index: {currentPathIndex} Length: {cachedPath.Count}");
+
+        // Apply vehicle controls
+        targetVehicle.SetDrive(forwardInput, turnInput, handbrake, false);
+    }
+
+
+    public Vector3 GetClosestPointOnPath(Vector3 targetPosition, List<Vector3> path)
+    {
+        if (path == null || path.Count == 0)
+        {
+            return targetPosition; // Return original position if path is invalid
+        }
+
+        Vector3 closestPoint = path[0];
+        float minDistance = Vector3.Distance(targetPosition, closestPoint);
+
+        // Iterate over all points on the path
+        foreach (Vector3 pathPoint in path)
+        {
+            float distance = Vector3.Distance(targetPosition, pathPoint);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestPoint = pathPoint;
+            }
+        }
+
+        return closestPoint;
     }
 }
 
@@ -199,7 +216,12 @@ public class CustomEditorVehicle_AI : Editor
         Vehicle_AI playerScript = (Vehicle_AI)target;
 
         GUILayout.Space(10);
-        
+        if (playerScript.controlVehicle = GUILayout.Toggle(playerScript.controlVehicle, playerScript.controlVehicle ? "Disable ai" : "Enable ai"))
+        {
+            playerScript.shouldGeneratePath = true;
+            playerScript.UpdateStartPosition();
+            playerScript.GeneratePath();
+        }
         if (playerScript.shouldGeneratePath = GUILayout.Toggle(playerScript.shouldGeneratePath, playerScript.shouldGeneratePath ? "Disable path generation" : "Enable path generation"))
         {
             if (playerScript.isRealTime = GUILayout.Toggle(playerScript.isRealTime, playerScript.isRealTime ? "Disable realtime generation" : "Enable realtime generation"))
@@ -224,7 +246,11 @@ public class CustomEditorVehicle_AI : Editor
         EditorGUILayout.LabelField($"Stored position: {playerScript.cachedStartPostion}");
         EditorGUILayout.LabelField($"Stored direction: {playerScript.cachedStartDirection}");
         GUILayout.Space(10);
+        if (playerScript.displayAiTarget = GUILayout.Toggle(playerScript.displayAiTarget, playerScript.displayAiTarget ? "Disable ai target display" : "Enable ai target display"))
+        {
+            playerScript.shouldGeneratePath = true;
 
+        }
     }
 }
 #endif
