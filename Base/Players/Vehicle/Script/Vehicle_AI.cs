@@ -7,11 +7,14 @@ using UnityEngine;
 public class Vehicle_AI : MonoBehaviour
 {
     [SerializeField] Vehicle_Player targetVehicle;
-    [SerializeField] float maxAngle = 30f;
-    [SerializeField] float spacing = 10f;
+    [SerializeField] float radius = 5f;
+    [SerializeField] float step = 1f;
     [NonSerialized] public bool shouldGeneratePath = false;
+    [NonSerialized] public bool isRealTime = false;
+
     [NonSerialized] public Vector3 cachedStartPostion = Vector3.zero;
     [NonSerialized] public Vector3 cachedStartDirection = Vector3.zero;
+    [NonSerialized] public List<Vector3> cachedPath = null;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +25,11 @@ public class Vehicle_AI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (isRealTime)
+        {
+            GeneratePath();
+        }
+
     }
 
 
@@ -31,7 +38,12 @@ public class Vehicle_AI : MonoBehaviour
         Handles.color = Color.gray;
         Handles.DrawWireCube(transform.position, transform.localScale);
         Handles.DrawDottedLine(transform.position, transform.position + (transform.forward * 5f), 5f);
-        GeneratePath(cachedStartPostion, transform.position, cachedStartDirection, transform.forward, maxAngle, spacing);
+        if (isRealTime)
+        {
+            UpdateStartPosition();
+            GeneratePath();
+        }
+        DisplayPath();
     }
 
     public void GeneratePath(Vector3 startPosition, Vector3 targetPosition, Vector3 startDirection, Vector3 endDirection, float maxAngle, float pointSpacing)
@@ -134,6 +146,45 @@ public class Vehicle_AI : MonoBehaviour
         cachedStartPostion = targetVehicle.transform.position;
         cachedStartDirection = targetVehicle.transform.forward;
     }
+
+    public void GeneratePath()
+    {
+        float startAngleRadians = Mathf.Atan2(cachedStartDirection.z, cachedStartDirection.x);
+        float startAngleDegrees = startAngleRadians * Mathf.Rad2Deg;
+
+        float endAngleRadians = Mathf.Atan2(transform.forward.z, transform.forward.x);
+        float endAngleDegrees = endAngleRadians * Mathf.Rad2Deg;
+
+        // Get front and rear axle midpoints correctly
+        Vector3 frontAxleMiddle = (targetVehicle.wheels[0].transform.position + targetVehicle.wheels[1].transform.position) * 0.5f;
+        Vector3 rearAxleMiddle = (targetVehicle.wheels[2].transform.position + targetVehicle.wheels[3].transform.position) * 0.5f;
+
+        // Wheelbase length
+        float wheelBase = Vector3.Distance(frontAxleMiddle, rearAxleMiddle);
+
+        float maxSteeringRad = targetVehicle.steeringAngle * Mathf.Deg2Rad; // Convert degrees to radians
+        float calculatedRadius = wheelBase / Mathf.Tan(maxSteeringRad);
+
+        cachedPath = DubinsPath.GetPathPoints(
+            start: new Vector2(cachedStartPostion.x, cachedStartPostion.z),
+            startAngle: startAngleRadians,
+            end: new Vector2(transform.position.x, transform.position.z),
+            endAngle: endAngleRadians,
+            radius: calculatedRadius,
+            stepSize: step);
+    }
+
+    public void DisplayPath()
+    {
+        if (shouldGeneratePath && cachedPath != null)
+        {
+            Handles.color = Color.green;
+            foreach (var point in cachedPath)
+            {
+                Handles.DrawWireCube(point, new Vector3(0.1f, 0.1f, 0.1f));
+            }
+        }
+    }
 }
 
 #region Custom Editor
@@ -148,11 +199,32 @@ public class CustomEditorVehicle_AI : Editor
         Vehicle_AI playerScript = (Vehicle_AI)target;
 
         GUILayout.Space(10);
-        playerScript.shouldGeneratePath = GUILayout.Toggle(playerScript.shouldGeneratePath, playerScript.shouldGeneratePath ? "Disable path generation" : "Enable path generation");
+        
+        if (playerScript.shouldGeneratePath = GUILayout.Toggle(playerScript.shouldGeneratePath, playerScript.shouldGeneratePath ? "Disable path generation" : "Enable path generation"))
+        {
+            if (playerScript.isRealTime = GUILayout.Toggle(playerScript.isRealTime, playerScript.isRealTime ? "Disable realtime generation" : "Enable realtime generation"))
+            {
+                
+            } else
+            {
+                if (GUILayout.Button(new GUIContent("Generate path", "Be careful executing events manually especially in editor out of play mode !")))
+                {
+                    playerScript.GeneratePath();
+                }
+            }
+
+        }
+        
         if (GUILayout.Button(new GUIContent("Update start position", "Be careful executing events manually especially in editor out of play mode !")))
         {
             playerScript.UpdateStartPosition();
+
         }
+        GUILayout.Space(10);
+        EditorGUILayout.LabelField($"Stored position: {playerScript.cachedStartPostion}");
+        EditorGUILayout.LabelField($"Stored direction: {playerScript.cachedStartDirection}");
+        GUILayout.Space(10);
+
     }
 }
 #endif
