@@ -1011,7 +1011,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1128,14 +1128,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a30b2bc6963df9147b98033ca6f9263c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotorSetup:
+    airDensity: 1.225
+    rotorDiscRadius: 0.5
+    rotorSpeed: 0
+    thrustCoefficient: 0.005
   targetSpeedRPM: 0
-  spoolupTime: 30
-  midFlightAccelerationFactor: 2
+  spoolupTime: 10
+  midFlightAccelerationFactor: 4
   rotorMesh: {fileID: 429512947}
   currentSpeedRPM: 0
+  currentThrustKg: 0
+  currentThrustN: 0
   idle: 0
   accelerating: 0
   decelerating: 0
+  rigidBody: {fileID: 0}
 --- !u!1 &938861271
 GameObject:
   m_ObjectHideFlags: 0
