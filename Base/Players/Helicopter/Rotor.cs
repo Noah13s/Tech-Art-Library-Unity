@@ -36,7 +36,10 @@ public class Rotor : MonoBehaviour
 
     [Header("Rotor Data")]
     [ReadOnly]
-    [Tooltip("Current speed of the rotor in RPM")]
+    [Tooltip("Current altitude of the rotor in meters.")]
+    [SerializeField] float currentAltitude = 0f;
+    [ReadOnly]
+    [Tooltip("Current speed of the rotor in RPM.")]
     [SerializeField] float currentSpeedRPM = 0f;
     [ReadOnly]
     [Tooltip("Current generated thrust by the rotor in Kg.")]
@@ -86,6 +89,7 @@ public class Rotor : MonoBehaviour
         }
 
         ApplyThrust();
+        UpdateData();
     }
 
     /// <summary>
@@ -174,5 +178,10 @@ public class Rotor : MonoBehaviour
     {
         // Apply thrust force to the Rigidbody in the up direction (or any direction your rotor is facing)
         rigidBody.AddForce(transform.up * currentThrustN * Time.fixedDeltaTime, ForceMode.Force);
+    }
+
+    private void UpdateData()
+    {
+        currentAltitude = transform.position.y;
     }
 }
