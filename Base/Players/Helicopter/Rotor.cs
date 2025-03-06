@@ -33,7 +33,7 @@ public class Rotor : MonoBehaviour
     [Range(2f, 4f)] public float midFlightAccelerationFactor = 2f;
 
     [SerializeField] Transform rotorMesh;
-
+    #region ReadOnlyDataVariables
     [Header("Rotor Data")]
     [ReadOnly]
     [Tooltip("Current altitude of the rotor in meters.")]
@@ -44,6 +44,7 @@ public class Rotor : MonoBehaviour
     [ReadOnly]
     [Tooltip("Current generated thrust by the rotor in Kg.")]
     [SerializeField] float currentThrustKg = 0f;
+    [ReadOnly]
     [Tooltip("Current generated thrust by the rotor in Newton.")]
     [SerializeField] float currentThrustN = 0f;
     [ReadOnly]
@@ -52,9 +53,12 @@ public class Rotor : MonoBehaviour
     [SerializeField] bool accelerating = false;
     [ReadOnly]
     [SerializeField] bool decelerating = false;
-
+    [ReadOnly]
+    [Tooltip("Rotor RPM to fully counter the wieght.")]
+    [SerializeField] float hoverRPM = 0f;
     [ReadOnly]
     [SerializeField] private Rigidbody rigidBody;
+    #endregion
     private float currentSpoolTime = 0f;
 
     // Start is called before the first frame update
@@ -88,8 +92,12 @@ public class Rotor : MonoBehaviour
             ApplyRotorSpeedToMesh();
         }
 
-        ApplyThrust();
         UpdateData();
+    }
+
+    private void FixedUpdate()
+    {
+        ApplyThrustAndTorque();
     }
 
     /// <summary>
@@ -174,14 +182,32 @@ public class Rotor : MonoBehaviour
         currentThrustKg = currentThrustN / 9.81f;
     }
 
-    private void ApplyThrust()
+    private void ApplyThrustAndTorque()
     {
         // Apply thrust force to the Rigidbody in the up direction (or any direction your rotor is facing)
-        rigidBody.AddForce(transform.up * currentThrustN * Time.fixedDeltaTime, ForceMode.Force);
+        rigidBody.AddForce(transform.up * currentThrustN, ForceMode.Force);
+
+        float omega = (currentSpeedRPM * 2f * Mathf.PI) / 60f; // Convert RPM to rad/s
+        float reactionTorque = (currentThrustN * rotorSetup.rotorDiscRadius); // Torque in N·m
+
+        // Apply the torque to the Rigidbody in the opposite direction of rotor spin
+        rigidBody.AddTorque(transform.up * -reactionTorque, ForceMode.Force);
     }
 
     private void UpdateData()
     {
         currentAltitude = transform.position.y;
+        hoverRPM = CalculateHoverRPM();
+    }
+
+    private float CalculateHoverRPM()
+    {
+        float gravityForce = rigidBody.mass * 9.81f; // Weight in Newtons
+        float rotorDiskArea = Mathf.PI * Mathf.Pow(rotorSetup.rotorDiscRadius, 2);
+
+        // Solve for RPM: thrust = airDensity * A * (RPS)^2 * Ct
+        float requiredRPS = Mathf.Sqrt(gravityForce / (rotorSetup.airDensity * rotorDiskArea * rotorSetup.thrustCoefficient));
+        hoverRPM = requiredRPS * 60f; // Convert RPS to RPM
+        return hoverRPM;
     }
 }
