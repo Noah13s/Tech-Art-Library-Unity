@@ -33,6 +33,7 @@ public class Rotor : MonoBehaviour
     [Range(2f, 4f)] public float midFlightAccelerationFactor = 2f;
 
     [SerializeField] Transform rotorMesh;
+    [SerializeField] private Rigidbody rigidBody;
     #region ReadOnlyDataVariables
     [Header("Rotor Data")]
     [ReadOnly]
@@ -40,13 +41,16 @@ public class Rotor : MonoBehaviour
     [SerializeField] float currentAltitude = 0f;
     [ReadOnly]
     [Tooltip("Current speed of the rotor in RPM.")]
-    [SerializeField] float currentSpeedRPM = 0f;
+    public float currentSpeedRPM = 0f;
     [ReadOnly]
     [Tooltip("Current generated thrust by the rotor in Kg.")]
     [SerializeField] float currentThrustKg = 0f;
     [ReadOnly]
     [Tooltip("Current generated thrust by the rotor in Newton.")]
-    [SerializeField] float currentThrustN = 0f;
+    public float currentThrustN = 0f;
+    [ReadOnly]
+    [Tooltip("Current generated torque by the rotor in Newton.")]
+    public float currentTorqueN = 0f;
     [ReadOnly]
     [SerializeField] bool idle = false;
     [ReadOnly]
@@ -54,12 +58,20 @@ public class Rotor : MonoBehaviour
     [ReadOnly]
     [SerializeField] bool decelerating = false;
     [ReadOnly]
-    [Tooltip("Rotor RPM to fully counter the wieght.")]
+    [Tooltip("Rotor RPM to fully counter the weight.")]
     [SerializeField] float hoverRPM = 0f;
     [ReadOnly]
-    [SerializeField] private Rigidbody rigidBody;
+    [Tooltip("Thrust required to fully counter the torque.")]
+    [SerializeField] float necessaryTorqueCounterThrust = 0f;
+    [ReadOnly]
+    [Tooltip("RPM required to fully counter the torque.")]
+    [SerializeField] float necessaryTorqueCounterRPM = 0f;
     #endregion
     private float currentSpoolTime = 0f;
+    public float tailDistance = 1f;
+    [ReadOnly]
+    [Tooltip("")]
+    [SerializeField] float calculatedTailDistance = 0f;
 
     // Start is called before the first frame update
     void Start()
@@ -93,6 +105,8 @@ public class Rotor : MonoBehaviour
         }
 
         UpdateData();
+
+        necessaryTorqueCounterThrust = CalculateCounterThrust(tailDistance);
     }
 
     private void FixedUpdate()
@@ -185,11 +199,11 @@ public class Rotor : MonoBehaviour
     private void ApplyThrustAndTorque()
     {
         // Apply thrust force to the Rigidbody in the up direction (or any direction your rotor is facing)
-        rigidBody.AddForce(transform.up * currentThrustN, ForceMode.Force);
+        rigidBody.AddForceAtPosition(transform.up * currentThrustN, rotorMesh.position,ForceMode.Force);
 
         float omega = (currentSpeedRPM * 2f * Mathf.PI) / 60f; // Convert RPM to rad/s
         float reactionTorque = (currentThrustN * rotorSetup.rotorDiscRadius); // Torque in N·m
-
+        currentTorqueN = reactionTorque;
         // Apply the torque to the Rigidbody in the opposite direction of rotor spin
         rigidBody.AddTorque(transform.up * -reactionTorque, ForceMode.Force);
     }
@@ -209,5 +223,36 @@ public class Rotor : MonoBehaviour
         float requiredRPS = Mathf.Sqrt(gravityForce / (rotorSetup.airDensity * rotorDiskArea * rotorSetup.thrustCoefficient));
         hoverRPM = requiredRPS * 60f; // Convert RPS to RPM
         return hoverRPM;
+    }
+    public void SetTargetRPM(float targetRPM)
+    {
+        targetSpeedRPM = targetRPM;
+    }
+
+    public void SetTargetThrust(float targetThrust)
+    {
+        // Calculate rotor disk area (A = π * r²)
+        float rotorDiskArea = Mathf.PI * Mathf.Pow(rotorSetup.rotorDiscRadius, 2);
+
+        // Solve for RPS (Rotations per Second)
+        float requiredRPS = Mathf.Sqrt(targetThrust / (rotorSetup.airDensity * rotorDiskArea * rotorSetup.thrustCoefficient));
+
+        // Convert RPS to RPM
+        float requiredRPM = requiredRPS * 60f;
+
+        // Set the target RPM
+        SetTargetRPM(requiredRPM);
+    }
+
+    public float CalculateCounterThrust(float secondaryRotorDistance)
+    {
+        if (secondaryRotorDistance == 0f)
+        {
+            Debug.LogError("Distance cannot be zero to avoid division by zero.");
+            return 0f;
+        }
+
+        float counterThrust = currentTorqueN / secondaryRotorDistance;
+        return counterThrust; // Returns thrust in Newtons
     }
 }

@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 61822951}
   - component: {fileID: 61822950}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Tail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -412,7 +412,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -608,6 +608,7 @@ GameObject:
   - component: {fileID: 429512947}
   - component: {fileID: 429512949}
   - component: {fileID: 429512948}
+  - component: {fileID: 429512950}
   m_Layer: 0
   m_Name: MainRotor
   m_TagString: Untagged
@@ -681,6 +682,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 429512946}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &429512950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 429512946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a30b2bc6963df9147b98033ca6f9263c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotorSetup:
+    airDensity: 1.225
+    rotorDiscRadius: 0.5
+    rotorSpeed: 0
+    thrustCoefficient: 0.005
+  targetSpeedRPM: 0
+  spoolupTime: 10
+  midFlightAccelerationFactor: 4
+  rotorMesh: {fileID: 429512947}
+  rigidBody: {fileID: 926390577}
+  currentAltitude: 0
+  currentSpeedRPM: 0
+  currentThrustKg: 0
+  currentThrustN: 0
+  currentTorqueN: 0
+  idle: 0
+  accelerating: 0
+  decelerating: 0
+  hoverRPM: 0
+  necessaryTorqueCounterThrust: 0
+  necessaryTorqueCounterRPM: 0
+  tailDistance: 2.336
+  calculatedTailDistance: 0
 --- !u!1001 &455701775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -700,6 +736,14 @@ PrefabInstance:
     - target: {fileID: 3024716815526781517, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
       propertyPath: scrollSpeed
       value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 3024716815526781517, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+      propertyPath: sensitivityX
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3024716815526781517, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+      propertyPath: sensitivityY
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5521588653666181606, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
       propertyPath: m_Name
@@ -749,8 +793,60 @@ PrefabInstance:
     - {fileID: 1164567113871997879, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4233180520674462114, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 630353930}
   m_SourcePrefab: {fileID: 100100000, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+--- !u!1 &630353925 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4233180520674462114, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
+  m_PrefabInstance: {fileID: 455701775}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &630353930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 630353925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!4 &634451338 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8114497232348542204, guid: e6c0898d0dacb0d4780198d9b6a03262, type: 3}
@@ -1238,7 +1334,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 80
+  m_Constraints: 90
   m_CollisionDetection: 0
 --- !u!65 &926390578
 BoxCollider:
@@ -1339,27 +1435,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 926390576}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a30b2bc6963df9147b98033ca6f9263c, type: 3}
+  m_Script: {fileID: 11500000, guid: c1bfccfdfa461194a98bbc20317073b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotorSetup:
-    airDensity: 1.225
-    rotorDiscRadius: 0.5
-    rotorSpeed: 0
-    thrustCoefficient: 0.005
-  targetSpeedRPM: 0
-  spoolupTime: 10
-  midFlightAccelerationFactor: 4
-  rotorMesh: {fileID: 429512947}
-  currentAltitude: 0
-  currentSpeedRPM: 0
-  currentThrustKg: 0
-  currentThrustN: 0
-  idle: 0
-  accelerating: 0
-  decelerating: 0
-  hoverRPM: 0
-  rigidBody: {fileID: 0}
+  mainRotor: {fileID: 429512950}
+  tailRotor: {fileID: 1533529359}
+  rigidBody: {fileID: 926390577}
+  tailRotorDistance: 0
+  requiredThrust: 0
 --- !u!1 &938861271
 GameObject:
   m_ObjectHideFlags: 0
@@ -2119,6 +2202,7 @@ GameObject:
   - component: {fileID: 1533529356}
   - component: {fileID: 1533529358}
   - component: {fileID: 1533529357}
+  - component: {fileID: 1533529359}
   m_Layer: 0
   m_Name: TailRotor
   m_TagString: Untagged
@@ -2192,6 +2276,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1533529355}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1533529359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533529355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a30b2bc6963df9147b98033ca6f9263c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotorSetup:
+    airDensity: 1.225
+    rotorDiscRadius: 0.5
+    rotorSpeed: 0
+    thrustCoefficient: 0.005
+  targetSpeedRPM: 0
+  spoolupTime: 1.5
+  midFlightAccelerationFactor: 4
+  rotorMesh: {fileID: 1533529356}
+  rigidBody: {fileID: 926390577}
+  currentAltitude: 0
+  currentSpeedRPM: 0
+  currentThrustKg: 0
+  currentThrustN: 0
+  currentTorqueN: 0
+  idle: 0
+  accelerating: 0
+  decelerating: 0
+  hoverRPM: 0
+  necessaryTorqueCounterThrust: 0
+  necessaryTorqueCounterRPM: 0
+  tailDistance: 1
+  calculatedTailDistance: 0
 --- !u!1 &1732705512 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: efa6b6afc8b34744b9df31ac1d20299e, type: 3}
