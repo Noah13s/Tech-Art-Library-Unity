@@ -14,6 +14,18 @@ public class Helicopter_Player : MonoBehaviour
     [ReadOnly][SerializeField] float tailRotorDistance; // Distance from center of mass to tail rotor
     [ReadOnly][SerializeField] float requiredThrust; // Distance from center of mass to tail rotor
     [ReadOnly] public Vector3 targetDirection;
+    [ReadOnly] public float directionDifference = 0f;
+    [ReadOnly] public float altitude = 0f;
+    public bool engineOnOff = false;
+
+    [SerializeField] private float Kp = 0.1f; // Proportional gain (adjust as needed)
+    [SerializeField] private float Kd = 0.05f; // Derivative gain (damping)
+
+    [SerializeField] private float maxCorrection = 0.5f; // Max allowed correction to prevent excessive turning
+
+
+    // Store last frame's directionDifference to calculate derivative term
+    private float lastDirectionDifference = 0f;
 
     //Debug
     [NonSerialized] public bool debugMode;
@@ -25,7 +37,11 @@ public class Helicopter_Player : MonoBehaviour
     private InputAction backwardAction;
     private InputAction rightAction;
     private InputAction leftAction;
+    private InputAction tiltRightAction;
+    private InputAction tiltLeftAction;
     private InputAction fullThrottleAction;
+    private InputAction upAction;
+    private InputAction downAction;
 #endif
 
     #endregion
@@ -39,7 +55,11 @@ public class Helicopter_Player : MonoBehaviour
         backwardAction = controls.Helicopter_Action_Map.Backwards;
         rightAction = controls.Helicopter_Action_Map.Right;
         leftAction = controls.Helicopter_Action_Map.Left;
+        tiltRightAction = controls.Helicopter_Action_Map.TiltRight;
+        tiltLeftAction = controls.Helicopter_Action_Map.TiltLeft;
         fullThrottleAction = controls.Helicopter_Action_Map.FullThrottle;
+        upAction = controls.Helicopter_Action_Map.Up;
+        downAction = controls.Helicopter_Action_Map.Down;
 #endif
         targetDirection = -transform.forward;
     }
@@ -51,17 +71,14 @@ public class Helicopter_Player : MonoBehaviour
 
     void Update()
     {
+        UpdateData();
+        TorqueCompensation();
 
-        tailRotorDistance = CalculateTailRotorDistance(tailRotor.transform);
-        
-        if (mainRotor != null && tailRotor != null)
-        {
-            // Calculate the required tail rotor thrust
-            requiredThrust = mainRotor.CalculateCounterThrust(tailRotorDistance);
 
-            // Apply thrust to the tail rotor
-            tailRotor.SetTargetThrust(requiredThrust);
-        }
+        HandleVerticalMovement();
+        HandleTiltMovement();
+
+
 
 #if ENABLE_INPUT_SYSTEM
         HandleNewInputSystem();
@@ -80,10 +97,100 @@ public class Helicopter_Player : MonoBehaviour
 
         // Apply rotation to direction vector
         Quaternion rotation = Quaternion.Euler(0, turn * turnSpeed * Time.deltaTime, 0);
-        Debug.Log(targetDirection);
         targetDirection = rotation * targetDirection;
     }
 #endif
+
+    private void HandleTiltMovement()
+    {
+        if (!engineOnOff || mainRotor == null)
+            return; // Exit if the engine is off or main rotor is missing
+
+        // Read player input
+        float forward = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>(); // Pitch input
+        float sideways = tiltRightAction.ReadValue<float>() - tiltLeftAction.ReadValue<float>(); // Roll input
+
+        // Define max tilt angles and smoothing
+        float maxTiltAngle = 10f; // Maximum cyclic tilt angle (degrees)
+        float tiltSpeed = 5f; // Smoothing speed
+
+        // Calculate target tilt angles based on input
+        float targetPitch = forward * maxTiltAngle; // Forward/backward tilt
+        float targetRoll = sideways * maxTiltAngle; // Left/right tilt
+
+        // Smoothly interpolate to the target tilt using Lerp
+        float smoothedPitch = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.x, targetPitch, Time.deltaTime * tiltSpeed);
+        float smoothedRoll = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.z, targetRoll, Time.deltaTime * tiltSpeed);
+
+        // Apply new rotation to the main rotor
+        mainRotor.transform.localRotation = Quaternion.Euler(smoothedPitch, 0, smoothedRoll);
+    }
+
+
+    private void HandleVerticalMovement()
+    {
+        if (engineOnOff)
+        {
+            float up = upAction.ReadValue<float>();
+            float down = downAction.ReadValue<float>();
+
+            if (up > 0f)
+            {
+                // Increase rotor speed to ascend
+                mainRotor.SetTargetRPM(mainRotor.hoverRPM * 1.2f);
+            }
+            else if (down > 0f)
+            {
+                // Decrease rotor speed to descend
+                mainRotor.SetTargetRPM(mainRotor.hoverRPM * 0.8f);
+            }
+            else
+            {
+                // Maintain hover RPM
+                mainRotor.SetTargetRPM(mainRotor.hoverRPM);
+            }
+        } else
+        {
+            mainRotor.SetTargetRPM(0f);
+        }
+    }
+
+    private void TorqueCompensation()
+    {
+        if (mainRotor != null && tailRotor != null)
+        {
+            // Calculate the required tail rotor thrust
+            requiredThrust = mainRotor.CalculateCounterThrust(tailRotorDistance);
+
+            // Proportional term (helps correct the angle)
+            float proportional = Kp * directionDifference;
+
+            // Derivative term (helps reduce overshooting)
+            float derivative = Kd * (directionDifference - lastDirectionDifference) / Time.deltaTime;
+
+            // Compute final correction
+            float correction = proportional + derivative;
+
+            // Clamp correction to prevent extreme overcorrection
+            correction = Mathf.Clamp(correction, -maxCorrection, maxCorrection);
+
+            // Apply limited correction
+            requiredThrust += correction;
+
+            // Apply thrust to the tail rotor
+            tailRotor.SetTargetThrust(requiredThrust);
+
+            // Store current direction difference for next frame
+            lastDirectionDifference = directionDifference;
+        }
+    }
+
+    private void UpdateData()
+    {
+        directionDifference = Vector3.SignedAngle(-transform.forward, targetDirection, transform.up);
+        tailRotorDistance = CalculateTailRotorDistance(tailRotor.transform);
+        altitude = transform.position.y;
+    }
 
     public float CalculateTailRotorDistance(Transform tailRotorTransform)
     {
@@ -100,6 +207,8 @@ public class Helicopter_Player : MonoBehaviour
         return distance;
     }
 
+
+    #region Debug
     private void OnDrawGizmos()
     {
         UpdateDebugVisuals();
@@ -221,7 +330,7 @@ public class Helicopter_Player : MonoBehaviour
         for (int i = 0; i < 4; i++)
             Gizmos.DrawLine(corners[i], corners[i + 4]);
     }
-
+    #endregion
 }
 
 #region Custom Editor

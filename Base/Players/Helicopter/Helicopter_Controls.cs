@@ -116,6 +116,42 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Up"",
+                    ""type"": ""Button"",
+                    ""id"": ""6e90d730-8c22-416a-98c3-8c8ff82ca08b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Down"",
+                    ""type"": ""Button"",
+                    ""id"": ""72e9ec13-195e-4958-8be4-cb924a475fe3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TiltLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""86fb1590-30d7-41a8-8303-3d412399555c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TiltRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""a4b55f8f-d062-45f3-ba09-477bed6e34eb"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -155,7 +191,7 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""042bb664-9b06-49bb-9359-2f9e16cc2fd2"",
-                    ""path"": ""<Keyboard>/d"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -283,6 +319,50 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
                     ""action"": ""FullThrottle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d456c3ea-799b-4251-94bb-5f21241e767d"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Up"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f9aa1b41-7a80-421a-b736-f88829fd9910"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Down"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c8063952-9d58-46b7-9774-53777dc977ed"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TiltLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8af5070d-78a2-40a4-b2d8-f2007e632571"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TiltRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -301,6 +381,10 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
         m_Helicopter_Action_Map_Look = m_Helicopter_Action_Map.FindAction("Look", throwIfNotFound: true);
         m_Helicopter_Action_Map_Interact = m_Helicopter_Action_Map.FindAction("Interact", throwIfNotFound: true);
         m_Helicopter_Action_Map_FullThrottle = m_Helicopter_Action_Map.FindAction("FullThrottle", throwIfNotFound: true);
+        m_Helicopter_Action_Map_Up = m_Helicopter_Action_Map.FindAction("Up", throwIfNotFound: true);
+        m_Helicopter_Action_Map_Down = m_Helicopter_Action_Map.FindAction("Down", throwIfNotFound: true);
+        m_Helicopter_Action_Map_TiltLeft = m_Helicopter_Action_Map.FindAction("TiltLeft", throwIfNotFound: true);
+        m_Helicopter_Action_Map_TiltRight = m_Helicopter_Action_Map.FindAction("TiltRight", throwIfNotFound: true);
     }
 
     ~@Helicopter_Controls()
@@ -377,6 +461,10 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Helicopter_Action_Map_Look;
     private readonly InputAction m_Helicopter_Action_Map_Interact;
     private readonly InputAction m_Helicopter_Action_Map_FullThrottle;
+    private readonly InputAction m_Helicopter_Action_Map_Up;
+    private readonly InputAction m_Helicopter_Action_Map_Down;
+    private readonly InputAction m_Helicopter_Action_Map_TiltLeft;
+    private readonly InputAction m_Helicopter_Action_Map_TiltRight;
     public struct Helicopter_Action_MapActions
     {
         private @Helicopter_Controls m_Wrapper;
@@ -391,6 +479,10 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_Helicopter_Action_Map_Look;
         public InputAction @Interact => m_Wrapper.m_Helicopter_Action_Map_Interact;
         public InputAction @FullThrottle => m_Wrapper.m_Helicopter_Action_Map_FullThrottle;
+        public InputAction @Up => m_Wrapper.m_Helicopter_Action_Map_Up;
+        public InputAction @Down => m_Wrapper.m_Helicopter_Action_Map_Down;
+        public InputAction @TiltLeft => m_Wrapper.m_Helicopter_Action_Map_TiltLeft;
+        public InputAction @TiltRight => m_Wrapper.m_Helicopter_Action_Map_TiltRight;
         public InputActionMap Get() { return m_Wrapper.m_Helicopter_Action_Map; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -430,6 +522,18 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
             @FullThrottle.started += instance.OnFullThrottle;
             @FullThrottle.performed += instance.OnFullThrottle;
             @FullThrottle.canceled += instance.OnFullThrottle;
+            @Up.started += instance.OnUp;
+            @Up.performed += instance.OnUp;
+            @Up.canceled += instance.OnUp;
+            @Down.started += instance.OnDown;
+            @Down.performed += instance.OnDown;
+            @Down.canceled += instance.OnDown;
+            @TiltLeft.started += instance.OnTiltLeft;
+            @TiltLeft.performed += instance.OnTiltLeft;
+            @TiltLeft.canceled += instance.OnTiltLeft;
+            @TiltRight.started += instance.OnTiltRight;
+            @TiltRight.performed += instance.OnTiltRight;
+            @TiltRight.canceled += instance.OnTiltRight;
         }
 
         private void UnregisterCallbacks(IHelicopter_Action_MapActions instance)
@@ -464,6 +568,18 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
             @FullThrottle.started -= instance.OnFullThrottle;
             @FullThrottle.performed -= instance.OnFullThrottle;
             @FullThrottle.canceled -= instance.OnFullThrottle;
+            @Up.started -= instance.OnUp;
+            @Up.performed -= instance.OnUp;
+            @Up.canceled -= instance.OnUp;
+            @Down.started -= instance.OnDown;
+            @Down.performed -= instance.OnDown;
+            @Down.canceled -= instance.OnDown;
+            @TiltLeft.started -= instance.OnTiltLeft;
+            @TiltLeft.performed -= instance.OnTiltLeft;
+            @TiltLeft.canceled -= instance.OnTiltLeft;
+            @TiltRight.started -= instance.OnTiltRight;
+            @TiltRight.performed -= instance.OnTiltRight;
+            @TiltRight.canceled -= instance.OnTiltRight;
         }
 
         public void RemoveCallbacks(IHelicopter_Action_MapActions instance)
@@ -493,5 +609,9 @@ public partial class @Helicopter_Controls: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnFullThrottle(InputAction.CallbackContext context);
+        void OnUp(InputAction.CallbackContext context);
+        void OnDown(InputAction.CallbackContext context);
+        void OnTiltLeft(InputAction.CallbackContext context);
+        void OnTiltRight(InputAction.CallbackContext context);
     }
 }

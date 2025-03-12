@@ -1443,6 +1443,13 @@ MonoBehaviour:
   rigidBody: {fileID: 926390577}
   tailRotorDistance: 0
   requiredThrust: 0
+  targetDirection: {x: 0, y: 0, z: 0}
+  directionDifference: 0
+  altitude: 0
+  engineOnOff: 0
+  Kp: 0.1
+  Kd: 0.18
+  maxCorrection: 0.5
 --- !u!1 &938861271
 GameObject:
   m_ObjectHideFlags: 0

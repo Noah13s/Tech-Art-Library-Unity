@@ -59,7 +59,7 @@ public class Rotor : MonoBehaviour
     [SerializeField] bool decelerating = false;
     [ReadOnly]
     [Tooltip("Rotor RPM to fully counter the weight.")]
-    [SerializeField] float hoverRPM = 0f;
+    public float hoverRPM = 0f;
     [ReadOnly]
     [Tooltip("Thrust required to fully counter the torque.")]
     [SerializeField] float necessaryTorqueCounterThrust = 0f;

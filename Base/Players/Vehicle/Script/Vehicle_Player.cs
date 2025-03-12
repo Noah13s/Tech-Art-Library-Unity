@@ -123,6 +123,13 @@ public class Vehicle_Player : MonoBehaviour
     }
 #endif
 
+    /// <summary>
+    /// Applies the inputs to the vehicle.
+    /// </summary>
+    /// <param name="forwardInput">The starting direction as a Vector3 (Euler angles in degrees).</param>
+    /// <param name="turnInput">The target direction as a Vector3 (Euler angles in degrees).</param>
+    /// <param name="handbrake">True or False boolean for the handbrake.</param>
+    /// <returns>The signed angular difference in degrees (-180 to 180).</returns>
     private void Drive(float forwardInput, float turnInput, bool handbrake, bool isFullThrottle)
     {
         // Adjust throttle based on shift key press
