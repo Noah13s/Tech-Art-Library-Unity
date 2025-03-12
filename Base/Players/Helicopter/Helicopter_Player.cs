@@ -226,6 +226,7 @@ public class Helicopter_Player : MonoBehaviour
 
         Handles.color = Color.green;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + -transform.forward * 5), 6);//   Draws a green line that indicates the direction of the aircraft
+        DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + -transform.forward * 5), transform.forward, 30f, 1f, 32, new Color(1f, 0f, 0f, 0.5f));
         Handles.color = Color.red;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + targetDirection * 5), 6);//   Draws an orange ln
     }
