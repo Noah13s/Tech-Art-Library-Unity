@@ -3,6 +3,7 @@ using UnityEngine.Events;
 
 public class PingPongEvent : MonoBehaviour
 {
+    [SerializeField] private bool invert = false;
     public UnityEvent eventA;
     public UnityEvent eventB;
 
@@ -13,16 +14,24 @@ public class PingPongEvent : MonoBehaviour
     {
         if (toggle)
         {
-            if (eventA != null)
+            if (!invert) 
             {
-                eventA.Invoke();
+                eventA?.Invoke();
+            }
+            else
+            {
+                eventB?.Invoke();
             }
         }
         else
         {
-            if (eventB != null)
+            if (!invert)
             {
-                eventB.Invoke();
+                eventB?.Invoke();
+            }
+            else
+            {
+                eventA?.Invoke();
             }
         }
 
@@ -32,18 +41,12 @@ public class PingPongEvent : MonoBehaviour
 
     public void TriggerA()
     {
-        if (eventA != null)
-        {
-            eventA.Invoke();
-        }
+        eventA?.Invoke();
     }
 
     public void TriggerB()
     {
-        if (eventB != null)
-        {
-            eventB.Invoke();
-        }
+        eventB?.Invoke();
     }
 
     public void SetToggleA()

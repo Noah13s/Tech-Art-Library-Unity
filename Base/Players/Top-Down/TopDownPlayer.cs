@@ -18,14 +18,17 @@ public class TopDownMousePlayer : MonoBehaviour
     [SerializeField] private float minZoom = 5.0f;
     [SerializeField] private float maxZoom = 20.0f;
     [SerializeField] private bool curvedZoom = true;
+    [SerializeField] private bool canRotate = false;
 
     [Header("Cursor Settings")]
     [SerializeField] private Texture2D defaultCursor;
     [SerializeField] private Texture2D grabbingCursor;
+    [SerializeField] private Texture2D rotatingCursor;
 
     private Vector3 moveDirection = Vector3.zero;
     private Vector3 lastMousePosition;
     private bool isDragging = false;
+    private bool isRotating = false;
     private float currentZoom;
 
 #if ENABLE_INPUT_SYSTEM
@@ -69,6 +72,7 @@ public class TopDownMousePlayer : MonoBehaviour
 
         // Move the character
         transform.Translate(moveDirection * Time.deltaTime * sensitivity, Space.World);
+        //transform.RotateAround(Vector3.zero , Vector3.up, moveDirection.x);
 
         // Update camera position
         if (mainCamera != null)
@@ -93,6 +97,16 @@ public class TopDownMousePlayer : MonoBehaviour
         {
             isDragging = false;
         }
+        if (Mouse.current.rightButton.isPressed && canRotate)
+        {
+            isRotating = true;
+            Vector2 mouseDelta = mouseInputAction.ReadValue<Vector2>();
+            inputDelta = new Vector3(-mouseDelta.x, 0, -mouseDelta.y); // Inverted input
+        }
+        else
+        {
+            isRotating = false;
+        }
 #elif ENABLE_LEGACY_INPUT_MANAGER
         // Legacy Input Manager: Read mouse input delta
         if (Input.GetMouseButton(0))
@@ -115,8 +129,8 @@ public class TopDownMousePlayer : MonoBehaviour
         }
 #endif
 
-        // Update cursor based on dragging state
-        UpdateCursor();
+            // Update cursor based on dragging state
+            UpdateCursor();
 
         // Convert screen-space input delta to world-space movement
         if (mainCamera != null)

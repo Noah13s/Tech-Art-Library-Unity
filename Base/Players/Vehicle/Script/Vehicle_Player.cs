@@ -344,7 +344,7 @@ public class Vehicle_Player : MonoBehaviour
         #region Single Wedge for Wheel Turn Angle Debug
         Handles.color = baseColor;
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, baseColor);        // Draw front wheel angle
+        DebugUtility.DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, baseColor);        // Draw front wheel angle
         //  Draws the center of the two front wheel angle meetup point 
         Handles.color = Color.blue;
         Handles.DrawWireCube(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2), new Vector3(0.1f, 0.1f, 0.1f));
@@ -383,136 +383,7 @@ public class Vehicle_Player : MonoBehaviour
 
 
     }
-    void DrawFilledWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
-    {
-        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
-        Vector3 top = center + normal * height;
-        int segments = 32;
-        float angleStep = angle / segments;
 
-        GL.PushMatrix();
-        GL.MultMatrix(Matrix4x4.identity);
-        GL.Begin(GL.TRIANGLES);
-        GL.Color(color);
-
-        // Fill the curved surfaces
-        for (int i = 0; i < segments; i++)
-        {
-            float currentAngle = i * angleStep;
-            float nextAngle = (i + 1) * angleStep;
-
-            Vector3 currentOuter = center + rotation * (Quaternion.AngleAxis(currentAngle, Vector3.up) * from) * outerRadius;
-            Vector3 nextOuter = center + rotation * (Quaternion.AngleAxis(nextAngle, Vector3.up) * from) * outerRadius;
-            Vector3 currentInner = center + rotation * (Quaternion.AngleAxis(currentAngle, Vector3.up) * from) * innerRadius;
-            Vector3 nextInner = center + rotation * (Quaternion.AngleAxis(nextAngle, Vector3.up) * from) * innerRadius;
-
-            // Bottom surface
-            GL.Vertex(currentInner);
-            GL.Vertex(currentOuter);
-            GL.Vertex(nextOuter);
-
-            GL.Vertex(currentInner);
-            GL.Vertex(nextOuter);
-            GL.Vertex(nextInner);
-
-            // Top surface
-            GL.Vertex(currentInner + normal * height);
-            GL.Vertex(nextOuter + normal * height);
-            GL.Vertex(currentOuter + normal * height);
-
-            GL.Vertex(currentInner + normal * height);
-            GL.Vertex(nextInner + normal * height);
-            GL.Vertex(nextOuter + normal * height);
-
-            // Side surfaces
-            GL.Vertex(currentInner);
-            GL.Vertex(currentInner + normal * height);
-            GL.Vertex(currentOuter + normal * height);
-
-            GL.Vertex(currentInner);
-            GL.Vertex(currentOuter + normal * height);
-            GL.Vertex(currentOuter);
-        }
-
-        // Fill the end caps
-        Vector3 startOuter = center + rotation * from * outerRadius;
-        Vector3 startInner = center + rotation * from * innerRadius;
-        Vector3 endOuter = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * outerRadius;
-        Vector3 endInner = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * innerRadius;
-
-        // Start cap
-        GL.Vertex(startInner);
-        GL.Vertex(startOuter);
-        GL.Vertex(startOuter + normal * height);
-
-        GL.Vertex(startInner);
-        GL.Vertex(startOuter + normal * height);
-        GL.Vertex(startInner + normal * height);
-
-        // End cap
-        GL.Vertex(endInner);
-        GL.Vertex(endOuter + normal * height);
-        GL.Vertex(endOuter);
-
-        GL.Vertex(endInner);
-        GL.Vertex(endInner + normal * height);
-        GL.Vertex(endOuter + normal * height);
-
-        GL.End();
-        GL.PopMatrix();
-
-        // Draw wireframe arcs
-        Handles.DrawWireArc(center, normal, from, angle, outerRadius);
-        Handles.DrawWireArc(center, normal, from, angle, innerRadius);
-        Handles.DrawWireArc(top, normal, from, angle, outerRadius);
-        Handles.DrawWireArc(top, normal, from, angle, innerRadius);
-
-        // Draw lines for edges
-        Vector3[] corners = new Vector3[]
-        {
-        startOuter, startInner, endOuter, endInner,
-        startOuter + normal * height, startInner + normal * height,
-        endOuter + normal * height, endInner + normal * height
-        };
-
-        Gizmos.DrawLine(corners[0], corners[1]);
-        Gizmos.DrawLine(corners[2], corners[3]);
-        Gizmos.DrawLine(corners[4], corners[5]);
-        Gizmos.DrawLine(corners[6], corners[7]);
-
-        for (int i = 0; i < 4; i++)
-            Gizmos.DrawLine(corners[i], corners[i + 4]);
-    }
-
-    void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius)
-    {
-        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
-        Vector3 top = center + normal * height;
-
-        // Draw arcs at bottom and top
-        Handles.DrawWireArc(center, normal, from, angle, outerRadius);
-        Handles.DrawWireArc(center, normal, from, angle, innerRadius);
-        Handles.DrawWireArc(top, normal, from, angle, outerRadius);
-        Handles.DrawWireArc(top, normal, from, angle, innerRadius);
-
-        // Calculate corner points
-        Vector3 startOuter = center + rotation * from * outerRadius;
-        Vector3 endOuter = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * outerRadius;
-        Vector3 startInner = center + rotation * from * innerRadius;
-        Vector3 endInner = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * innerRadius;
-
-        // Draw vertical lines at edges
-        Gizmos.DrawLine(startOuter, startOuter + normal * height);
-        Gizmos.DrawLine(endOuter, endOuter + normal * height);
-        Gizmos.DrawLine(startInner, startInner + normal * height);
-        Gizmos.DrawLine(endInner, endInner + normal * height);
-
-        // Draw lines connecting inner and outer arcs
-        Gizmos.DrawLine(startInner, startOuter);
-        Gizmos.DrawLine(endInner, endOuter);
-        Gizmos.DrawLine(startInner + normal * height, startOuter + normal * height);
-        Gizmos.DrawLine(endInner + normal * height, endOuter + normal * height);
-    }
 
     public Vector3 CalculateC(Vector3 A, Vector3 B, float angle)
     {

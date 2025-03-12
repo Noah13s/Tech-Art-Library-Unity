@@ -28,7 +28,7 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
             ""id"": ""ad5492f3-8439-44a8-8ee9-41691c9ab66c"",
             ""actions"": [
                 {
-                    ""name"": ""Move"",
+                    ""name"": ""Up"",
                     ""type"": ""Button"",
                     ""id"": ""04e74356-1e26-4a86-9eeb-3d78e0bc2f51"",
                     ""expectedControlType"": """",
@@ -37,7 +37,7 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Backwards"",
+                    ""name"": ""Down"",
                     ""type"": ""Button"",
                     ""id"": ""d62d328b-3bce-49e6-83bd-6ffe0df43010"",
                     ""expectedControlType"": """",
@@ -82,15 +82,6 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Jump"",
-                    ""type"": ""Button"",
-                    ""id"": ""8f1d36d0-70d1-4a75-bfb9-a5486c13fe2a"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Look"",
                     ""type"": ""Value"",
                     ""id"": ""16fe58d6-9c5a-47d0-9523-63cd6003c135"",
@@ -126,7 +117,7 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Move"",
+                    ""action"": ""Up"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -137,7 +128,7 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Backwards"",
+                    ""action"": ""Down"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -187,17 +178,6 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""381d774b-34ab-4100-9b5a-5615373518a8"",
-                    ""path"": ""<Keyboard>/space"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Jump"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""e4d11cef-9497-4070-882a-d08c597d7c5e"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
@@ -236,13 +216,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
 }");
         // TopDownActionMap
         m_TopDownActionMap = asset.FindActionMap("TopDownActionMap", throwIfNotFound: true);
-        m_TopDownActionMap_Move = m_TopDownActionMap.FindAction("Move", throwIfNotFound: true);
-        m_TopDownActionMap_Backwards = m_TopDownActionMap.FindAction("Backwards", throwIfNotFound: true);
+        m_TopDownActionMap_Up = m_TopDownActionMap.FindAction("Up", throwIfNotFound: true);
+        m_TopDownActionMap_Down = m_TopDownActionMap.FindAction("Down", throwIfNotFound: true);
         m_TopDownActionMap_Right = m_TopDownActionMap.FindAction("Right", throwIfNotFound: true);
         m_TopDownActionMap_Left = m_TopDownActionMap.FindAction("Left", throwIfNotFound: true);
         m_TopDownActionMap_FrontBack = m_TopDownActionMap.FindAction("Front/Back", throwIfNotFound: true);
         m_TopDownActionMap_Sideways = m_TopDownActionMap.FindAction("Sideways", throwIfNotFound: true);
-        m_TopDownActionMap_Jump = m_TopDownActionMap.FindAction("Jump", throwIfNotFound: true);
         m_TopDownActionMap_Look = m_TopDownActionMap.FindAction("Look", throwIfNotFound: true);
         m_TopDownActionMap_Interact = m_TopDownActionMap.FindAction("Interact", throwIfNotFound: true);
         m_TopDownActionMap_MouseDrag = m_TopDownActionMap.FindAction("MouseDrag", throwIfNotFound: true);
@@ -312,13 +291,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
     // TopDownActionMap
     private readonly InputActionMap m_TopDownActionMap;
     private List<ITopDownActionMapActions> m_TopDownActionMapActionsCallbackInterfaces = new List<ITopDownActionMapActions>();
-    private readonly InputAction m_TopDownActionMap_Move;
-    private readonly InputAction m_TopDownActionMap_Backwards;
+    private readonly InputAction m_TopDownActionMap_Up;
+    private readonly InputAction m_TopDownActionMap_Down;
     private readonly InputAction m_TopDownActionMap_Right;
     private readonly InputAction m_TopDownActionMap_Left;
     private readonly InputAction m_TopDownActionMap_FrontBack;
     private readonly InputAction m_TopDownActionMap_Sideways;
-    private readonly InputAction m_TopDownActionMap_Jump;
     private readonly InputAction m_TopDownActionMap_Look;
     private readonly InputAction m_TopDownActionMap_Interact;
     private readonly InputAction m_TopDownActionMap_MouseDrag;
@@ -326,13 +304,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
     {
         private @TopDownControls m_Wrapper;
         public TopDownActionMapActions(@TopDownControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Move => m_Wrapper.m_TopDownActionMap_Move;
-        public InputAction @Backwards => m_Wrapper.m_TopDownActionMap_Backwards;
+        public InputAction @Up => m_Wrapper.m_TopDownActionMap_Up;
+        public InputAction @Down => m_Wrapper.m_TopDownActionMap_Down;
         public InputAction @Right => m_Wrapper.m_TopDownActionMap_Right;
         public InputAction @Left => m_Wrapper.m_TopDownActionMap_Left;
         public InputAction @FrontBack => m_Wrapper.m_TopDownActionMap_FrontBack;
         public InputAction @Sideways => m_Wrapper.m_TopDownActionMap_Sideways;
-        public InputAction @Jump => m_Wrapper.m_TopDownActionMap_Jump;
         public InputAction @Look => m_Wrapper.m_TopDownActionMap_Look;
         public InputAction @Interact => m_Wrapper.m_TopDownActionMap_Interact;
         public InputAction @MouseDrag => m_Wrapper.m_TopDownActionMap_MouseDrag;
@@ -345,12 +322,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_TopDownActionMapActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_TopDownActionMapActionsCallbackInterfaces.Add(instance);
-            @Move.started += instance.OnMove;
-            @Move.performed += instance.OnMove;
-            @Move.canceled += instance.OnMove;
-            @Backwards.started += instance.OnBackwards;
-            @Backwards.performed += instance.OnBackwards;
-            @Backwards.canceled += instance.OnBackwards;
+            @Up.started += instance.OnUp;
+            @Up.performed += instance.OnUp;
+            @Up.canceled += instance.OnUp;
+            @Down.started += instance.OnDown;
+            @Down.performed += instance.OnDown;
+            @Down.canceled += instance.OnDown;
             @Right.started += instance.OnRight;
             @Right.performed += instance.OnRight;
             @Right.canceled += instance.OnRight;
@@ -363,9 +340,6 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
             @Sideways.started += instance.OnSideways;
             @Sideways.performed += instance.OnSideways;
             @Sideways.canceled += instance.OnSideways;
-            @Jump.started += instance.OnJump;
-            @Jump.performed += instance.OnJump;
-            @Jump.canceled += instance.OnJump;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
@@ -379,12 +353,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(ITopDownActionMapActions instance)
         {
-            @Move.started -= instance.OnMove;
-            @Move.performed -= instance.OnMove;
-            @Move.canceled -= instance.OnMove;
-            @Backwards.started -= instance.OnBackwards;
-            @Backwards.performed -= instance.OnBackwards;
-            @Backwards.canceled -= instance.OnBackwards;
+            @Up.started -= instance.OnUp;
+            @Up.performed -= instance.OnUp;
+            @Up.canceled -= instance.OnUp;
+            @Down.started -= instance.OnDown;
+            @Down.performed -= instance.OnDown;
+            @Down.canceled -= instance.OnDown;
             @Right.started -= instance.OnRight;
             @Right.performed -= instance.OnRight;
             @Right.canceled -= instance.OnRight;
@@ -397,9 +371,6 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
             @Sideways.started -= instance.OnSideways;
             @Sideways.performed -= instance.OnSideways;
             @Sideways.canceled -= instance.OnSideways;
-            @Jump.started -= instance.OnJump;
-            @Jump.performed -= instance.OnJump;
-            @Jump.canceled -= instance.OnJump;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
@@ -428,13 +399,12 @@ public partial class @TopDownControls: IInputActionCollection2, IDisposable
     public TopDownActionMapActions @TopDownActionMap => new TopDownActionMapActions(this);
     public interface ITopDownActionMapActions
     {
-        void OnMove(InputAction.CallbackContext context);
-        void OnBackwards(InputAction.CallbackContext context);
+        void OnUp(InputAction.CallbackContext context);
+        void OnDown(InputAction.CallbackContext context);
         void OnRight(InputAction.CallbackContext context);
         void OnLeft(InputAction.CallbackContext context);
         void OnFrontBack(InputAction.CallbackContext context);
         void OnSideways(InputAction.CallbackContext context);
-        void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnMouseDrag(InputAction.CallbackContext context);

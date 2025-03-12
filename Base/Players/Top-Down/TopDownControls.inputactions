@@ -6,7 +6,7 @@
             "id": "ad5492f3-8439-44a8-8ee9-41691c9ab66c",
             "actions": [
                 {
-                    "name": "Move",
+                    "name": "Up",
                     "type": "Button",
                     "id": "04e74356-1e26-4a86-9eeb-3d78e0bc2f51",
                     "expectedControlType": "",
@@ -15,7 +15,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Backwards",
+                    "name": "Down",
                     "type": "Button",
                     "id": "d62d328b-3bce-49e6-83bd-6ffe0df43010",
                     "expectedControlType": "",
@@ -60,15 +60,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Jump",
-                    "type": "Button",
-                    "id": "8f1d36d0-70d1-4a75-bfb9-a5486c13fe2a",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Look",
                     "type": "Value",
                     "id": "16fe58d6-9c5a-47d0-9523-63cd6003c135",
@@ -104,7 +95,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Move",
+                    "action": "Up",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -115,7 +106,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Backwards",
+                    "action": "Down",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -160,17 +151,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Sideways",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "381d774b-34ab-4100-9b5a-5615373518a8",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
