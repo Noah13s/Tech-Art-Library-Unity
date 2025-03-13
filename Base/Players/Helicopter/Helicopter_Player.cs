@@ -76,7 +76,7 @@ public class Helicopter_Player : MonoBehaviour
 
 
         HandleVerticalMovement();
-        HandleTiltMovement();
+        //HandleTiltMovement();
 
 
 
@@ -217,6 +217,18 @@ public class Helicopter_Player : MonoBehaviour
     void UpdateDebugVisuals()
     {
         if (!debugMode) { return; }
+        // Create a 1x1 texture
+        Texture2D backgroundColoredTexture = new(1, 1);
+        // Set the color with alpha (e.g., semi-transparent red)
+        backgroundColoredTexture.SetPixel(0, 0, Color.white); // RGBA, where 0.5f is 50% transparency
+        backgroundColoredTexture.Apply();
+        GUIStyle style = new()
+        {
+            fontSize = 10,
+            normal = new GUIStyleState()
+        };
+        style.normal.textColor = Color.black;
+        style.normal.background = backgroundColoredTexture;
         //  Setup + Var declaration
         Handles.color = baseColor;
 
@@ -226,9 +238,13 @@ public class Helicopter_Player : MonoBehaviour
 
         Handles.color = Color.green;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + -transform.forward * 5), 6);//   Draws a green line that indicates the direction of the aircraft
-        DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + -transform.forward * 5), transform.forward, 30f, 1f, 32, new Color(1f, 0f, 0f, 0.5f));
+        DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + (-transform.forward * 5.5f)), transform.forward, 20f, 0.5f, 32, Color.green);
+        Handles.Label((rigidBody.worldCenterOfMass + (-transform.forward * 5.5f)), "Test", style);
         Handles.color = Color.red;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + targetDirection * 5), 6);//   Draws an orange ln
+        DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + targetDirection * 5.5f), -targetDirection, 20f, 0.5f, 32, Color.red);
+        Handles.Label((rigidBody.worldCenterOfMass + targetDirection * 5.5f), "Test", style);
+
     }
     #endregion
 }
