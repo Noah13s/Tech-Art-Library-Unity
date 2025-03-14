@@ -690,6 +690,205 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""TopDown_Player"",
+            ""id"": ""a5c6d70a-7311-4936-8876-28e2facf054e"",
+            ""actions"": [
+                {
+                    ""name"": ""Up"",
+                    ""type"": ""Button"",
+                    ""id"": ""3afde817-926f-404f-8bc4-cb3b332fa780"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Down"",
+                    ""type"": ""Button"",
+                    ""id"": ""2297acdf-d960-49a5-b40b-2992eb984f3a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Right"",
+                    ""type"": ""Button"",
+                    ""id"": ""21d78ce5-0251-45d1-9173-a7f7c1b0730d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Left"",
+                    ""type"": ""Button"",
+                    ""id"": ""f0904842-40d8-444b-8843-b2b87f7095c8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Front/Back"",
+                    ""type"": ""Value"",
+                    ""id"": ""4a1720d0-655d-47e5-985a-967ac85191d1"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Left/Right"",
+                    ""type"": ""Value"",
+                    ""id"": ""b3fcbc25-7e5d-497d-81c5-699b3d3c5b92"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""453af8c0-d867-436b-a01c-ddeb5d3d6333"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""9ad4cfdd-f445-411e-98dc-eb80e2f65546"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseDrag"",
+                    ""type"": ""Value"",
+                    ""id"": ""d299c593-bef1-42d1-95df-94f1b1c167ed"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""03173272-2de0-4e88-b72b-d15317dfdda6"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Up"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""28e32c8f-6459-4a15-b7ba-ca86dc061b4d"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Up"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""29331426-8933-4611-9bbe-654a017569cf"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d1cf9047-9291-44d7-b830-9a92c4527e17"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""64e86166-5b3b-46a6-97c8-a4215ecac6e0"",
+                    ""path"": ""<Joystick>/stick/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Front/Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""edd7f2b7-36ce-48f2-bdb0-c2ecb71a5eb3"",
+                    ""path"": ""<Joystick>/stick/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left/Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7493ce07-5952-42b7-a5e2-3b55bf0be49d"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d4d97b5e-82c3-4208-9e98-b51339fa4afd"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""91097f0a-bdf2-48ad-8a48-78dc56b72221"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseDrag"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""33c9067a-30f8-4513-a375-53f4d3eac2f6"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Down"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -754,6 +953,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Car_Player_Look = m_Car_Player.FindAction("Look", throwIfNotFound: true);
         m_Car_Player_Interact = m_Car_Player.FindAction("Interact", throwIfNotFound: true);
         m_Car_Player_FullThrottle = m_Car_Player.FindAction("FullThrottle", throwIfNotFound: true);
+        // TopDown_Player
+        m_TopDown_Player = asset.FindActionMap("TopDown_Player", throwIfNotFound: true);
+        m_TopDown_Player_Up = m_TopDown_Player.FindAction("Up", throwIfNotFound: true);
+        m_TopDown_Player_Down = m_TopDown_Player.FindAction("Down", throwIfNotFound: true);
+        m_TopDown_Player_Right = m_TopDown_Player.FindAction("Right", throwIfNotFound: true);
+        m_TopDown_Player_Left = m_TopDown_Player.FindAction("Left", throwIfNotFound: true);
+        m_TopDown_Player_FrontBack = m_TopDown_Player.FindAction("Front/Back", throwIfNotFound: true);
+        m_TopDown_Player_LeftRight = m_TopDown_Player.FindAction("Left/Right", throwIfNotFound: true);
+        m_TopDown_Player_Look = m_TopDown_Player.FindAction("Look", throwIfNotFound: true);
+        m_TopDown_Player_Interact = m_TopDown_Player.FindAction("Interact", throwIfNotFound: true);
+        m_TopDown_Player_MouseDrag = m_TopDown_Player.FindAction("MouseDrag", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -763,6 +973,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         UnityEngine.Debug.Assert(!m_Orbit_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Orbit_Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Helicopter_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Helicopter_Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Car_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Car_Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_TopDown_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.TopDown_Player.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1226,6 +1437,116 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public Car_PlayerActions @Car_Player => new Car_PlayerActions(this);
+
+    // TopDown_Player
+    private readonly InputActionMap m_TopDown_Player;
+    private List<ITopDown_PlayerActions> m_TopDown_PlayerActionsCallbackInterfaces = new List<ITopDown_PlayerActions>();
+    private readonly InputAction m_TopDown_Player_Up;
+    private readonly InputAction m_TopDown_Player_Down;
+    private readonly InputAction m_TopDown_Player_Right;
+    private readonly InputAction m_TopDown_Player_Left;
+    private readonly InputAction m_TopDown_Player_FrontBack;
+    private readonly InputAction m_TopDown_Player_LeftRight;
+    private readonly InputAction m_TopDown_Player_Look;
+    private readonly InputAction m_TopDown_Player_Interact;
+    private readonly InputAction m_TopDown_Player_MouseDrag;
+    public struct TopDown_PlayerActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public TopDown_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Up => m_Wrapper.m_TopDown_Player_Up;
+        public InputAction @Down => m_Wrapper.m_TopDown_Player_Down;
+        public InputAction @Right => m_Wrapper.m_TopDown_Player_Right;
+        public InputAction @Left => m_Wrapper.m_TopDown_Player_Left;
+        public InputAction @FrontBack => m_Wrapper.m_TopDown_Player_FrontBack;
+        public InputAction @LeftRight => m_Wrapper.m_TopDown_Player_LeftRight;
+        public InputAction @Look => m_Wrapper.m_TopDown_Player_Look;
+        public InputAction @Interact => m_Wrapper.m_TopDown_Player_Interact;
+        public InputAction @MouseDrag => m_Wrapper.m_TopDown_Player_MouseDrag;
+        public InputActionMap Get() { return m_Wrapper.m_TopDown_Player; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TopDown_PlayerActions set) { return set.Get(); }
+        public void AddCallbacks(ITopDown_PlayerActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Add(instance);
+            @Up.started += instance.OnUp;
+            @Up.performed += instance.OnUp;
+            @Up.canceled += instance.OnUp;
+            @Down.started += instance.OnDown;
+            @Down.performed += instance.OnDown;
+            @Down.canceled += instance.OnDown;
+            @Right.started += instance.OnRight;
+            @Right.performed += instance.OnRight;
+            @Right.canceled += instance.OnRight;
+            @Left.started += instance.OnLeft;
+            @Left.performed += instance.OnLeft;
+            @Left.canceled += instance.OnLeft;
+            @FrontBack.started += instance.OnFrontBack;
+            @FrontBack.performed += instance.OnFrontBack;
+            @FrontBack.canceled += instance.OnFrontBack;
+            @LeftRight.started += instance.OnLeftRight;
+            @LeftRight.performed += instance.OnLeftRight;
+            @LeftRight.canceled += instance.OnLeftRight;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
+            @MouseDrag.started += instance.OnMouseDrag;
+            @MouseDrag.performed += instance.OnMouseDrag;
+            @MouseDrag.canceled += instance.OnMouseDrag;
+        }
+
+        private void UnregisterCallbacks(ITopDown_PlayerActions instance)
+        {
+            @Up.started -= instance.OnUp;
+            @Up.performed -= instance.OnUp;
+            @Up.canceled -= instance.OnUp;
+            @Down.started -= instance.OnDown;
+            @Down.performed -= instance.OnDown;
+            @Down.canceled -= instance.OnDown;
+            @Right.started -= instance.OnRight;
+            @Right.performed -= instance.OnRight;
+            @Right.canceled -= instance.OnRight;
+            @Left.started -= instance.OnLeft;
+            @Left.performed -= instance.OnLeft;
+            @Left.canceled -= instance.OnLeft;
+            @FrontBack.started -= instance.OnFrontBack;
+            @FrontBack.performed -= instance.OnFrontBack;
+            @FrontBack.canceled -= instance.OnFrontBack;
+            @LeftRight.started -= instance.OnLeftRight;
+            @LeftRight.performed -= instance.OnLeftRight;
+            @LeftRight.canceled -= instance.OnLeftRight;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
+            @MouseDrag.started -= instance.OnMouseDrag;
+            @MouseDrag.performed -= instance.OnMouseDrag;
+            @MouseDrag.canceled -= instance.OnMouseDrag;
+        }
+
+        public void RemoveCallbacks(ITopDown_PlayerActions instance)
+        {
+            if (m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITopDown_PlayerActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TopDown_PlayerActions @TopDown_Player => new TopDown_PlayerActions(this);
     private int m_AzertyKeyboardSchemeIndex = -1;
     public InputControlScheme AzertyKeyboardScheme
     {
@@ -1285,5 +1606,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnFullThrottle(InputAction.CallbackContext context);
+    }
+    public interface ITopDown_PlayerActions
+    {
+        void OnUp(InputAction.CallbackContext context);
+        void OnDown(InputAction.CallbackContext context);
+        void OnRight(InputAction.CallbackContext context);
+        void OnLeft(InputAction.CallbackContext context);
+        void OnFrontBack(InputAction.CallbackContext context);
+        void OnLeftRight(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnMouseDrag(InputAction.CallbackContext context);
     }
 }

@@ -48,7 +48,7 @@ public class Vehicle_Player : MonoBehaviour
     [Tooltip("Maximum volume of the engine sound.")]
     public float maxVolume = 1.0f;
 #if ENABLE_INPUT_SYSTEM
-    private Vehicle_Controls controls;
+    private InputSystem_Actions controls;
     private InputAction forwardAction;
     private InputAction backwardAction;
     private InputAction rightAction;
@@ -81,14 +81,14 @@ public class Vehicle_Player : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // Initialize the input actions for the new Input System
-        controls = new Vehicle_Controls();
+        controls = new ();
         controls.Enable();
-        forwardAction = controls.Vehicle_Action_Map.Forward;
-        backwardAction = controls.Vehicle_Action_Map.Backwards;
-        rightAction = controls.Vehicle_Action_Map.Right;
-        leftAction = controls.Vehicle_Action_Map.Left;
-        handbrakeAction = controls.Vehicle_Action_Map.Handbrake;
-        fullThrottleAction = controls.Vehicle_Action_Map.FullThrottle;
+        forwardAction = controls.Car_Player.Forward;
+        backwardAction = controls.Car_Player.Backward;
+        rightAction = controls.Car_Player.Right;
+        leftAction = controls.Car_Player.Left;
+        handbrakeAction = controls.Car_Player.Handbrake;
+        fullThrottleAction = controls.Car_Player.FullThrottle;
 #endif
     }
 

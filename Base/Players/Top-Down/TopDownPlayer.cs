@@ -53,9 +53,9 @@ public class TopDownMousePlayer : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // Assuming `TopDownControls` is your InputAction asset with a "MouseDrag" action
-        var controls = new TopDownControls();
+        var controls = new InputSystem_Actions();
         controls.Enable();
-        mouseInputAction = controls.TopDownActionMap.MouseDrag;
+        mouseInputAction = controls.TopDown_Player.MouseDrag;
 #endif
     }
 
