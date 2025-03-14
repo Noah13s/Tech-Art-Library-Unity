@@ -47,7 +47,7 @@ public class First_Person_Player : MonoBehaviour
     private float rotationX = 0;
 
 #if ENABLE_INPUT_SYSTEM
-    private FPS_Controls controls; // Reference to your Input Action Asset
+    private InputSystem_Actions controls; // Reference to your Input Action Asset
     private InputAction forwardAction;
     private InputAction backwardAction;
     private InputAction rightAction;
@@ -67,15 +67,15 @@ public class First_Person_Player : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // Initialize the input actions for the new Input System
-        controls = new FPS_Controls();
+        controls = new ();
         controls.Enable();
-        forwardAction = controls.FPS_Action_Map.Forward;
-        backwardAction = controls.FPS_Action_Map.Backwards;
-        rightAction = controls.FPS_Action_Map.Right;
-        leftAction = controls.FPS_Action_Map.Left;
-        jumpAction = controls.FPS_Action_Map.Jump;
-        lookAction = controls.FPS_Action_Map.Look;
-        moveAction = controls.FPS_Action_Map.Move;
+        forwardAction = controls.FirstPerson_Player.Forward;
+        backwardAction = controls.FirstPerson_Player.Backward;
+        rightAction = controls.FirstPerson_Player.Right;
+        leftAction = controls.FirstPerson_Player.Left;
+        jumpAction = controls.FirstPerson_Player.Jump;
+        lookAction = controls.FirstPerson_Player.Look;
+        moveAction = controls.FirstPerson_Player.Move;
 #endif
     }
 

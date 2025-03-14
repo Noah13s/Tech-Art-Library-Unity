@@ -28,7 +28,7 @@ public class FPSPlayerInteraction : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
     private InputAction interactAction;
-    private FPS_Controls controls;
+    private InputSystem_Actions controls;
 #endif
 
     private void Start()
@@ -37,9 +37,9 @@ public class FPSPlayerInteraction : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // Initialize input actions for new Input System
-        controls = new FPS_Controls();
+        controls = new ();
         controls.Enable();
-        interactAction = controls.FPS_Action_Map.Interact; // Using the Interact action from the input map
+        interactAction = controls.FirstPerson_Player.Interact; // Using the Interact action from the input map
 #endif
     }
 
