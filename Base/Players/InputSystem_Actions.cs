@@ -28,60 +28,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""id"": ""55d48aba-8fc1-4bc2-975c-c6b0d4c7c1d9"",
             ""actions"": [
                 {
-                    ""name"": ""Forward"",
-                    ""type"": ""Button"",
-                    ""id"": ""9732b7b5-c3d9-4fa5-8467-16f3cdeff5e4"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Backward"",
-                    ""type"": ""Button"",
-                    ""id"": ""95324e98-8a81-4bd5-92fc-fbc028375e65"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Right"",
-                    ""type"": ""Button"",
-                    ""id"": ""1466ae94-d93e-4844-9cdd-88f39cdb0284"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Left"",
-                    ""type"": ""Button"",
-                    ""id"": ""2e2b50ab-cd03-48ff-bf1c-b6ef06a4e8b5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Front/Back"",
-                    ""type"": ""Value"",
-                    ""id"": ""501a9f14-b7fe-47f6-a9e3-ad52b09c58e4"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Left/Right"",
-                    ""type"": ""Value"",
-                    ""id"": ""b98c32c9-978a-4b9b-a053-5a7def07bf83"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""51f30810-f832-46ed-9b12-42f310a880c1"",
@@ -119,94 +65,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""c317180e-6c83-4a29-90ba-e87fe8afc046"",
-                    ""path"": ""<Keyboard>/z"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";AzertyKeyboard"",
-                    ""action"": ""Forward"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""a18e7788-2620-4242-a325-90393b1f095f"",
-                    ""path"": ""<Keyboard>/w"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";QwertyKeyboard"",
-                    ""action"": ""Forward"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""0ac5497a-4cc2-41bb-930b-b2bdc6b18955"",
-                    ""path"": ""<Keyboard>/s"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";AzertyKeyboard;QwertyKeyboard"",
-                    ""action"": ""Backward"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""18d5ea0f-754c-4a7a-b272-d90c677aea48"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";AzertyKeyboard"",
-                    ""action"": ""Right"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""0d9b7e81-ec03-44b0-acc6-ccc72438ce50"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";AzertyKeyboard"",
-                    ""action"": ""Left"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""d5aebca2-6a09-496b-bf7b-5194382495e5"",
-                    ""path"": ""<Keyboard>/a"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";QwertyKeyboard"",
-                    ""action"": ""Left"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""8b484735-2e99-4912-bcbe-4f2f317b4c00"",
-                    ""path"": ""<Joystick>/stick/y"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Front/Back"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""df918444-f6ef-47e0-874f-249e1cf2d8bb"",
-                    ""path"": ""<Joystick>/stick/x"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Left/Right"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": """",
                     ""id"": ""3b81454e-3863-4fa7-9139-4d8b288ef0b9"",
@@ -272,6 +130,83 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""d25a03ca-c70b-496e-b00b-bf7351d129d2"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""52f63bcd-5b56-48ca-bc80-80045e792549"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""5f175acb-5c7e-486d-ada8-d806f1f83621"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""02a7e35c-1cc8-4aea-8073-72064baba91e"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""415d5d4d-c5fa-4575-bf58-f61843efbee7"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Left"",
+                    ""id"": ""541fc7d1-aa84-4d4b-a4ba-f8ff28c0f4d3"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""46825b56-6283-4fcf-b9a5-cfe839638072"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -775,6 +710,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""e8662dd7-cc41-48f6-8ae3-9d6f57770b24"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -887,6 +831,94 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Down"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""723c7179-dc2c-488d-8dd6-ab3e050dce3e"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""ad6104c2-e63c-448a-912e-972ce540cafe"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""08125181-b8da-4b26-8045-4710c9ef1e7b"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""38520f85-01c5-4e09-a6f3-59470a1e0924"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""04ba4321-dee9-4a28-99c9-332c5abb3d2c"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""cabc579a-e884-4c21-bd24-57e8606d2eaa"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""f88f86c7-3ae3-4080-85bd-cde2ace89721"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""14d0fefa-bdb0-4e88-869f-c32130d2c6f6"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -918,12 +950,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
 }");
         // FirstPerson_Player
         m_FirstPerson_Player = asset.FindActionMap("FirstPerson_Player", throwIfNotFound: true);
-        m_FirstPerson_Player_Forward = m_FirstPerson_Player.FindAction("Forward", throwIfNotFound: true);
-        m_FirstPerson_Player_Backward = m_FirstPerson_Player.FindAction("Backward", throwIfNotFound: true);
-        m_FirstPerson_Player_Right = m_FirstPerson_Player.FindAction("Right", throwIfNotFound: true);
-        m_FirstPerson_Player_Left = m_FirstPerson_Player.FindAction("Left", throwIfNotFound: true);
-        m_FirstPerson_Player_FrontBack = m_FirstPerson_Player.FindAction("Front/Back", throwIfNotFound: true);
-        m_FirstPerson_Player_LeftRight = m_FirstPerson_Player.FindAction("Left/Right", throwIfNotFound: true);
         m_FirstPerson_Player_Jump = m_FirstPerson_Player.FindAction("Jump", throwIfNotFound: true);
         m_FirstPerson_Player_Look = m_FirstPerson_Player.FindAction("Look", throwIfNotFound: true);
         m_FirstPerson_Player_Interact = m_FirstPerson_Player.FindAction("Interact", throwIfNotFound: true);
@@ -964,6 +990,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_TopDown_Player_Look = m_TopDown_Player.FindAction("Look", throwIfNotFound: true);
         m_TopDown_Player_Interact = m_TopDown_Player.FindAction("Interact", throwIfNotFound: true);
         m_TopDown_Player_MouseDrag = m_TopDown_Player.FindAction("MouseDrag", throwIfNotFound: true);
+        m_TopDown_Player_Move = m_TopDown_Player.FindAction("Move", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1035,12 +1062,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     // FirstPerson_Player
     private readonly InputActionMap m_FirstPerson_Player;
     private List<IFirstPerson_PlayerActions> m_FirstPerson_PlayerActionsCallbackInterfaces = new List<IFirstPerson_PlayerActions>();
-    private readonly InputAction m_FirstPerson_Player_Forward;
-    private readonly InputAction m_FirstPerson_Player_Backward;
-    private readonly InputAction m_FirstPerson_Player_Right;
-    private readonly InputAction m_FirstPerson_Player_Left;
-    private readonly InputAction m_FirstPerson_Player_FrontBack;
-    private readonly InputAction m_FirstPerson_Player_LeftRight;
     private readonly InputAction m_FirstPerson_Player_Jump;
     private readonly InputAction m_FirstPerson_Player_Look;
     private readonly InputAction m_FirstPerson_Player_Interact;
@@ -1049,12 +1070,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     {
         private @InputSystem_Actions m_Wrapper;
         public FirstPerson_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Forward => m_Wrapper.m_FirstPerson_Player_Forward;
-        public InputAction @Backward => m_Wrapper.m_FirstPerson_Player_Backward;
-        public InputAction @Right => m_Wrapper.m_FirstPerson_Player_Right;
-        public InputAction @Left => m_Wrapper.m_FirstPerson_Player_Left;
-        public InputAction @FrontBack => m_Wrapper.m_FirstPerson_Player_FrontBack;
-        public InputAction @LeftRight => m_Wrapper.m_FirstPerson_Player_LeftRight;
         public InputAction @Jump => m_Wrapper.m_FirstPerson_Player_Jump;
         public InputAction @Look => m_Wrapper.m_FirstPerson_Player_Look;
         public InputAction @Interact => m_Wrapper.m_FirstPerson_Player_Interact;
@@ -1068,24 +1083,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_FirstPerson_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_FirstPerson_PlayerActionsCallbackInterfaces.Add(instance);
-            @Forward.started += instance.OnForward;
-            @Forward.performed += instance.OnForward;
-            @Forward.canceled += instance.OnForward;
-            @Backward.started += instance.OnBackward;
-            @Backward.performed += instance.OnBackward;
-            @Backward.canceled += instance.OnBackward;
-            @Right.started += instance.OnRight;
-            @Right.performed += instance.OnRight;
-            @Right.canceled += instance.OnRight;
-            @Left.started += instance.OnLeft;
-            @Left.performed += instance.OnLeft;
-            @Left.canceled += instance.OnLeft;
-            @FrontBack.started += instance.OnFrontBack;
-            @FrontBack.performed += instance.OnFrontBack;
-            @FrontBack.canceled += instance.OnFrontBack;
-            @LeftRight.started += instance.OnLeftRight;
-            @LeftRight.performed += instance.OnLeftRight;
-            @LeftRight.canceled += instance.OnLeftRight;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -1102,24 +1099,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(IFirstPerson_PlayerActions instance)
         {
-            @Forward.started -= instance.OnForward;
-            @Forward.performed -= instance.OnForward;
-            @Forward.canceled -= instance.OnForward;
-            @Backward.started -= instance.OnBackward;
-            @Backward.performed -= instance.OnBackward;
-            @Backward.canceled -= instance.OnBackward;
-            @Right.started -= instance.OnRight;
-            @Right.performed -= instance.OnRight;
-            @Right.canceled -= instance.OnRight;
-            @Left.started -= instance.OnLeft;
-            @Left.performed -= instance.OnLeft;
-            @Left.canceled -= instance.OnLeft;
-            @FrontBack.started -= instance.OnFrontBack;
-            @FrontBack.performed -= instance.OnFrontBack;
-            @FrontBack.canceled -= instance.OnFrontBack;
-            @LeftRight.started -= instance.OnLeftRight;
-            @LeftRight.performed -= instance.OnLeftRight;
-            @LeftRight.canceled -= instance.OnLeftRight;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -1450,6 +1429,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_TopDown_Player_Look;
     private readonly InputAction m_TopDown_Player_Interact;
     private readonly InputAction m_TopDown_Player_MouseDrag;
+    private readonly InputAction m_TopDown_Player_Move;
     public struct TopDown_PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1463,6 +1443,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @Look => m_Wrapper.m_TopDown_Player_Look;
         public InputAction @Interact => m_Wrapper.m_TopDown_Player_Interact;
         public InputAction @MouseDrag => m_Wrapper.m_TopDown_Player_MouseDrag;
+        public InputAction @Move => m_Wrapper.m_TopDown_Player_Move;
         public InputActionMap Get() { return m_Wrapper.m_TopDown_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1499,6 +1480,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MouseDrag.started += instance.OnMouseDrag;
             @MouseDrag.performed += instance.OnMouseDrag;
             @MouseDrag.canceled += instance.OnMouseDrag;
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
         }
 
         private void UnregisterCallbacks(ITopDown_PlayerActions instance)
@@ -1530,6 +1514,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @MouseDrag.started -= instance.OnMouseDrag;
             @MouseDrag.performed -= instance.OnMouseDrag;
             @MouseDrag.canceled -= instance.OnMouseDrag;
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
         }
 
         public void RemoveCallbacks(ITopDown_PlayerActions instance)
@@ -1567,12 +1554,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     }
     public interface IFirstPerson_PlayerActions
     {
-        void OnForward(InputAction.CallbackContext context);
-        void OnBackward(InputAction.CallbackContext context);
-        void OnRight(InputAction.CallbackContext context);
-        void OnLeft(InputAction.CallbackContext context);
-        void OnFrontBack(InputAction.CallbackContext context);
-        void OnLeftRight(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
@@ -1618,5 +1599,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnMouseDrag(InputAction.CallbackContext context);
+        void OnMove(InputAction.CallbackContext context);
     }
 }

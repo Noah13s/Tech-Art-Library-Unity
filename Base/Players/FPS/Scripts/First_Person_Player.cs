@@ -48,10 +48,8 @@ public class First_Person_Player : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
     private InputSystem_Actions controls; // Reference to your Input Action Asset
-    private InputAction forwardAction;
-    private InputAction backwardAction;
-    private InputAction rightAction;
-    private InputAction leftAction;
+    private InputAction frontBackAction;
+    private InputAction leftRightAction;
     private InputAction jumpAction;
     private InputAction lookAction;
     private InputAction moveAction;
@@ -69,10 +67,6 @@ public class First_Person_Player : MonoBehaviour
         // Initialize the input actions for the new Input System
         controls = new ();
         controls.Enable();
-        forwardAction = controls.FirstPerson_Player.Forward;
-        backwardAction = controls.FirstPerson_Player.Backward;
-        rightAction = controls.FirstPerson_Player.Right;
-        leftAction = controls.FirstPerson_Player.Left;
         jumpAction = controls.FirstPerson_Player.Jump;
         lookAction = controls.FirstPerson_Player.Look;
         moveAction = controls.FirstPerson_Player.Move;
@@ -115,9 +109,6 @@ public class First_Person_Player : MonoBehaviour
             forwardMovement = joystick.GetVertical();
             rightMovement = joystick.GetHorizontal();
         }
-
-        forwardMovement = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>();
-        rightMovement = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
 
         forwardMovement += moveAction.ReadValue<Vector2>().y;
         rightMovement += moveAction.ReadValue<Vector2>().x;
