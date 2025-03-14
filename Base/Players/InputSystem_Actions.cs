@@ -444,9 +444,90 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""id"": ""41e84a13-ca09-4deb-a61a-c9ec66bf832b"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""Forward"",
                     ""type"": ""Button"",
                     ""id"": ""60963ad1-304d-4cff-a39f-9c10f6628cc7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Backward"",
+                    ""type"": ""Button"",
+                    ""id"": ""9131eff6-491b-4bf8-b51f-2bbed86cd720"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Right"",
+                    ""type"": ""Button"",
+                    ""id"": ""66eebd59-9646-477f-a559-5c8aca200d2a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Left"",
+                    ""type"": ""Button"",
+                    ""id"": ""743b8df6-5dcc-4cc5-beb1-14583d4f0696"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Front/back"",
+                    ""type"": ""Value"",
+                    ""id"": ""66adbf34-6d16-456f-94f9-dcac57031c47"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Left/Right"",
+                    ""type"": ""Value"",
+                    ""id"": ""46f2a835-04ac-455f-b479-9b0e274317b4"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Handbrake"",
+                    ""type"": ""Button"",
+                    ""id"": ""b2b99cc0-355d-49c3-9ec4-ae49582faa5c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""153fe80f-e499-45bf-949a-c2af8a932eb8"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Interact"",
+                    ""type"": ""Button"",
+                    ""id"": ""a50f7e44-7d16-4ed1-83fb-ddf212fee610"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FullThrottle"",
+                    ""type"": ""Button"",
+                    ""id"": ""2b9e8fe6-ed05-493c-9867-21d13f9c12a6"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -457,11 +538,154 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""772f6f4a-8762-4295-9fd4-634e564bf2d8"",
-                    ""path"": """",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Forward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6cdf2a37-45d2-4593-a5b0-e38d28ff9136"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Forward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d892c111-a883-4cfe-84ec-b48b7704b91d"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""Forward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1ab24742-95ee-4fa2-8fff-ebd7101f4699"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Backward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""77a53e58-edd1-4199-9ed7-68c303b1db54"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4f52963f-9837-4c14-9eb8-38d491a24c3c"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""db0fcf94-5bf9-43d4-a4f4-353c58c60e7c"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Left"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2c186e84-572f-425f-8c9e-4f1ff904fe6f"",
+                    ""path"": ""<Joystick>/stick/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Front/back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""375ab50c-01c3-4f6c-b9a7-808ad19001e4"",
+                    ""path"": ""<Joystick>/stick/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left/Right"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""636b986d-a74f-46b0-9455-568717111d84"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Handbrake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""06a34e79-7ae9-4257-8a02-007d92bd3efa"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Handbrake"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab1e5da8-0144-4501-a762-990c4e9e599d"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3b255c6f-5646-4cbd-b9a8-0d5280b88f7a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2436da26-b075-4064-be21-4a2e90995ef3"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FullThrottle"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -520,7 +744,16 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Helicopter_Player_Newaction = m_Helicopter_Player.FindAction("New action", throwIfNotFound: true);
         // Car_Player
         m_Car_Player = asset.FindActionMap("Car_Player", throwIfNotFound: true);
-        m_Car_Player_Newaction = m_Car_Player.FindAction("New action", throwIfNotFound: true);
+        m_Car_Player_Forward = m_Car_Player.FindAction("Forward", throwIfNotFound: true);
+        m_Car_Player_Backward = m_Car_Player.FindAction("Backward", throwIfNotFound: true);
+        m_Car_Player_Right = m_Car_Player.FindAction("Right", throwIfNotFound: true);
+        m_Car_Player_Left = m_Car_Player.FindAction("Left", throwIfNotFound: true);
+        m_Car_Player_Frontback = m_Car_Player.FindAction("Front/back", throwIfNotFound: true);
+        m_Car_Player_LeftRight = m_Car_Player.FindAction("Left/Right", throwIfNotFound: true);
+        m_Car_Player_Handbrake = m_Car_Player.FindAction("Handbrake", throwIfNotFound: true);
+        m_Car_Player_Look = m_Car_Player.FindAction("Look", throwIfNotFound: true);
+        m_Car_Player_Interact = m_Car_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Car_Player_FullThrottle = m_Car_Player.FindAction("FullThrottle", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -879,12 +1112,30 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     // Car_Player
     private readonly InputActionMap m_Car_Player;
     private List<ICar_PlayerActions> m_Car_PlayerActionsCallbackInterfaces = new List<ICar_PlayerActions>();
-    private readonly InputAction m_Car_Player_Newaction;
+    private readonly InputAction m_Car_Player_Forward;
+    private readonly InputAction m_Car_Player_Backward;
+    private readonly InputAction m_Car_Player_Right;
+    private readonly InputAction m_Car_Player_Left;
+    private readonly InputAction m_Car_Player_Frontback;
+    private readonly InputAction m_Car_Player_LeftRight;
+    private readonly InputAction m_Car_Player_Handbrake;
+    private readonly InputAction m_Car_Player_Look;
+    private readonly InputAction m_Car_Player_Interact;
+    private readonly InputAction m_Car_Player_FullThrottle;
     public struct Car_PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
         public Car_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Car_Player_Newaction;
+        public InputAction @Forward => m_Wrapper.m_Car_Player_Forward;
+        public InputAction @Backward => m_Wrapper.m_Car_Player_Backward;
+        public InputAction @Right => m_Wrapper.m_Car_Player_Right;
+        public InputAction @Left => m_Wrapper.m_Car_Player_Left;
+        public InputAction @Frontback => m_Wrapper.m_Car_Player_Frontback;
+        public InputAction @LeftRight => m_Wrapper.m_Car_Player_LeftRight;
+        public InputAction @Handbrake => m_Wrapper.m_Car_Player_Handbrake;
+        public InputAction @Look => m_Wrapper.m_Car_Player_Look;
+        public InputAction @Interact => m_Wrapper.m_Car_Player_Interact;
+        public InputAction @FullThrottle => m_Wrapper.m_Car_Player_FullThrottle;
         public InputActionMap Get() { return m_Wrapper.m_Car_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -894,16 +1145,70 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_Car_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_Car_PlayerActionsCallbackInterfaces.Add(instance);
-            @Newaction.started += instance.OnNewaction;
-            @Newaction.performed += instance.OnNewaction;
-            @Newaction.canceled += instance.OnNewaction;
+            @Forward.started += instance.OnForward;
+            @Forward.performed += instance.OnForward;
+            @Forward.canceled += instance.OnForward;
+            @Backward.started += instance.OnBackward;
+            @Backward.performed += instance.OnBackward;
+            @Backward.canceled += instance.OnBackward;
+            @Right.started += instance.OnRight;
+            @Right.performed += instance.OnRight;
+            @Right.canceled += instance.OnRight;
+            @Left.started += instance.OnLeft;
+            @Left.performed += instance.OnLeft;
+            @Left.canceled += instance.OnLeft;
+            @Frontback.started += instance.OnFrontback;
+            @Frontback.performed += instance.OnFrontback;
+            @Frontback.canceled += instance.OnFrontback;
+            @LeftRight.started += instance.OnLeftRight;
+            @LeftRight.performed += instance.OnLeftRight;
+            @LeftRight.canceled += instance.OnLeftRight;
+            @Handbrake.started += instance.OnHandbrake;
+            @Handbrake.performed += instance.OnHandbrake;
+            @Handbrake.canceled += instance.OnHandbrake;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
+            @Interact.started += instance.OnInteract;
+            @Interact.performed += instance.OnInteract;
+            @Interact.canceled += instance.OnInteract;
+            @FullThrottle.started += instance.OnFullThrottle;
+            @FullThrottle.performed += instance.OnFullThrottle;
+            @FullThrottle.canceled += instance.OnFullThrottle;
         }
 
         private void UnregisterCallbacks(ICar_PlayerActions instance)
         {
-            @Newaction.started -= instance.OnNewaction;
-            @Newaction.performed -= instance.OnNewaction;
-            @Newaction.canceled -= instance.OnNewaction;
+            @Forward.started -= instance.OnForward;
+            @Forward.performed -= instance.OnForward;
+            @Forward.canceled -= instance.OnForward;
+            @Backward.started -= instance.OnBackward;
+            @Backward.performed -= instance.OnBackward;
+            @Backward.canceled -= instance.OnBackward;
+            @Right.started -= instance.OnRight;
+            @Right.performed -= instance.OnRight;
+            @Right.canceled -= instance.OnRight;
+            @Left.started -= instance.OnLeft;
+            @Left.performed -= instance.OnLeft;
+            @Left.canceled -= instance.OnLeft;
+            @Frontback.started -= instance.OnFrontback;
+            @Frontback.performed -= instance.OnFrontback;
+            @Frontback.canceled -= instance.OnFrontback;
+            @LeftRight.started -= instance.OnLeftRight;
+            @LeftRight.performed -= instance.OnLeftRight;
+            @LeftRight.canceled -= instance.OnLeftRight;
+            @Handbrake.started -= instance.OnHandbrake;
+            @Handbrake.performed -= instance.OnHandbrake;
+            @Handbrake.canceled -= instance.OnHandbrake;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
+            @Interact.started -= instance.OnInteract;
+            @Interact.performed -= instance.OnInteract;
+            @Interact.canceled -= instance.OnInteract;
+            @FullThrottle.started -= instance.OnFullThrottle;
+            @FullThrottle.performed -= instance.OnFullThrottle;
+            @FullThrottle.canceled -= instance.OnFullThrottle;
         }
 
         public void RemoveCallbacks(ICar_PlayerActions instance)
@@ -970,6 +1275,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     }
     public interface ICar_PlayerActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnForward(InputAction.CallbackContext context);
+        void OnBackward(InputAction.CallbackContext context);
+        void OnRight(InputAction.CallbackContext context);
+        void OnLeft(InputAction.CallbackContext context);
+        void OnFrontback(InputAction.CallbackContext context);
+        void OnLeftRight(InputAction.CallbackContext context);
+        void OnHandbrake(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
+        void OnInteract(InputAction.CallbackContext context);
+        void OnFullThrottle(InputAction.CallbackContext context);
     }
 }
