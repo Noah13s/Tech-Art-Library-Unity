@@ -308,9 +308,45 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""id"": ""d87ae2fd-df18-4c12-a901-ffd5ccca94cb"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
                     ""id"": ""4ce15e7a-8c39-48e1-8e7e-b91ce1eb1eef"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Delta"",
+                    ""type"": ""Value"",
+                    ""id"": ""d20f261e-dba6-4f3e-bbca-efc5105681c5"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""ScrollWheel"",
+                    ""type"": ""Value"",
+                    ""id"": ""59f3d34a-1a52-4105-8548-9980f50cf96c"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LeftButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""060b7718-324c-4344-a538-3b8b22eeb3c4"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""bfdac060-e897-42ef-9b36-c751ae0e4edb"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -321,11 +357,55 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""b3d59cbf-172d-471e-a557-299a88075334"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f44dc678-1ba9-4436-a63b-28f50698374f"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Delta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""260cff3f-5da4-46ff-95a1-6f0a483cb565"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ScrollWheel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""00647d31-8e83-4048-a17c-911d0b844196"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a5792b69-1a0d-40a8-b7bf-cdda3af370a6"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightButton"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -430,7 +510,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_ThirdPerson_Player_Newaction = m_ThirdPerson_Player.FindAction("New action", throwIfNotFound: true);
         // Orbit_Player
         m_Orbit_Player = asset.FindActionMap("Orbit_Player", throwIfNotFound: true);
-        m_Orbit_Player_Newaction = m_Orbit_Player.FindAction("New action", throwIfNotFound: true);
+        m_Orbit_Player_Position = m_Orbit_Player.FindAction("Position", throwIfNotFound: true);
+        m_Orbit_Player_Delta = m_Orbit_Player.FindAction("Delta", throwIfNotFound: true);
+        m_Orbit_Player_ScrollWheel = m_Orbit_Player.FindAction("ScrollWheel", throwIfNotFound: true);
+        m_Orbit_Player_LeftButton = m_Orbit_Player.FindAction("LeftButton", throwIfNotFound: true);
+        m_Orbit_Player_RightButton = m_Orbit_Player.FindAction("RightButton", throwIfNotFound: true);
         // Helicopter_Player
         m_Helicopter_Player = asset.FindActionMap("Helicopter_Player", throwIfNotFound: true);
         m_Helicopter_Player_Newaction = m_Helicopter_Player.FindAction("New action", throwIfNotFound: true);
@@ -671,12 +755,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     // Orbit_Player
     private readonly InputActionMap m_Orbit_Player;
     private List<IOrbit_PlayerActions> m_Orbit_PlayerActionsCallbackInterfaces = new List<IOrbit_PlayerActions>();
-    private readonly InputAction m_Orbit_Player_Newaction;
+    private readonly InputAction m_Orbit_Player_Position;
+    private readonly InputAction m_Orbit_Player_Delta;
+    private readonly InputAction m_Orbit_Player_ScrollWheel;
+    private readonly InputAction m_Orbit_Player_LeftButton;
+    private readonly InputAction m_Orbit_Player_RightButton;
     public struct Orbit_PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
         public Orbit_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Orbit_Player_Newaction;
+        public InputAction @Position => m_Wrapper.m_Orbit_Player_Position;
+        public InputAction @Delta => m_Wrapper.m_Orbit_Player_Delta;
+        public InputAction @ScrollWheel => m_Wrapper.m_Orbit_Player_ScrollWheel;
+        public InputAction @LeftButton => m_Wrapper.m_Orbit_Player_LeftButton;
+        public InputAction @RightButton => m_Wrapper.m_Orbit_Player_RightButton;
         public InputActionMap Get() { return m_Wrapper.m_Orbit_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -686,16 +778,40 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_Orbit_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_Orbit_PlayerActionsCallbackInterfaces.Add(instance);
-            @Newaction.started += instance.OnNewaction;
-            @Newaction.performed += instance.OnNewaction;
-            @Newaction.canceled += instance.OnNewaction;
+            @Position.started += instance.OnPosition;
+            @Position.performed += instance.OnPosition;
+            @Position.canceled += instance.OnPosition;
+            @Delta.started += instance.OnDelta;
+            @Delta.performed += instance.OnDelta;
+            @Delta.canceled += instance.OnDelta;
+            @ScrollWheel.started += instance.OnScrollWheel;
+            @ScrollWheel.performed += instance.OnScrollWheel;
+            @ScrollWheel.canceled += instance.OnScrollWheel;
+            @LeftButton.started += instance.OnLeftButton;
+            @LeftButton.performed += instance.OnLeftButton;
+            @LeftButton.canceled += instance.OnLeftButton;
+            @RightButton.started += instance.OnRightButton;
+            @RightButton.performed += instance.OnRightButton;
+            @RightButton.canceled += instance.OnRightButton;
         }
 
         private void UnregisterCallbacks(IOrbit_PlayerActions instance)
         {
-            @Newaction.started -= instance.OnNewaction;
-            @Newaction.performed -= instance.OnNewaction;
-            @Newaction.canceled -= instance.OnNewaction;
+            @Position.started -= instance.OnPosition;
+            @Position.performed -= instance.OnPosition;
+            @Position.canceled -= instance.OnPosition;
+            @Delta.started -= instance.OnDelta;
+            @Delta.performed -= instance.OnDelta;
+            @Delta.canceled -= instance.OnDelta;
+            @ScrollWheel.started -= instance.OnScrollWheel;
+            @ScrollWheel.performed -= instance.OnScrollWheel;
+            @ScrollWheel.canceled -= instance.OnScrollWheel;
+            @LeftButton.started -= instance.OnLeftButton;
+            @LeftButton.performed -= instance.OnLeftButton;
+            @LeftButton.canceled -= instance.OnLeftButton;
+            @RightButton.started -= instance.OnRightButton;
+            @RightButton.performed -= instance.OnRightButton;
+            @RightButton.canceled -= instance.OnRightButton;
         }
 
         public void RemoveCallbacks(IOrbit_PlayerActions instance)
@@ -842,7 +958,11 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     }
     public interface IOrbit_PlayerActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnPosition(InputAction.CallbackContext context);
+        void OnDelta(InputAction.CallbackContext context);
+        void OnScrollWheel(InputAction.CallbackContext context);
+        void OnLeftButton(InputAction.CallbackContext context);
+        void OnRightButton(InputAction.CallbackContext context);
     }
     public interface IHelicopter_PlayerActions
     {

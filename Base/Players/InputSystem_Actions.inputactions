@@ -286,9 +286,45 @@
             "id": "d87ae2fd-df18-4c12-a901-ffd5ccca94cb",
             "actions": [
                 {
-                    "name": "New action",
-                    "type": "Button",
+                    "name": "Position",
+                    "type": "Value",
                     "id": "4ce15e7a-8c39-48e1-8e7e-b91ce1eb1eef",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Delta",
+                    "type": "Value",
+                    "id": "d20f261e-dba6-4f3e-bbca-efc5105681c5",
+                    "expectedControlType": "Delta",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "ScrollWheel",
+                    "type": "Value",
+                    "id": "59f3d34a-1a52-4105-8548-9980f50cf96c",
+                    "expectedControlType": "Delta",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "LeftButton",
+                    "type": "Button",
+                    "id": "060b7718-324c-4344-a538-3b8b22eeb3c4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightButton",
+                    "type": "Button",
+                    "id": "bfdac060-e897-42ef-9b36-c751ae0e4edb",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -299,11 +335,55 @@
                 {
                     "name": "",
                     "id": "b3d59cbf-172d-471e-a557-299a88075334",
-                    "path": "",
+                    "path": "<Mouse>/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f44dc678-1ba9-4436-a63b-28f50698374f",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Delta",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "260cff3f-5da4-46ff-95a1-6f0a483cb565",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ScrollWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "00647d31-8e83-4048-a17c-911d0b844196",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5792b69-1a0d-40a8-b7bf-cdda3af370a6",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightButton",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

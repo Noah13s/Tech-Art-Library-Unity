@@ -26,7 +26,7 @@ public class OrbitCamera : MonoBehaviour
     private float currentRotationY = 0f;
     private Vector3 targetPosition;
 #if ENABLE_INPUT_SYSTEM
-    private PCInputs PCcontrols;
+    private InputSystem_Actions PCcontrols;
     private ControllerInputs ControllerControls;
     private TouchInputs Touchcontrols;
 #endif
@@ -36,7 +36,7 @@ public class OrbitCamera : MonoBehaviour
 
         // Initialize the new input system controls
 #if ENABLE_INPUT_SYSTEM
-        PCcontrols = new PCInputs();
+        PCcontrols = new ();
         ControllerControls = new ControllerInputs();
         Touchcontrols = new TouchInputs();
 #endif
@@ -92,11 +92,11 @@ public class OrbitCamera : MonoBehaviour
         if (RightClickMove)
         {
 #if ENABLE_INPUT_SYSTEM
-            if (PCcontrols.Mouse.LeftButton.IsPressed() && IsCursorOverGameWindow())
+            if (PCcontrols.Orbit_Player.LeftButton.IsPressed() && IsCursorOverGameWindow())
             {
                 // Rotate the camera based on mouse input            
-                currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
-                currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
+                currentRotationX += PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
+                currentRotationY -= PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
             }
 #else
             if (Input.GetMouseButton(1) && IsCursorOverGameWindow())
@@ -113,8 +113,8 @@ public class OrbitCamera : MonoBehaviour
             // Rotate the camera based on input
             currentRotationX += ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().x * sensitivityX;
             currentRotationY -= ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().y * sensitivityY;
-            currentRotationX += PCcontrols.Mouse.Delta.ReadValue<Vector2>().x * sensitivityX;
-            currentRotationY -= PCcontrols.Mouse.Delta.ReadValue<Vector2>().y * sensitivityY;
+            currentRotationX += PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
             currentRotationX += Touchcontrols.Touch.Delta.ReadValue<Vector2>().x * sensitivityX;
             currentRotationY -= Touchcontrols.Touch.Delta.ReadValue<Vector2>().y * sensitivityY;
 #else
@@ -129,7 +129,7 @@ public class OrbitCamera : MonoBehaviour
         if (allowScrolling && IsCursorOverGameWindow())
         {
 #if ENABLE_INPUT_SYSTEM
-            distance += PCcontrols.Mouse.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
+            distance += PCcontrols.Orbit_Player.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
 #else
             distance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
 #endif
@@ -183,7 +183,7 @@ public class OrbitCamera : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // New Input System
-        mousePosition = PCcontrols.Mouse.Position.ReadValue<Vector2>();
+        mousePosition = PCcontrols.Orbit_Player.Position.ReadValue<Vector2>();
 #else
         // Legacy Input System
         mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
