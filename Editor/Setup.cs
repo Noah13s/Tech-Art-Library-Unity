@@ -8,13 +8,13 @@ using UnityEditor.PackageManager;
 
 public class Setup
 {
-
+    /*
     [InitializeOnLoadMethod]
     private static async void InstallDependencies()
     {
         await ListPackages();
         await ListSamples("com.n04h.techartlibrary"); // Replace with your package name
-    }
+    }*/
 
     private static async Task ListPackages()
     {
