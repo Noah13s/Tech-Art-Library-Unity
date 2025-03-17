@@ -32,6 +32,8 @@ public class Rotor : MonoBehaviour
     [Tooltip("The acceleration from standstill is different from the acceleration mid-flight this factor determines how much faster it is mid flight.")]
     [Range(2f, 4f)] public float midFlightAccelerationFactor = 2f;
 
+    public bool canTilt = false;
+
     [SerializeField] Transform rotorMesh;
     [SerializeField] private Rigidbody rigidBody;
     #region ReadOnlyDataVariables
@@ -101,7 +103,7 @@ public class Rotor : MonoBehaviour
         // Apply the rotor speed to the mesh (or rotor animation) if the rotor is moving
         if (currentSpeedRPM > 0)
         {
-            ApplyRotorSpeedToMesh();
+            UpdateRotorRotation();
         }
 
         UpdateData();
@@ -164,16 +166,41 @@ public class Rotor : MonoBehaviour
         }
     }
 
+    private float rotorSpinAngle = 0f;  // Tracks accumulated Y-rotation
+    public Vector2 tiltInput;
     /// <summary>
     /// Apply the current speed to the rotor mesh for visual representation.
     /// </summary>
-    private void ApplyRotorSpeedToMesh()
+    private void UpdateRotorRotation()
     {
         if (rotorMesh != null)
         {
-            // Rotate the rotor mesh based on current speed (scaled by RPM)
-            float rotationSpeed = currentSpeedRPM * Time.deltaTime;
-            rotorMesh.Rotate(Vector3.up * rotationSpeed);  // Rotates around the Y-axis (up direction)
+            if (canTilt)
+            {
+                // Extract pitch (X) and roll (Y) from tiltInput
+                float pitch = tiltInput.y;
+                float roll = tiltInput.x;
+
+                // First, apply tilt rotation
+                Quaternion tiltRotation = Quaternion.Euler(pitch, 0, roll);
+                transform.localRotation = tiltRotation;
+
+                // Then, increment the spin angle
+                float rotationSpeed = currentSpeedRPM * Time.deltaTime;
+                rotorSpinAngle += rotationSpeed;
+
+                // Apply the spin around the local Y-axis
+                transform.Rotate(Vector3.up, rotorSpinAngle, Space.Self);
+            }
+            else
+            {
+                // Then, increment the spin angle
+                float rotationSpeed = currentSpeedRPM * Time.deltaTime;
+                rotorSpinAngle += rotationSpeed;
+
+                // Apply the spin around the local Y-axis
+                transform.Rotate(Vector3.up, rotorSpinAngle, Space.Self);
+            }
         }
     }
 

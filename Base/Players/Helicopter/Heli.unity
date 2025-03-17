@@ -702,6 +702,7 @@ MonoBehaviour:
   targetSpeedRPM: 0
   spoolupTime: 10
   midFlightAccelerationFactor: 4
+  canTilt: 1
   rotorMesh: {fileID: 429512947}
   rigidBody: {fileID: 926390577}
   currentAltitude: 0
@@ -717,6 +718,7 @@ MonoBehaviour:
   necessaryTorqueCounterRPM: 0
   tailDistance: 2.336
   calculatedTailDistance: 0
+  tiltInput: {x: 0, y: 0}
 --- !u!1001 &455701775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1319,7 +1321,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0.1
-  m_AngularDrag: 0.1
+  m_AngularDrag: 0.5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1446,7 +1448,7 @@ MonoBehaviour:
   targetDirection: {x: 0, y: 0, z: 0}
   directionDifference: 0
   altitude: 0
-  engineOnOff: 0
+  engineOnOff: 1
   Kp: 0.1
   Kd: 0.18
   maxCorrection: 0.5
@@ -2303,6 +2305,7 @@ MonoBehaviour:
   targetSpeedRPM: 0
   spoolupTime: 1.5
   midFlightAccelerationFactor: 4
+  canTilt: 0
   rotorMesh: {fileID: 1533529356}
   rigidBody: {fileID: 926390577}
   currentAltitude: 0
@@ -2318,6 +2321,7 @@ MonoBehaviour:
   necessaryTorqueCounterRPM: 0
   tailDistance: 1
   calculatedTailDistance: 0
+  tiltInput: {x: 0, y: 0}
 --- !u!1 &1732705512 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: efa6b6afc8b34744b9df31ac1d20299e, type: 3}

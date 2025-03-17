@@ -32,16 +32,11 @@ public class Helicopter_Player : MonoBehaviour
     Color baseColor = new(255, 255, 255, 0.5f);
 
 #if ENABLE_INPUT_SYSTEM
-    private Helicopter_Controls controls;
-    private InputAction forwardAction;
-    private InputAction backwardAction;
-    private InputAction rightAction;
-    private InputAction leftAction;
-    private InputAction tiltRightAction;
-    private InputAction tiltLeftAction;
+    private InputSystem_Actions controls;
     private InputAction fullThrottleAction;
-    private InputAction upAction;
-    private InputAction downAction;
+    private InputAction thrustAction;
+    private InputAction yawAction;
+    private InputAction tiltAction;
 #endif
 
     #endregion
@@ -49,17 +44,12 @@ public class Helicopter_Player : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
         // Initialize the input actions for the new Input System
-        controls = new Helicopter_Controls();
+        controls = new ();
         controls.Enable();
-        forwardAction = controls.Helicopter_Action_Map.Forward;
-        backwardAction = controls.Helicopter_Action_Map.Backwards;
-        rightAction = controls.Helicopter_Action_Map.Right;
-        leftAction = controls.Helicopter_Action_Map.Left;
-        tiltRightAction = controls.Helicopter_Action_Map.TiltRight;
-        tiltLeftAction = controls.Helicopter_Action_Map.TiltLeft;
-        fullThrottleAction = controls.Helicopter_Action_Map.FullThrottle;
-        upAction = controls.Helicopter_Action_Map.Up;
-        downAction = controls.Helicopter_Action_Map.Down;
+        controls.bindingMask = new InputBinding { groups = "QwertyKeyboard" };// Masks ou the qwerty control scheme inputs
+        thrustAction = controls.Helicopter_Player.Thrust;
+        yawAction = controls.Helicopter_Player.Yaw;
+        tiltAction = controls.Helicopter_Player.Tilt;
 #endif
         targetDirection = -transform.forward;
     }
@@ -76,7 +66,7 @@ public class Helicopter_Player : MonoBehaviour
 
 
         HandleVerticalMovement();
-        //HandleTiltMovement();
+        HandleTiltMovement();
 
 
 
@@ -89,10 +79,8 @@ public class Helicopter_Player : MonoBehaviour
     private void HandleNewInputSystem()
     {
         // Read inputs
-        float forward = forwardAction.ReadValue<float>();
-        float backward = backwardAction.ReadValue<float>();
-        float turn = rightAction.ReadValue<float>() - leftAction.ReadValue<float>();
-        bool isFullThrottle = fullThrottleAction.IsPressed();
+        Vector2 tilt = tiltAction.ReadValue<Vector2>();
+        float turn = yawAction.ReadValue<float>();
         float turnSpeed = 100f; // Adjust for sensitivity
 
         // Apply rotation to direction vector
@@ -107,23 +95,22 @@ public class Helicopter_Player : MonoBehaviour
             return; // Exit if the engine is off or main rotor is missing
 
         // Read player input
-        float forward = forwardAction.ReadValue<float>() - backwardAction.ReadValue<float>(); // Pitch input
-        float sideways = tiltRightAction.ReadValue<float>() - tiltLeftAction.ReadValue<float>(); // Roll input
+        Vector2 tiltInput = tiltAction.ReadValue<Vector2>(); // Pitch input
 
         // Define max tilt angles and smoothing
-        float maxTiltAngle = 10f; // Maximum cyclic tilt angle (degrees)
+        float maxTiltAngle = 50f; // Maximum cyclic tilt angle (degrees)
         float tiltSpeed = 5f; // Smoothing speed
 
-        // Calculate target tilt angles based on input
-        float targetPitch = forward * maxTiltAngle; // Forward/backward tilt
-        float targetRoll = sideways * maxTiltAngle; // Left/right tilt
+        Vector2 tilt = tiltInput * maxTiltAngle;
 
         // Smoothly interpolate to the target tilt using Lerp
-        float smoothedPitch = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.x, targetPitch, Time.deltaTime * tiltSpeed);
-        float smoothedRoll = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.z, targetRoll, Time.deltaTime * tiltSpeed);
+        float smoothedPitch = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.x, tilt.x, Time.deltaTime * tiltSpeed);
+        float smoothedRoll = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.z, tilt.y, Time.deltaTime * tiltSpeed);
+        //tilt = new Vector2(smoothedPitch, smoothedRoll);
 
         // Apply new rotation to the main rotor
-        mainRotor.transform.localRotation = Quaternion.Euler(smoothedPitch, 0, smoothedRoll);
+        //mainRotor.transform.localRotation = Quaternion.Euler(smoothedPitch, mainRotor.transform.localEulerAngles.y, smoothedRoll);
+        mainRotor.tiltInput = tilt;
     }
 
 
@@ -131,15 +118,14 @@ public class Helicopter_Player : MonoBehaviour
     {
         if (engineOnOff)
         {
-            float up = upAction.ReadValue<float>();
-            float down = downAction.ReadValue<float>();
+            float thrust = thrustAction.ReadValue<float>();
 
-            if (up > 0f)
+            if (thrust > 0f)
             {
                 // Increase rotor speed to ascend
                 mainRotor.SetTargetRPM(mainRotor.hoverRPM * 1.2f);
             }
-            else if (down > 0f)
+            else if (thrust < 0f)
             {
                 // Decrease rotor speed to descend
                 mainRotor.SetTargetRPM(mainRotor.hoverRPM * 0.8f);
@@ -224,7 +210,7 @@ public class Helicopter_Player : MonoBehaviour
         backgroundColoredTexture.Apply();
         GUIStyle style = new()
         {
-            fontSize = 10,
+            fontSize = 13,
             normal = new GUIStyleState()
         };
         style.normal.textColor = Color.black;
@@ -233,17 +219,17 @@ public class Helicopter_Player : MonoBehaviour
         Handles.color = baseColor;
 
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DebugUtility.DrawFilledWedgeGizmo(rigidBody.worldCenterOfMass, transform.up, transform.forward, 360f, 0f, 4f,6f, baseColor);        // Draw front wheel angle
+        DebugUtility.DrawFilledWedgeGizmo(rigidBody.worldCenterOfMass, transform.up, -transform.forward, directionDifference, 0f, 4f,6f, baseColor);        // Draw front wheel angle
 
 
         Handles.color = Color.green;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + -transform.forward * 5), 6);//   Draws a green line that indicates the direction of the aircraft
         DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + (-transform.forward * 5.5f)), transform.forward, 20f, 0.5f, 32, Color.green);
-        Handles.Label((rigidBody.worldCenterOfMass + (-transform.forward * 5.5f)), "Test", style);
+        Handles.Label((rigidBody.worldCenterOfMass + (-transform.forward * 5.5f)), $"Heli angle : {Mathf.Round(Quaternion.FromToRotation(-transform.forward, Vector3.forward).eulerAngles.y)}", style);
         Handles.color = Color.red;
         Handles.DrawLine(rigidBody.worldCenterOfMass, (rigidBody.worldCenterOfMass + targetDirection * 5), 6);//   Draws an orange ln
         DebugUtility.DrawFilledCone((rigidBody.worldCenterOfMass + targetDirection * 5.5f), -targetDirection, 20f, 0.5f, 32, Color.red);
-        Handles.Label((rigidBody.worldCenterOfMass + targetDirection * 5.5f), "Test", style);
+        Handles.Label((rigidBody.worldCenterOfMass + targetDirection * 5.5f), $"Target angle : {Mathf.Round(Quaternion.FromToRotation(targetDirection, Vector3.forward).eulerAngles.y)}", style);
 
     }
     #endregion

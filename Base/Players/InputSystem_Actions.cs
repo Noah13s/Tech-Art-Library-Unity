@@ -351,26 +351,187 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""id"": ""9aa0384a-291e-4e06-ac47-91f613bd5742"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
+                    ""name"": ""Tilt"",
+                    ""type"": ""Value"",
                     ""id"": ""61dece34-18a2-4fe1-a798-2f41b4c26787"",
-                    ""expectedControlType"": """",
+                    ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Yaw"",
+                    ""type"": ""Value"",
+                    ""id"": ""ddfa0daf-ebc6-4772-91e8-694c3d329906"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Thrust"",
+                    ""type"": ""Value"",
+                    ""id"": ""1de639af-514b-4f42-812e-3370a8ad64bf"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
                 {
-                    ""name"": """",
-                    ""id"": ""52e5a5fc-4b06-46fa-9587-68774302f16b"",
-                    ""path"": """",
+                    ""name"": ""Keyboard"",
+                    ""id"": ""9bb286fc-8b87-46de-aaed-a58f2e4e9294"",
+                    ""path"": ""1DAxis"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""New action"",
-                    ""isComposite"": false,
+                    ""action"": ""Yaw"",
+                    ""isComposite"": true,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""def88893-5e90-45dc-9ec2-819d3903735e"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Yaw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""e4a32e37-13c1-4f59-ab48-3f818127f69d"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Yaw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""b705c5eb-fed8-4490-8c89-d2871130b4f7"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Yaw"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""dcf15a3f-c5d0-4082-874f-10cc08ff8f32"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""b17f18f1-b776-4ae5-a9f4-c8f030cdb697"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""2512f91a-e4b8-40ed-bcb2-27f59fdd860a"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""c50dee38-3e2b-4fcf-93a8-b6b7bc799dbd"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""78d386ce-915e-4105-9cd4-aac193c6ce95"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";AzertyKeyboard"",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""64640eab-0f0a-4294-992a-b65847959c32"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";QwertyKeyboard"",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""08d80bd4-96bf-46e8-aec3-6e0f162861f0"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Tilt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""c9be3f43-9f70-4f76-8ea3-5ca6c96c53bf"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Thrust"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""ae34796f-ee40-47a9-8fef-08c5c75add9f"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Thrust"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""0af5f7b8-6bf1-44df-91da-5d9cd5e81e81"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Thrust"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -631,60 +792,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""id"": ""a5c6d70a-7311-4936-8876-28e2facf054e"",
             ""actions"": [
                 {
-                    ""name"": ""Up"",
-                    ""type"": ""Button"",
-                    ""id"": ""3afde817-926f-404f-8bc4-cb3b332fa780"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Down"",
-                    ""type"": ""Button"",
-                    ""id"": ""2297acdf-d960-49a5-b40b-2992eb984f3a"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Right"",
-                    ""type"": ""Button"",
-                    ""id"": ""21d78ce5-0251-45d1-9173-a7f7c1b0730d"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Left"",
-                    ""type"": ""Button"",
-                    ""id"": ""f0904842-40d8-444b-8843-b2b87f7095c8"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""Front/Back"",
-                    ""type"": ""Value"",
-                    ""id"": ""4a1720d0-655d-47e5-985a-967ac85191d1"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
-                    ""name"": ""Left/Right"",
-                    ""type"": ""Value"",
-                    ""id"": ""b3fcbc25-7e5d-497d-81c5-699b3d3c5b92"",
-                    ""expectedControlType"": ""Axis"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": true
-                },
-                {
                     ""name"": ""Look"",
                     ""type"": ""Value"",
                     ""id"": ""453af8c0-d867-436b-a01c-ddeb5d3d6333"",
@@ -724,72 +831,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""03173272-2de0-4e88-b72b-d15317dfdda6"",
-                    ""path"": ""<Keyboard>/z"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";AzertyKeyboard"",
-                    ""action"": ""Up"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""28e32c8f-6459-4a15-b7ba-ca86dc061b4d"",
-                    ""path"": ""<Keyboard>/w"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";QwertyKeyboard"",
-                    ""action"": ""Up"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""29331426-8933-4611-9bbe-654a017569cf"",
-                    ""path"": ""<Keyboard>/d"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Right"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""d1cf9047-9291-44d7-b830-9a92c4527e17"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Left"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""64e86166-5b3b-46a6-97c8-a4215ecac6e0"",
-                    ""path"": ""<Joystick>/stick/y"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Front/Back"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""edd7f2b7-36ce-48f2-bdb0-c2ecb71a5eb3"",
-                    ""path"": ""<Joystick>/stick/x"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Left/Right"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""7493ce07-5952-42b7-a5e2-3b55bf0be49d"",
                     ""path"": ""<Mouse>/delta"",
                     ""interactions"": """",
@@ -818,17 +859,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MouseDrag"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""33c9067a-30f8-4513-a375-53f4d3eac2f6"",
-                    ""path"": ""<Keyboard>/s"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Down"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -966,7 +996,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Orbit_Player_RightButton = m_Orbit_Player.FindAction("RightButton", throwIfNotFound: true);
         // Helicopter_Player
         m_Helicopter_Player = asset.FindActionMap("Helicopter_Player", throwIfNotFound: true);
-        m_Helicopter_Player_Newaction = m_Helicopter_Player.FindAction("New action", throwIfNotFound: true);
+        m_Helicopter_Player_Tilt = m_Helicopter_Player.FindAction("Tilt", throwIfNotFound: true);
+        m_Helicopter_Player_Yaw = m_Helicopter_Player.FindAction("Yaw", throwIfNotFound: true);
+        m_Helicopter_Player_Thrust = m_Helicopter_Player.FindAction("Thrust", throwIfNotFound: true);
         // Car_Player
         m_Car_Player = asset.FindActionMap("Car_Player", throwIfNotFound: true);
         m_Car_Player_Forward = m_Car_Player.FindAction("Forward", throwIfNotFound: true);
@@ -981,12 +1013,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Car_Player_FullThrottle = m_Car_Player.FindAction("FullThrottle", throwIfNotFound: true);
         // TopDown_Player
         m_TopDown_Player = asset.FindActionMap("TopDown_Player", throwIfNotFound: true);
-        m_TopDown_Player_Up = m_TopDown_Player.FindAction("Up", throwIfNotFound: true);
-        m_TopDown_Player_Down = m_TopDown_Player.FindAction("Down", throwIfNotFound: true);
-        m_TopDown_Player_Right = m_TopDown_Player.FindAction("Right", throwIfNotFound: true);
-        m_TopDown_Player_Left = m_TopDown_Player.FindAction("Left", throwIfNotFound: true);
-        m_TopDown_Player_FrontBack = m_TopDown_Player.FindAction("Front/Back", throwIfNotFound: true);
-        m_TopDown_Player_LeftRight = m_TopDown_Player.FindAction("Left/Right", throwIfNotFound: true);
         m_TopDown_Player_Look = m_TopDown_Player.FindAction("Look", throwIfNotFound: true);
         m_TopDown_Player_Interact = m_TopDown_Player.FindAction("Interact", throwIfNotFound: true);
         m_TopDown_Player_MouseDrag = m_TopDown_Player.FindAction("MouseDrag", throwIfNotFound: true);
@@ -1256,12 +1282,16 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     // Helicopter_Player
     private readonly InputActionMap m_Helicopter_Player;
     private List<IHelicopter_PlayerActions> m_Helicopter_PlayerActionsCallbackInterfaces = new List<IHelicopter_PlayerActions>();
-    private readonly InputAction m_Helicopter_Player_Newaction;
+    private readonly InputAction m_Helicopter_Player_Tilt;
+    private readonly InputAction m_Helicopter_Player_Yaw;
+    private readonly InputAction m_Helicopter_Player_Thrust;
     public struct Helicopter_PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
         public Helicopter_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Helicopter_Player_Newaction;
+        public InputAction @Tilt => m_Wrapper.m_Helicopter_Player_Tilt;
+        public InputAction @Yaw => m_Wrapper.m_Helicopter_Player_Yaw;
+        public InputAction @Thrust => m_Wrapper.m_Helicopter_Player_Thrust;
         public InputActionMap Get() { return m_Wrapper.m_Helicopter_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1271,16 +1301,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_Helicopter_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_Helicopter_PlayerActionsCallbackInterfaces.Add(instance);
-            @Newaction.started += instance.OnNewaction;
-            @Newaction.performed += instance.OnNewaction;
-            @Newaction.canceled += instance.OnNewaction;
+            @Tilt.started += instance.OnTilt;
+            @Tilt.performed += instance.OnTilt;
+            @Tilt.canceled += instance.OnTilt;
+            @Yaw.started += instance.OnYaw;
+            @Yaw.performed += instance.OnYaw;
+            @Yaw.canceled += instance.OnYaw;
+            @Thrust.started += instance.OnThrust;
+            @Thrust.performed += instance.OnThrust;
+            @Thrust.canceled += instance.OnThrust;
         }
 
         private void UnregisterCallbacks(IHelicopter_PlayerActions instance)
         {
-            @Newaction.started -= instance.OnNewaction;
-            @Newaction.performed -= instance.OnNewaction;
-            @Newaction.canceled -= instance.OnNewaction;
+            @Tilt.started -= instance.OnTilt;
+            @Tilt.performed -= instance.OnTilt;
+            @Tilt.canceled -= instance.OnTilt;
+            @Yaw.started -= instance.OnYaw;
+            @Yaw.performed -= instance.OnYaw;
+            @Yaw.canceled -= instance.OnYaw;
+            @Thrust.started -= instance.OnThrust;
+            @Thrust.performed -= instance.OnThrust;
+            @Thrust.canceled -= instance.OnThrust;
         }
 
         public void RemoveCallbacks(IHelicopter_PlayerActions instance)
@@ -1420,12 +1462,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     // TopDown_Player
     private readonly InputActionMap m_TopDown_Player;
     private List<ITopDown_PlayerActions> m_TopDown_PlayerActionsCallbackInterfaces = new List<ITopDown_PlayerActions>();
-    private readonly InputAction m_TopDown_Player_Up;
-    private readonly InputAction m_TopDown_Player_Down;
-    private readonly InputAction m_TopDown_Player_Right;
-    private readonly InputAction m_TopDown_Player_Left;
-    private readonly InputAction m_TopDown_Player_FrontBack;
-    private readonly InputAction m_TopDown_Player_LeftRight;
     private readonly InputAction m_TopDown_Player_Look;
     private readonly InputAction m_TopDown_Player_Interact;
     private readonly InputAction m_TopDown_Player_MouseDrag;
@@ -1434,12 +1470,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     {
         private @InputSystem_Actions m_Wrapper;
         public TopDown_PlayerActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Up => m_Wrapper.m_TopDown_Player_Up;
-        public InputAction @Down => m_Wrapper.m_TopDown_Player_Down;
-        public InputAction @Right => m_Wrapper.m_TopDown_Player_Right;
-        public InputAction @Left => m_Wrapper.m_TopDown_Player_Left;
-        public InputAction @FrontBack => m_Wrapper.m_TopDown_Player_FrontBack;
-        public InputAction @LeftRight => m_Wrapper.m_TopDown_Player_LeftRight;
         public InputAction @Look => m_Wrapper.m_TopDown_Player_Look;
         public InputAction @Interact => m_Wrapper.m_TopDown_Player_Interact;
         public InputAction @MouseDrag => m_Wrapper.m_TopDown_Player_MouseDrag;
@@ -1453,24 +1483,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_TopDown_PlayerActionsCallbackInterfaces.Add(instance);
-            @Up.started += instance.OnUp;
-            @Up.performed += instance.OnUp;
-            @Up.canceled += instance.OnUp;
-            @Down.started += instance.OnDown;
-            @Down.performed += instance.OnDown;
-            @Down.canceled += instance.OnDown;
-            @Right.started += instance.OnRight;
-            @Right.performed += instance.OnRight;
-            @Right.canceled += instance.OnRight;
-            @Left.started += instance.OnLeft;
-            @Left.performed += instance.OnLeft;
-            @Left.canceled += instance.OnLeft;
-            @FrontBack.started += instance.OnFrontBack;
-            @FrontBack.performed += instance.OnFrontBack;
-            @FrontBack.canceled += instance.OnFrontBack;
-            @LeftRight.started += instance.OnLeftRight;
-            @LeftRight.performed += instance.OnLeftRight;
-            @LeftRight.canceled += instance.OnLeftRight;
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
@@ -1487,24 +1499,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
 
         private void UnregisterCallbacks(ITopDown_PlayerActions instance)
         {
-            @Up.started -= instance.OnUp;
-            @Up.performed -= instance.OnUp;
-            @Up.canceled -= instance.OnUp;
-            @Down.started -= instance.OnDown;
-            @Down.performed -= instance.OnDown;
-            @Down.canceled -= instance.OnDown;
-            @Right.started -= instance.OnRight;
-            @Right.performed -= instance.OnRight;
-            @Right.canceled -= instance.OnRight;
-            @Left.started -= instance.OnLeft;
-            @Left.performed -= instance.OnLeft;
-            @Left.canceled -= instance.OnLeft;
-            @FrontBack.started -= instance.OnFrontBack;
-            @FrontBack.performed -= instance.OnFrontBack;
-            @FrontBack.canceled -= instance.OnFrontBack;
-            @LeftRight.started -= instance.OnLeftRight;
-            @LeftRight.performed -= instance.OnLeftRight;
-            @LeftRight.canceled -= instance.OnLeftRight;
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
@@ -1573,7 +1567,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     }
     public interface IHelicopter_PlayerActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnTilt(InputAction.CallbackContext context);
+        void OnYaw(InputAction.CallbackContext context);
+        void OnThrust(InputAction.CallbackContext context);
     }
     public interface ICar_PlayerActions
     {
@@ -1590,12 +1586,6 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     }
     public interface ITopDown_PlayerActions
     {
-        void OnUp(InputAction.CallbackContext context);
-        void OnDown(InputAction.CallbackContext context);
-        void OnRight(InputAction.CallbackContext context);
-        void OnLeft(InputAction.CallbackContext context);
-        void OnFrontBack(InputAction.CallbackContext context);
-        void OnLeftRight(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnMouseDrag(InputAction.CallbackContext context);
