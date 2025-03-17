@@ -33,6 +33,7 @@ public class TopDownMousePlayer : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
     private InputAction mouseInputAction;
+    private InputAction moveAction;
 #endif
 
     private void Start()
@@ -56,6 +57,7 @@ public class TopDownMousePlayer : MonoBehaviour
         var controls = new InputSystem_Actions();
         controls.Enable();
         mouseInputAction = controls.TopDown_Player.MouseDrag;
+        moveAction = controls.TopDown_Player.Move;
 #endif
     }
 
