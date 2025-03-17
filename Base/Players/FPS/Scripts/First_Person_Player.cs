@@ -48,8 +48,6 @@ public class First_Person_Player : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
     private InputSystem_Actions controls; // Reference to your Input Action Asset
-    private InputAction frontBackAction;
-    private InputAction leftRightAction;
     private InputAction jumpAction;
     private InputAction lookAction;
     private InputAction moveAction;
