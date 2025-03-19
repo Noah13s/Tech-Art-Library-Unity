@@ -344,7 +344,7 @@ public class Vehicle_Player : MonoBehaviour
         #region Single Wedge for Wheel Turn Angle Debug
         Handles.color = baseColor;
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DebugUtility.DrawFilledWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, baseColor);        // Draw front wheel angle
+        DebugUtility.DrawWedgeGizmo(new Vector3(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2).x, averageWheelsHeight, CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle * 2).z), Vector3.up, Quaternion.Euler(0, -steeringAngle, 0) * transform.forward, steeringAngle*2, 0f, 4f, 6f, baseColor);        // Draw front wheel angle
         //  Draws the center of the two front wheel angle meetup point 
         Handles.color = Color.blue;
         Handles.DrawWireCube(CalculateC(wheels[0].transform.position, wheels[1].transform.position, steeringAngle*2), new Vector3(0.1f, 0.1f, 0.1f));

@@ -219,7 +219,7 @@ public class Helicopter_Player : MonoBehaviour
         Handles.color = baseColor;
 
         //  Draws a single wedge for the two front wheels turn angle (should check if the two front wheels are turnable)
-        DebugUtility.DrawFilledWedgeGizmo(rigidBody.worldCenterOfMass, transform.up, -transform.forward, directionDifference, 0f, 4f,6f, baseColor);        // Draw front wheel angle
+        DebugUtility.DrawWedgeGizmo(rigidBody.worldCenterOfMass, transform.up, -transform.forward, directionDifference, 0f, 6f, Color.red);        // Draw front wheel angle
 
 
         Handles.color = Color.green;

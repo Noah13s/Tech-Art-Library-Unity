@@ -3,29 +3,29 @@ using UnityEngine;
 
 public static class DebugUtility
 {
+    #region DrawWedgeGizmo
+    #region 3D
     /// <summary>
-    /// Draws a wireframe box in the scene for debugging purposes.
+    /// Draws a filled 3D wedge gizmo.<br></br>
     /// </summary>
-    /// <param name="center">The center position of the box in world space.</param>
-    /// <param name="normal">The dimensions of the box (width, height, depth).</param>
-    /// <param name="color">The color of the box lines.</param>
-    /// <param name="from">The duration in seconds for which the box will be visible in the scene view. Set to 0 for a single frame.</param>
-    /// <remarks>
-    /// This method uses `Debug.DrawLine` to render the edges of the box.
-    /// It only appears in the **Scene View** and does not render in **Game View**.
-    /// </remarks>
-    /// <example>
-    /// Example usage:
-    /// <code>
-    /// DebugDraw.DrawBox(Vector3.zero, new Vector3(2, 2, 2), Color.red, 5f);
-    /// </code>
-    /// </example>
-    public static void DrawFilledWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
+    /// <param name="center">The center position of the wedge.</param>
+    /// <param name="normal">The upper direction of the wedge.</param>
+    /// <param name="from">The starting edge of the wedge</param>
+    /// <param name="angle">The angle value of the wedge in degrees.<br></br>Determines its "width".</param>
+    /// <param name="height">The height of the wedge. Follows the <paramref name="normal"/> direction.</param>
+    /// <param name="innerRadius">The inner radius of the wedge.</param>
+    /// <param name="outerRadius">The outer radius of the wedge.</param>
+    /// <param name="color">The color of filled faces.</param>
+    public static void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius, Color color)
     {
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
         Vector3 top = center + normal * height;
         int segments = 32;
         float angleStep = angle / segments;
+
+        // Create a material that supports vertex colors
+        Material material = new Material(Shader.Find("Hidden/Internal-Colored"));
+        material.SetPass(0);
 
         GL.PushMatrix();
         GL.MultMatrix(Matrix4x4.identity);
@@ -121,6 +121,16 @@ public static class DebugUtility
             Gizmos.DrawLine(corners[i], corners[i + 4]);
     }
 
+    /// <summary>
+    /// Draws a wired 3D wedge gizmo.<br></br>
+    /// </summary>
+    /// <param name="center">The center position of the wedge.</param>
+    /// <param name="normal">The upper direction of the wedge.</param>
+    /// <param name="from">The starting edge of the wedge</param>
+    /// <param name="angle">The angle value of the wedge in degrees.<br></br>Determines its "width".</param>
+    /// <param name="height">The height of the wedge. Follows the <paramref name="normal"/> direction.</param>
+    /// <param name="innerRadius">The inner radius of the wedge.</param>
+    /// <param name="outerRadius">The outer radius of the wedge.</param>
     public static void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float height, float innerRadius, float outerRadius)
     {
         Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
@@ -150,8 +160,111 @@ public static class DebugUtility
         Gizmos.DrawLine(startInner + normal * height, startOuter + normal * height);
         Gizmos.DrawLine(endInner + normal * height, endOuter + normal * height);
     }
+    #endregion
+    #region 2D
+    /// <summary>
+    /// Draws a wired 2D wedge gizmo.<br></br>
+    /// </summary>
+    /// <param name="center">The center position of the wedge.</param>
+    /// <param name="normal">The upper direction of the wedge.</param>
+    /// <param name="from">The starting edge of the wedge</param>
+    /// <param name="angle">The angle value of the wedge in degrees.<br></br>Determines its "width".</param>
+    /// <param name="innerRadius">The inner radius of the wedge.</param>
+    /// <param name="outerRadius">The outer radius of the wedge.</param>
+    public static void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float innerRadius, float outerRadius)
+    {
+        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
 
+        // Draw arcs
+        Handles.DrawWireArc(center, normal, from, angle, outerRadius);
+        Handles.DrawWireArc(center, normal, from, angle, innerRadius);
 
+        // Calculate corner points
+        Vector3 startOuter = center + rotation * from * outerRadius;
+        Vector3 endOuter = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * outerRadius;
+        Vector3 startInner = center + rotation * from * innerRadius;
+        Vector3 endInner = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * innerRadius;
+
+        // Draw lines connecting inner and outer arcs
+        Gizmos.DrawLine(startInner, startOuter);
+        Gizmos.DrawLine(endInner, endOuter);
+    }
+
+    /// <summary>
+    /// Draws a filled 2D wedge gizmo.<br></br>
+    /// <param name="center">The center position of the wedge.</param>
+    /// <param name="normal">The upper direction of the wedge.</param>
+    /// <param name="from">The starting edge of the wedge</param>
+    /// <param name="angle">The angle value of the wedge in degrees.<br></br>Determines its "width".</param>
+    /// <param name="innerRadius">The inner radius of the wedge.</param>
+    /// <param name="outerRadius">The outer radius of the wedge.</param>
+    /// <param name="color">The color of filled faces.</param>
+    public static void DrawWedgeGizmo(Vector3 center, Vector3 normal, Vector3 from, float angle, float innerRadius, float outerRadius, Color color)
+    {
+        Quaternion rotation = Quaternion.FromToRotation(Vector3.up, normal);
+        int segments = 32;
+        float angleStep = angle / segments;
+
+        // Create a material that supports vertex colors
+        Material material = new Material(Shader.Find("Hidden/Internal-Colored"));
+        material.SetPass(0);
+
+        GL.PushMatrix();
+        GL.MultMatrix(Matrix4x4.identity);
+        GL.Begin(GL.TRIANGLES);
+        GL.Color(color);
+
+        // Fill the wedge
+        for (int i = 0; i < segments; i++)
+        {
+            float currentAngle = i * angleStep;
+            float nextAngle = (i + 1) * angleStep;
+
+            Vector3 currentOuter = center + rotation * (Quaternion.AngleAxis(currentAngle, Vector3.up) * from) * outerRadius;
+            Vector3 nextOuter = center + rotation * (Quaternion.AngleAxis(nextAngle, Vector3.up) * from) * outerRadius;
+            Vector3 currentInner = center + rotation * (Quaternion.AngleAxis(currentAngle, Vector3.up) * from) * innerRadius;
+            Vector3 nextInner = center + rotation * (Quaternion.AngleAxis(nextAngle, Vector3.up) * from) * innerRadius;
+
+            // Draw two triangles to fill the segment
+            GL.Vertex(currentInner);
+            GL.Vertex(currentOuter);
+            GL.Vertex(nextOuter);
+
+            GL.Vertex(currentInner);
+            GL.Vertex(nextOuter);
+            GL.Vertex(nextInner);
+        }
+
+        GL.End();
+        GL.PopMatrix();
+
+        // Draw wireframe outline
+        Handles.color = color;
+        Handles.DrawWireArc(center, normal, from, angle, outerRadius);
+        Handles.DrawWireArc(center, normal, from, angle, innerRadius);
+
+        // Draw the straight edges
+        Vector3 startOuter = center + rotation * from * outerRadius;
+        Vector3 startInner = center + rotation * from * innerRadius;
+        Vector3 endOuter = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * outerRadius;
+        Vector3 endInner = center + rotation * (Quaternion.AngleAxis(angle, Vector3.up) * from) * innerRadius;
+
+        Gizmos.color = color;
+        Gizmos.DrawLine(startOuter, startInner);
+        Gizmos.DrawLine(endOuter, endInner);
+    }
+    #endregion
+    #endregion
+
+    /// <summary>
+    /// Draws a filled 3D cone.<br></br>
+    /// </summary>
+    /// <param name="position">The center position of the cone in world space.</param>
+    /// <param name="direction">The forward direction of the cone.</param>
+    /// <param name="angle">The angle value of the wedge in degrees.<br></br>Determines its "width".</param>
+    /// <param name="height">The height of the wedge. Follows the <paramref name="normal"/> direction.</param>
+    /// <param name="segments">The inner radius of the wedge.</param>
+    /// <param name="color">The color of filled faces.</param>
     public static void DrawFilledCone(Vector3 position, Vector3 direction, float angle, float height, int segments, Color color)
     {
         direction = direction.normalized;
