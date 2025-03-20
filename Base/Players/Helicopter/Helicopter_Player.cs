@@ -141,6 +141,11 @@ public class Helicopter_Player : MonoBehaviour
         }
     }
 
+    // Add a new serialized gain for the integral term
+    [SerializeField] private float Ki = 0.01f; // Integral gain (adjust as needed)
+                                               // And a new variable to accumulate error over time
+    private float integralError = 0f;
+
     private void TorqueCompensation()
     {
         if (mainRotor != null && tailRotor != null)
@@ -148,25 +153,29 @@ public class Helicopter_Player : MonoBehaviour
             // Calculate the required tail rotor thrust
             requiredThrust = mainRotor.CalculateCounterThrust(tailRotorDistance);
 
-            // Proportional term (helps correct the angle)
+            // Update the accumulated error (integral term)
+            integralError += directionDifference * Time.deltaTime;
+
+            // Proportional term: helps correct the angle
             float proportional = Kp * directionDifference;
 
-            // Derivative term (helps reduce overshooting)
+            // Derivative term: helps reduce overshooting
             float derivative = Kd * (directionDifference - lastDirectionDifference) / Time.deltaTime;
 
-            // Compute final correction
-            float correction = proportional + derivative;
+            // Integral term: reduces steady-state error
+            float integral = Ki * integralError;
 
-            // Clamp correction to prevent extreme overcorrection
+            // Compute final correction combining all three terms
+            float correction = proportional + derivative + integral;
+
+            // Clamp correction to prevent excessive turning
             correction = Mathf.Clamp(correction, -maxCorrection, maxCorrection);
 
-            // Apply limited correction
+            // Apply the correction to the required thrust
             requiredThrust += correction;
-
-            // Apply thrust to the tail rotor
             tailRotor.SetTargetThrust(requiredThrust);
 
-            // Store current direction difference for next frame
+            // Store current direction difference for the next frame
             lastDirectionDifference = directionDifference;
         }
     }
