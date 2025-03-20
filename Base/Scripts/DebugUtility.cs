@@ -4,7 +4,7 @@ using UnityEngine;
 public static class DebugUtility
 {
     #region DrawWedgeGizmo
-    #region 3D
+    #region 3D Wedge
     /// <summary>
     /// Draws a filled 3D wedge gizmo.<br></br>
     /// </summary>
@@ -161,7 +161,7 @@ public static class DebugUtility
         Gizmos.DrawLine(endInner + normal * height, endOuter + normal * height);
     }
     #endregion
-    #region 2D
+    #region 2D Wedge
     /// <summary>
     /// Draws a wired 2D wedge gizmo.<br></br>
     /// </summary>
