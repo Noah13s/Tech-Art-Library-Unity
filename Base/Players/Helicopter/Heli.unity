@@ -624,14 +624,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 429512946}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.2588191, w: 0.9659258}
   m_LocalPosition: {x: 0, y: 0.659, z: 0}
   m_LocalScale: {x: 0.25754, y: 0.25754, z: 0.25754}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1025010038}
   m_Father: {fileID: 926390581}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 30}
 --- !u!23 &429512948
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1304,7 +1304,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 90
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!65 &926390578
 BoxCollider:
@@ -1535,6 +1535,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1013321087}
+  - component: {fileID: 1013321088}
   m_Layer: 0
   m_Name: Environment
   m_TagString: Untagged
@@ -1569,6 +1570,30 @@ Transform:
   - {fileID: 58839628}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1013321088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013321086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 798c2dc57ec352e43adde484e557d2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  equal: 0
+  equalTo: 0
+  superior: 0
+  superiorTo: 0
+  inferior: 0
+  inferiorTo: 0
+  counterValueStrg: 0
+  startValue: 0
+  textToUpdate: {fileID: 0}
+  onCounterEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1025010037
 GameObject:
   m_ObjectHideFlags: 0

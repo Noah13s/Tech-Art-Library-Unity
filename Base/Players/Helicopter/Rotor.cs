@@ -282,4 +282,33 @@ public class Rotor : MonoBehaviour
         float counterThrust = currentTorqueN / secondaryRotorDistance;
         return counterThrust; // Returns thrust in Newtons
     }
+
+    public float CalculateMainRotorTiltAdjusted(float mainRotorThrustN)
+    {
+        // Get the counter thrust as if this rotor was acting as the tail rotor
+        float counterThrust = CalculateCounterThrust(tailDistance);
+
+        // Avoid division by zero
+        if (mainRotorThrustN <= 0f)
+        {
+            Debug.LogWarning("Main rotor thrust is zero or negative; cannot calculate tilt.");
+            return 0f;
+        }
+
+        // Calculate the basic ratio for the arcsin input
+        float ratio = counterThrust / mainRotorThrustN;
+        ratio = Mathf.Clamp(ratio, -1f, 1f);
+
+        // Basic tilt calculation (in radians)
+        float tiltRadians = Mathf.Asin(ratio);
+
+        // Introduce a correction factor to boost the tilt if needed
+        // Tune this factor empirically until drift is countered
+        float correctionFactor = 2.0f; // for example, 1.5 or 2.0
+
+        // Apply correction factor and convert to degrees
+        float tiltDegrees = tiltRadians * Mathf.Rad2Deg * correctionFactor;
+
+        return tiltDegrees;
+    }
 }

@@ -93,7 +93,7 @@ public class Helicopter_Player : MonoBehaviour
     {
         if (!engineOnOff || mainRotor == null)
             return; // Exit if the engine is off or main rotor is missing
-
+        
         // Read player input
         Vector2 tiltInput = tiltAction.ReadValue<Vector2>(); // Pitch input
 
@@ -101,7 +101,8 @@ public class Helicopter_Player : MonoBehaviour
         float maxTiltAngle = 50f; // Maximum cyclic tilt angle (degrees)
         float tiltSpeed = 5f; // Smoothing speed
 
-        Vector2 tilt = tiltInput * maxTiltAngle;
+        //Vector2 tilt = tiltInput * maxTiltAngle;
+        Vector2 tilt = new Vector2(tailRotor.CalculateMainRotorTiltAdjusted(mainRotor.currentThrustN), 0f);
 
         // Smoothly interpolate to the target tilt using Lerp
         float smoothedPitch = Mathf.LerpAngle(mainRotor.transform.localRotation.eulerAngles.x, tilt.x, Time.deltaTime * tiltSpeed);
@@ -111,6 +112,9 @@ public class Helicopter_Player : MonoBehaviour
         // Apply new rotation to the main rotor
         //mainRotor.transform.localRotation = Quaternion.Euler(smoothedPitch, mainRotor.transform.localEulerAngles.y, smoothedRoll);
         mainRotor.tiltInput = tilt;
+        
+        Debug.Log(tailRotor.CalculateMainRotorTiltAdjusted(mainRotor.currentThrustN));
+        
     }
 
 
