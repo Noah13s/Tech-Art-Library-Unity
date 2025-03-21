@@ -150,39 +150,48 @@ public class Helicopter_Player : MonoBehaviour
                                                // And a new variable to accumulate error over time
     private float integralError = 0f;
 
-    private void TorqueCompensation()
+private void TorqueCompensation() 
+{
+    if (mainRotor != null && tailRotor != null)
     {
-        if (mainRotor != null && tailRotor != null)
-        {
-            // Calculate the required tail rotor thrust
-            requiredThrust = mainRotor.CalculateCounterThrust(tailRotorDistance);
+        // Calculate the base required thrust ignoring main rotor tilt
+        float baseRequiredThrust = mainRotor.CalculateCounterThrust(tailRotorDistance);
 
-            // Update the accumulated error (integral term)
-            integralError += directionDifference * Time.deltaTime;
+        // Get the main rotor tilt angle that already compensates for drift
+        float mainRotorTilt = mainRotor.CalculateMainRotorTiltAdjusted(mainRotor.currentThrustN);
 
-            // Proportional term: helps correct the angle
-            float proportional = Kp * directionDifference;
+        // Convert tilt angle to a thrust reduction factor
+        float tiltCompensationFactor = Mathf.Cos(mainRotorTilt * Mathf.Deg2Rad); // Reduce thrust if tilted
 
-            // Derivative term: helps reduce overshooting
-            float derivative = Kd * (directionDifference - lastDirectionDifference) / Time.deltaTime;
+        // Apply the compensation factor
+        requiredThrust = baseRequiredThrust * tiltCompensationFactor;
 
-            // Integral term: reduces steady-state error
-            float integral = Ki * integralError;
+        // Update the accumulated error (integral term)
+        integralError += directionDifference * Time.deltaTime;
 
-            // Compute final correction combining all three terms
-            float correction = proportional + derivative + integral;
+        // Proportional term: helps correct the angle
+        float proportional = Kp * directionDifference;
 
-            // Clamp correction to prevent excessive turning
-            correction = Mathf.Clamp(correction, -maxCorrection, maxCorrection);
+        // Derivative term: helps reduce overshooting
+        float derivative = Kd * (directionDifference - lastDirectionDifference) / Time.deltaTime;
 
-            // Apply the correction to the required thrust
-            requiredThrust += correction;
-            tailRotor.SetTargetThrust(requiredThrust);
+        // Integral term: reduces steady-state error
+        float integral = Ki * integralError;
 
-            // Store current direction difference for the next frame
-            lastDirectionDifference = directionDifference;
-        }
+        // Compute final correction combining all three terms
+        float correction = proportional + derivative + integral;
+
+        // Clamp correction to prevent excessive turning
+        correction = Mathf.Clamp(correction, -maxCorrection, maxCorrection);
+
+        // Apply the correction to the required thrust
+        requiredThrust += correction;
+        tailRotor.SetTargetThrust(requiredThrust);
+
+        // Store current direction difference for the next frame
+        lastDirectionDifference = directionDifference;
     }
+}
 
     private void UpdateData()
     {
