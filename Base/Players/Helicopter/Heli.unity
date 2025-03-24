@@ -1583,15 +1583,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   equal: 0
-  equalTo: 0
   superior: 0
-  superiorTo: 0
   inferior: 0
-  inferiorTo: 0
   counterValueStrg: 0
   startValue: 0
   textToUpdate: {fileID: 0}
-  onCounterEvent:
+  onConditionEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1025010037

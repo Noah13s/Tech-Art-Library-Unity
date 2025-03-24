@@ -85,7 +85,7 @@ public class SphereGeneration : MonoBehaviour
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = null;
     }
-
+#if UNITY_EDITOR
     // Custom Editor for the script
     [CustomEditor(typeof(SphereGeneration))]
     public class CustomViewportEditor : Editor
@@ -110,4 +110,5 @@ public class SphereGeneration : MonoBehaviour
             }
         }
     }
+#endif
 }

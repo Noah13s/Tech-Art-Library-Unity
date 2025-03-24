@@ -3,6 +3,7 @@ using UnityEngine;
 
 public static class DebugUtility
 {
+#if UNITY_EDITOR
     #region DrawWedgeGizmo
     #region 3D Wedge
     /// <summary>
@@ -294,4 +295,5 @@ public static class DebugUtility
         // Draw the base cap
         Handles.DrawAAConvexPolygon(baseVertices);
     }
+#endif
 }

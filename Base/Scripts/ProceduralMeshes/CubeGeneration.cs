@@ -147,7 +147,7 @@ public class CubeGeneration : MonoBehaviour
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = null;
     }
-
+#if UNITY_EDITOR
     // Custom Editor for the script
     [CustomEditor(typeof(CubeGeneration))]
     public class CustomViewportEditor : Editor
@@ -172,4 +172,5 @@ public class CubeGeneration : MonoBehaviour
             }
         }
     }
+#endif
 }

@@ -117,7 +117,7 @@ public class CylinderGeneration : MonoBehaviour
         MeshFilter meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = null;
     }
-
+#if UNITY_EDITOR
     [CustomEditor(typeof(CylinderGeneration))]
     public class CustomViewportEditor : Editor
     {
@@ -137,4 +137,5 @@ public class CylinderGeneration : MonoBehaviour
             }
         }
     }
+#endif
 }
