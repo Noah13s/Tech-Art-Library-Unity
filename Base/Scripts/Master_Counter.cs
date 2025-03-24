@@ -1,19 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+using System;
 using TMPro;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.Events;
 
 public class Master_Counter : MonoBehaviour
 {
     [Header("Conditions")]
-    [SerializeField] bool equal = false;
-    [SerializeField] int equalTo = 0;
-    [SerializeField] bool superior = false;
-    [SerializeField] int superiorTo = 0;
-    [SerializeField] bool inferior = false;
-    [SerializeField] int inferiorTo = 0;
+    [SerializeField] public bool equal = false;
+    [NonSerialized] public int equalTo = 0;
+    [SerializeField] public bool superior = false;
+    [NonSerialized] public int superiorTo = 0;
+    [SerializeField] public bool inferior = false;
+    [NonSerialized] public int inferiorTo = 0;
 
     [Header("Other")]
     [SerializeField]
@@ -92,3 +91,39 @@ public class Master_Counter : MonoBehaviour
         }
     }
 }
+
+#region Custom Editor
+#if UNITY_EDITOR
+[CustomEditor(typeof(Master_Counter))]
+public class CustomEditorMasterCounter : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        Master_Counter playerScript = (Master_Counter)target;
+
+        // Draw default inspector
+        DrawDefaultInspector();
+
+        // Show 'Equal to value' field when 'equal' is checked
+        if (playerScript.equal)
+        {
+            playerScript.equalTo = EditorGUILayout.IntField("Equal to value: ", playerScript.equalTo);
+        }
+
+        // You can add similar checks for 'superior' and 'inferior' if needed
+        if (playerScript.superior)
+        {
+            playerScript.superiorTo = EditorGUILayout.IntField("Superior to value: ", playerScript.superiorTo);
+        }
+
+        if (playerScript.inferior)
+        {
+            playerScript.inferiorTo = EditorGUILayout.IntField("Inferior to value: ", playerScript.inferiorTo);
+        }
+
+        // Ensure to save the modified values
+        EditorUtility.SetDirty(playerScript);
+    }
+}
+#endif
+#endregion
