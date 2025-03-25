@@ -33,7 +33,7 @@ public class InteractiveObject : MonoBehaviour
         Debug.Log("Interacting with " + gameObject.name);
 
         // Invoke the UnityEvent when the object is interacted with
-        onInteract?.Invoke();
+        if(onInteract != null) { onInteract.Invoke(); }
     }
 
     // Method to enable the interaction

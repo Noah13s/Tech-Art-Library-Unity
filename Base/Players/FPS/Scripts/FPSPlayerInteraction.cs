@@ -11,7 +11,7 @@ public class FPSPlayerInteraction : MonoBehaviour
 {
     [Header("Interaction Settings")]
     [SerializeField] private float interactionDistance = 3.0f;  // How far the player can reach to interact
-    [SerializeField] private LayerMask interactionLayer = default;  // Layer to detect interactable objects
+    [SerializeField] private LayerMask interactionLayer;  // Layer to detect interactable objects
 
     [Header("Debug Settings")]
     [SerializeField] private bool debugMode = false;  // Toggle for enabling/disabling debug mode
@@ -133,19 +133,22 @@ public class FPSPlayerInteraction : MonoBehaviour
                 if (true) // Used to only invoke if the state has changed but removed that 
                 {
                     isInteractionAvailable = true;
-                    onInteractionPossible?.Invoke(); // Invoke when interaction becomes possible
+                    if (onInteractionPossible != null)
+                    {
+                        onInteractionPossible.Invoke();  // Invoke when interaction becomes possible
+                    }
+                }
+                else if (isInteractionAvailable) // Check if we were previously available
+                {
+                    isInteractionAvailable = false; // Set to unavailable
+                    if (onInteractionUnavailable != null) { onInteractionUnavailable.Invoke(); } // Invoke when interaction becomes unavailable
                 }
             }
-            else if (isInteractionAvailable) // Check if we were previously available
+            else if (isInteractionAvailable) // If no object is hit and was previously available
             {
-                isInteractionAvailable = false; // Set to unavailable
-                onInteractionUnavailable?.Invoke(); // Invoke when interaction becomes unavailable
+                isInteractionAvailable = false;
+                if (onInteractionUnavailable != null) { onInteractionUnavailable.Invoke(); } // Invoke when interaction becomes unavailable
             }
-        }
-        else if (isInteractionAvailable) // If no object is hit and was previously available
-        {
-            isInteractionAvailable = false;
-            onInteractionUnavailable?.Invoke(); // Invoke when interaction becomes unavailable
         }
     }
 

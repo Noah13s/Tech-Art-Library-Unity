@@ -42,8 +42,15 @@ public class GrabableObject : InteractiveObject // Inherit from InteractiveObjec
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
         // Find the player transform and camera transform (assuming the player has a tag "Player")
-        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-        playerCameraTransform = Camera.main?.transform; // Get the main camera's transform
+        if (GameObject.FindGameObjectWithTag("Player"))
+        {
+            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        }
+        // Get the main camera's transform
+        if (Camera.main != null) 
+        {
+            playerCameraTransform = Camera.main.transform;
+        }
         if (playerTransform == null)
         {
             Debug.LogError("Player transform not found. Make sure there is a GameObject with the 'Player' tag in the scene.");
@@ -105,7 +112,7 @@ public class GrabableObject : InteractiveObject // Inherit from InteractiveObjec
         }
 
         // Invoke the UnityEvent when the object is grabbed
-        onGrab?.Invoke();
+        if (onGrab != null) { onGrab.Invoke(); }
     }
 
     // Method to release the object
