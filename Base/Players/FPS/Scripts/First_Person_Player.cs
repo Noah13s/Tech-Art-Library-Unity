@@ -241,10 +241,19 @@ public class First_Person_Player : MonoBehaviour
                 }
 
                 // Jumping logic
-                if (Input.GetKey(KeyCode.Space) || externalJump == true || Input.GetButton("Cross"))
+                if (Input.GetKey(KeyCode.Space) || externalJump == true)
                 {
                     moveDirection.y = jumpForce;
                     externalJump = false;
+                }
+                if (UtilityMethods.ButtonExists("Cross"))
+                {
+                    if (Input.GetButton("Cross"))
+                    {
+                        moveDirection.y = jumpForce;
+                        externalJump = false;
+
+                    }
                 }
 
                 // Handle bouncing if enabled
