@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using TechArtLibraryUtility;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem; // New Input System namespace
@@ -212,8 +210,14 @@ public class First_Person_Player : MonoBehaviour
         }
         else
         {
-            forwardMovement = Input.GetAxis("Vertical") * moveSpeed;
-            rightMovement = Input.GetAxis("Horizontal") * moveSpeed;
+            forwardMovement += Input.GetAxis("Vertical") * moveSpeed;
+            rightMovement += Input.GetAxis("Horizontal") * moveSpeed;
+            // PSVITA Controls
+            if (UtilityMethods.AxisExists("Left Stick Vertical") && UtilityMethods.AxisExists("Left Stick Horizontal"))
+            {
+                forwardMovement += Input.GetAxis("Left Stick Vertical") * moveSpeed;
+                rightMovement += Input.GetAxis("Left Stick Horizontal") * moveSpeed;
+            }
         }
 
         // Desired movement vector
@@ -237,7 +241,7 @@ public class First_Person_Player : MonoBehaviour
                 }
 
                 // Jumping logic
-                if (Input.GetButton("Jump") || externalJump == true)
+                if (Input.GetKey(KeyCode.Space) || externalJump == true || Input.GetButton("Cross"))
                 {
                     moveDirection.y = jumpForce;
                     externalJump = false;
@@ -257,9 +261,16 @@ public class First_Person_Player : MonoBehaviour
                 moveDirection = desiredMovement;
 
                 // Jumping logic
-                if (Input.GetButton("Jump"))
+                if (Input.GetKey(KeyCode.Space))
                 {
                     moveDirection.y = jumpForce;
+                }
+                if (UtilityMethods.ButtonExists("Cross"))
+                {
+                    if (Input.GetButton("Cross")) 
+                    {
+                        moveDirection.y = jumpForce;
+                    }
                 }
             }
         }
@@ -276,15 +287,19 @@ public class First_Person_Player : MonoBehaviour
         if (touchControl != null && touchControl.IsTouching())
         {
             lookInput = touchControl.GetTouchDelta();
-        }
+        }       
         // Fallback to mouse/keyboard if touch input is not available
         else
         {
             // Camera rotation (looking around)
             lookInput.x += Input.GetAxis("Mouse X");
             lookInput.y += Input.GetAxis("Mouse Y");
-            lookInput.x += Input.GetAxis("Right Stick Horizontal");
-            lookInput.y += Input.GetAxis("Right Stick Vertical");
+            // PSVITA Controls
+            if (UtilityMethods.AxisExists("Right Stick Vertical") && UtilityMethods.AxisExists("Right Stick Horizontal"))
+            {
+                lookInput.x += Input.GetAxis("Right Stick Horizontal");
+                lookInput.y += Input.GetAxis("Right Stick Vertical");
+            }
         }
         // Update rotation based on touch input
         rotationX -= lookInput.y * lookSpeed; // Invert y-axis for a more natural look
