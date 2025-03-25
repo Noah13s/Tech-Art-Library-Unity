@@ -177,7 +177,7 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
             isTouching = true;
 
             // Fire the touch start event
-            onTouchStart?.Invoke();
+            if (onTouchStart != null) { onTouchStart.Invoke(); }
         }
         else
         {
@@ -187,7 +187,7 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
             lastTouchPosition = currentTouchPosition;
 
             // Fire the touch dragging event
-            onTouching?.Invoke();
+            if (onTouching != null) { onTouching.Invoke(); }
         }
     }
 
@@ -236,7 +236,7 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
         // authorisedFingerIds.Clear();  // Uncomment this if you want to clear after every touch
 
         // Fire the touch end event
-        onTouchEnd?.Invoke();
+        if(onTouching != null) { onTouchEnd.Invoke(); };
     }
 
 
@@ -288,7 +288,7 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
         }
 
         // Debug log to verify the list is updated
-        Debug.Log("Updated authorisedFingerIds: " + string.Join(",", authorisedFingerIds));
+        //Debug.Log("Updated authorisedFingerIds: " + string.Join(",", authorisedFingerIds));
     }
 
     public void RemoveAuthorizedFingerId(int fingerId)
@@ -305,7 +305,7 @@ public class UITouchControl : MonoBehaviour, IDragHandler, IPointerUpHandler, IP
         }
 
         // Debug log to verify the list is updated
-        Debug.Log("Updated authorisedFingerIds: " + string.Join(",", authorisedFingerIds));
+        //Debug.Log("Updated authorisedFingerIds: " + string.Join(",", authorisedFingerIds));
     }
 
 

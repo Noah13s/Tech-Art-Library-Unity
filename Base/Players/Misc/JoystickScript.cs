@@ -154,8 +154,8 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
         float distance = Mathf.Min(direction.magnitude, maxDistance); // Clamp distance
         inputVector = direction.normalized * (distance / maxDistance); // Normalize and scale input vector
         innerJoystick.position = joystickCenter + direction.normalized * distance; // Move the inner joystick
-
-        onDragging?.Invoke(); // Trigger onDragging event during movement
+        
+        if (onDragging != null) { onDragging.Invoke(); }// Trigger onDragging event during movement
     }
 
     private bool IsWithinJoystickBounds(Vector2 position)
@@ -170,8 +170,8 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
         inputVector = Vector2.zero;              // Reset input vector
         isJoystickActive = false;                // Mark joystick as inactive
         dragTouchId = -1;                        // Reset drag touch ID
-        onDragEnd?.Invoke();                     // Trigger onDragEnd event when released
-    }
+        if (onDragEnd != null) { onDragEnd.Invoke(); }// Trigger onDragEnd event when released
+        }
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -181,7 +181,7 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             MoveJoystick(eventData.position); // Start moving the joystick immediately
             dragTouchId = eventData.pointerId; // Track the dragging touch ID
             isJoystickActive = true; // Mark joystick as active
-            onDragStart?.Invoke(); // Trigger onDragStart event
+            if (onDragStart != null) { onDragStart.Invoke(); }// Trigger onDragStart event
         }
     }
 
@@ -201,6 +201,6 @@ public class JoystickControl : MonoBehaviour, IDragHandler, IPointerUpHandler, I
         }
     }
 
-    public float GetHorizontal() => inputVector.x; // Get horizontal input
-    public float GetVertical() => inputVector.y;   // Get vertical input
+    public float GetHorizontal() { return inputVector.x; } // Get horizontal input
+    public float GetVertical() { return inputVector.y; }// Get vertical input
 }
