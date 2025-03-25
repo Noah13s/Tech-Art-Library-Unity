@@ -71,12 +71,6 @@ public class First_Person_Player : MonoBehaviour
 #endif
     }
 
-    // Reinitialize on var changed
-    private void OnValidate()
-    {
-        Initalise();
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -287,9 +281,10 @@ public class First_Person_Player : MonoBehaviour
         else
         {
             // Camera rotation (looking around)
-            lookInput.x -= Input.GetAxis("Mouse Y");
-            lookInput.y = Input.GetAxis("Mouse X");
-
+            lookInput.x += Input.GetAxis("Mouse X");
+            lookInput.y += Input.GetAxis("Mouse Y");
+            lookInput.x += Input.GetAxis("Right Stick Horizontal");
+            lookInput.y += Input.GetAxis("Right Stick Vertical");
         }
         // Update rotation based on touch input
         rotationX -= lookInput.y * lookSpeed; // Invert y-axis for a more natural look

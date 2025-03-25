@@ -1,11 +1,343 @@
 fileFormatVersion: 2
 guid: b7233978ed80e124da277e79098ef125
 ModelImporter:
-  serializedVersion: 22200
-  internalIDToNameTable: []
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: 'Node #0'
+    100004: 'Node #1'
+    100006: 'Node #10'
+    100008: 'Node #11'
+    100010: 'Node #12'
+    100012: 'Node #13'
+    100014: 'Node #14'
+    100016: 'Node #15'
+    100018: 'Node #16'
+    100020: 'Node #17'
+    100022: 'Node #18'
+    100024: 'Node #19'
+    100026: 'Node #2'
+    100028: 'Node #20'
+    100030: 'Node #21'
+    100032: 'Node #22'
+    100034: 'Node #23'
+    100036: 'Node #24'
+    100038: 'Node #25'
+    100040: 'Node #26'
+    100042: 'Node #27'
+    100044: 'Node #28'
+    100046: 'Node #29'
+    100048: 'Node #3'
+    100050: 'Node #30'
+    100052: 'Node #31'
+    100054: 'Node #32'
+    100056: 'Node #33'
+    100058: 'Node #34'
+    100060: 'Node #35'
+    100062: 'Node #36'
+    100064: 'Node #37'
+    100066: 'Node #38'
+    100068: 'Node #39'
+    100070: 'Node #4'
+    100072: 'Node #40'
+    100074: 'Node #41'
+    100076: 'Node #42'
+    100078: 'Node #43'
+    100080: 'Node #44'
+    100082: 'Node #45'
+    100084: 'Node #46'
+    100086: 'Node #47'
+    100088: 'Node #48'
+    100090: 'Node #49'
+    100092: 'Node #5'
+    100094: 'Node #50'
+    100096: 'Node #51'
+    100098: 'Node #52'
+    100100: 'Node #53'
+    100102: 'Node #54'
+    100104: 'Node #55'
+    100106: 'Node #56'
+    100108: 'Node #57'
+    100110: 'Node #58'
+    100112: 'Node #59'
+    100114: 'Node #6'
+    100116: 'Node #60'
+    100118: 'Node #61'
+    100120: 'Node #62'
+    100122: 'Node #63'
+    100124: 'Node #64'
+    100126: 'Node #65'
+    100128: 'Node #66'
+    100130: 'Node #67'
+    100132: 'Node #68'
+    100134: 'Node #69'
+    100136: 'Node #7'
+    100138: 'Node #70'
+    100140: 'Node #71'
+    100142: 'Node #72'
+    100144: 'Node #73'
+    100146: 'Node #74'
+    100148: 'Node #75'
+    100150: 'Node #76'
+    100152: 'Node #77'
+    100154: 'Node #78'
+    100156: 'Node #79'
+    100158: 'Node #8'
+    100160: 'Node #80'
+    100162: 'Node #81'
+    100164: 'Node #9'
+    400000: //RootNode
+    400002: 'Node #0'
+    400004: 'Node #1'
+    400006: 'Node #10'
+    400008: 'Node #11'
+    400010: 'Node #12'
+    400012: 'Node #13'
+    400014: 'Node #14'
+    400016: 'Node #15'
+    400018: 'Node #16'
+    400020: 'Node #17'
+    400022: 'Node #18'
+    400024: 'Node #19'
+    400026: 'Node #2'
+    400028: 'Node #20'
+    400030: 'Node #21'
+    400032: 'Node #22'
+    400034: 'Node #23'
+    400036: 'Node #24'
+    400038: 'Node #25'
+    400040: 'Node #26'
+    400042: 'Node #27'
+    400044: 'Node #28'
+    400046: 'Node #29'
+    400048: 'Node #3'
+    400050: 'Node #30'
+    400052: 'Node #31'
+    400054: 'Node #32'
+    400056: 'Node #33'
+    400058: 'Node #34'
+    400060: 'Node #35'
+    400062: 'Node #36'
+    400064: 'Node #37'
+    400066: 'Node #38'
+    400068: 'Node #39'
+    400070: 'Node #4'
+    400072: 'Node #40'
+    400074: 'Node #41'
+    400076: 'Node #42'
+    400078: 'Node #43'
+    400080: 'Node #44'
+    400082: 'Node #45'
+    400084: 'Node #46'
+    400086: 'Node #47'
+    400088: 'Node #48'
+    400090: 'Node #49'
+    400092: 'Node #5'
+    400094: 'Node #50'
+    400096: 'Node #51'
+    400098: 'Node #52'
+    400100: 'Node #53'
+    400102: 'Node #54'
+    400104: 'Node #55'
+    400106: 'Node #56'
+    400108: 'Node #57'
+    400110: 'Node #58'
+    400112: 'Node #59'
+    400114: 'Node #6'
+    400116: 'Node #60'
+    400118: 'Node #61'
+    400120: 'Node #62'
+    400122: 'Node #63'
+    400124: 'Node #64'
+    400126: 'Node #65'
+    400128: 'Node #66'
+    400130: 'Node #67'
+    400132: 'Node #68'
+    400134: 'Node #69'
+    400136: 'Node #7'
+    400138: 'Node #70'
+    400140: 'Node #71'
+    400142: 'Node #72'
+    400144: 'Node #73'
+    400146: 'Node #74'
+    400148: 'Node #75'
+    400150: 'Node #76'
+    400152: 'Node #77'
+    400154: 'Node #78'
+    400156: 'Node #79'
+    400158: 'Node #8'
+    400160: 'Node #80'
+    400162: 'Node #81'
+    400164: 'Node #9'
+    2000000: 'Node #81'
+    2100000: Material_16
+    2300000: 'Node #11'
+    2300002: 'Node #12'
+    2300004: 'Node #17'
+    2300006: 'Node #18'
+    2300008: 'Node #19'
+    2300010: 'Node #2'
+    2300012: 'Node #20'
+    2300014: 'Node #21'
+    2300016: 'Node #22'
+    2300018: 'Node #23'
+    2300020: 'Node #24'
+    2300022: 'Node #25'
+    2300024: 'Node #26'
+    2300026: 'Node #27'
+    2300028: 'Node #28'
+    2300030: 'Node #3'
+    2300032: 'Node #31'
+    2300034: 'Node #32'
+    2300036: 'Node #33'
+    2300038: 'Node #34'
+    2300040: 'Node #35'
+    2300042: 'Node #36'
+    2300044: 'Node #37'
+    2300046: 'Node #38'
+    2300048: 'Node #39'
+    2300050: 'Node #40'
+    2300052: 'Node #41'
+    2300054: 'Node #42'
+    2300056: 'Node #45'
+    2300058: 'Node #46'
+    2300060: 'Node #47'
+    2300062: 'Node #48'
+    2300064: 'Node #5'
+    2300066: 'Node #50'
+    2300068: 'Node #51'
+    2300070: 'Node #52'
+    2300072: 'Node #53'
+    2300074: 'Node #54'
+    2300076: 'Node #55'
+    2300078: 'Node #56'
+    2300080: 'Node #57'
+    2300082: 'Node #58'
+    2300084: 'Node #59'
+    2300086: 'Node #6'
+    2300088: 'Node #60'
+    2300090: 'Node #61'
+    2300092: 'Node #62'
+    2300094: 'Node #63'
+    2300096: 'Node #64'
+    2300098: 'Node #65'
+    2300100: 'Node #66'
+    2300102: 'Node #67'
+    2300104: 'Node #68'
+    2300106: 'Node #69'
+    2300108: 'Node #70'
+    2300110: 'Node #71'
+    2300112: 'Node #72'
+    2300114: 'Node #73'
+    2300116: 'Node #74'
+    2300118: 'Node #75'
+    2300120: 'Node #76'
+    2300122: 'Node #77'
+    2300124: 'Node #78'
+    2300126: 'Node #79'
+    2300128: 'Node #8'
+    2300130: 'Node #80'
+    2300132: 'Node #9'
+    3300000: 'Node #11'
+    3300002: 'Node #12'
+    3300004: 'Node #17'
+    3300006: 'Node #18'
+    3300008: 'Node #19'
+    3300010: 'Node #2'
+    3300012: 'Node #20'
+    3300014: 'Node #21'
+    3300016: 'Node #22'
+    3300018: 'Node #23'
+    3300020: 'Node #24'
+    3300022: 'Node #25'
+    3300024: 'Node #26'
+    3300026: 'Node #27'
+    3300028: 'Node #28'
+    3300030: 'Node #3'
+    3300032: 'Node #31'
+    3300034: 'Node #32'
+    3300036: 'Node #33'
+    3300038: 'Node #34'
+    3300040: 'Node #35'
+    3300042: 'Node #36'
+    3300044: 'Node #37'
+    3300046: 'Node #38'
+    3300048: 'Node #39'
+    3300050: 'Node #40'
+    3300052: 'Node #41'
+    3300054: 'Node #42'
+    3300056: 'Node #45'
+    3300058: 'Node #46'
+    3300060: 'Node #47'
+    3300062: 'Node #48'
+    3300064: 'Node #5'
+    3300066: 'Node #50'
+    3300068: 'Node #51'
+    3300070: 'Node #52'
+    3300072: 'Node #53'
+    3300074: 'Node #54'
+    3300076: 'Node #55'
+    3300078: 'Node #56'
+    3300080: 'Node #57'
+    3300082: 'Node #58'
+    3300084: 'Node #59'
+    3300086: 'Node #6'
+    3300088: 'Node #60'
+    3300090: 'Node #61'
+    3300092: 'Node #62'
+    3300094: 'Node #63'
+    3300096: 'Node #64'
+    3300098: 'Node #65'
+    3300100: 'Node #66'
+    3300102: 'Node #67'
+    3300104: 'Node #68'
+    3300106: 'Node #69'
+    3300108: 'Node #70'
+    3300110: 'Node #71'
+    3300112: 'Node #72'
+    3300114: 'Node #73'
+    3300116: 'Node #74'
+    3300118: 'Node #75'
+    3300120: 'Node #76'
+    3300122: 'Node #77'
+    3300124: 'Node #78'
+    3300126: 'Node #79'
+    3300128: 'Node #8'
+    3300130: 'Node #80'
+    3300132: 'Node #9'
+    4300000: 'Node #80'
+    4300002: 'Node #78'
+    4300004: 'Node #74'
+    4300006: 'Node #72'
+    4300008: 'Node #71'
+    4300010: 'Node #70'
+    4300012: 'Node #67'
+    4300014: 'Node #66'
+    4300016: 'Node #65'
+    4300018: 'Node #64'
+    4300020: 'Node #62'
+    4300022: 'Node #61'
+    4300024: 'Node #60'
+    4300026: 'Node #59'
+    4300028: 'Node #58'
+    4300030: 'Node #57'
+    4300032: 'Node #55'
+    4300034: 'Node #53'
+    4300036: 'Node #51'
+    4300038: 'Node #50'
+    4300040: 'Node #42'
+    4300042: 'Node #41'
+    4300044: 'Node #40'
+    4300046: 'Node #12'
+    4300048: 'Node #11'
+    4300050: 'Node #9'
+    4300052: 'Node #8'
+    4300054: 'Node #6'
+    4300056: 'Node #5'
+    9500000: //RootNode
   externalObjects: {}
   materials:
-    materialImportMode: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -14,7 +346,6 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 0
     motionNodeName: 
     rigImportErrors: 
     rigImportWarnings: 
@@ -38,49 +369,34 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    useSRGBMaterialColor: 1
-    sortHierarchyByName: 1
-    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    nodeNameCollisionStrategy: 1
-    fileIdsGeneration: 2
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
+    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
-    bakeAxisConversion: 0
     preserveHierarchy: 0
-    skinWeightsMode: 0
-    maxBonesPerVertex: 4
-    minBoneWeight: 0.001
-    optimizeBones: 1
-    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
-    secondaryUVMarginMethod: 1
-    secondaryUVMinLightmapResolution: 40
-    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
-    strictVertexDataChecks: 0
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
-    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
-    blendShapeNormalImportMode: 1
-    normalSmoothingSource: 0
-  referencedClips: []
   importAnimation: 1
+  copyAvatar: 0
   humanDescription:
-    serializedVersion: 3
+    serializedVersion: 2
     human: []
     skeleton: []
     armTwist: 0.5
@@ -90,19 +406,13 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
-  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
-  importBlendShapeDeformPercent: 1
-  remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
   assetBundleName: 
