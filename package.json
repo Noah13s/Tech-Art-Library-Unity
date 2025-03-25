@@ -2,7 +2,7 @@
   "name": "com.n04h.techartlibrary",
   "displayName": "Tech Art Library",
   "version": "0.0.2",
-  "unity": "2022.1",
+  "unity": "2018.2",
   "description": "This is N04H's personal Tech-Art-Library tools for Unity",
   "author": {
     "name": "N04H",
@@ -10,46 +10,6 @@
     "url": "http://noah-portfolio.alwaysdata.net/"
   },
   "dependencies": {
-    "com.unity.shadergraph": "14.0.10",
-    "com.unity.mathematics": "1.2.6",
-	"com.unity.inputsystem": "1.7.0",
-	"com.unity.textmeshpro": "1.7.0"
-  },
-	"samples": [
-		{
-		  "displayName": "Example 1",
-		  "description": "This sample is just an example",
-		  "path": "Samples~/Example1"
-		},
-		{
-			"displayName": "VR",
-			"description": "This sample contains VR related content",
-			"path": "Samples~/VR"
-		},
-		{
-			"displayName": "AR",
-			"description": "This sample contains AR related content",
-			"path": "Samples~/AR"
-		},
-		{
-			"displayName": "WebSocket",
-			"description": "This sample contains Websocket related content",
-			"path": "Samples~/WebSocket"
-		},
-		{
-			"displayName": "SerialPort",
-			"description": "This sample contains SerialPort related content",
-			"path": "Samples~/SerialPort"
-		},
-		{
-			"displayName": "Physics",
-			"description": "This sample contains Physics related content",
-			"path": "Samples~/Physics"
-		},
-		{
-			"displayName": "Multiplayer",
-			"description": "This sample contains Multiplayer related content",
-			"path": "Samples~/Multiplayer"
-		}
-	  ]
+
+  }
 }
