@@ -1,5 +1,4 @@
 using System;
-using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
@@ -21,8 +20,6 @@ public class Master_Counter : MonoBehaviour
     [SerializeField]
     private int startValue = 0;
 
-    public TextMeshProUGUI textToUpdate;
-
     [SerializeField] UnityEvent onConditionEvent;
 
     private int counterValue;
@@ -30,13 +27,6 @@ public class Master_Counter : MonoBehaviour
     private void Start()
     {
         counterValue = startValue;
-    }
-
-    private void OnDrawGizmos()
-    {
-        counterValueStrg = counterValue.ToString();
-        if (textToUpdate != null)
-            textToUpdate.text = counterValueStrg;
     }
 
     [ContextMenu("IncrementCounter")]
@@ -74,20 +64,18 @@ public class Master_Counter : MonoBehaviour
     private void CheckConditions()
     {
         counterValueStrg = counterValue.ToString();
-        if (textToUpdate != null)
-            textToUpdate.text = counterValueStrg;
 
         if (equal && counterValue == equalTo)
         {
-            onConditionEvent?.Invoke();
+            if (onConditionEvent != null) {  onConditionEvent.Invoke(); }
         }
         if (superior && counterValue > superiorTo)
         {
-            onConditionEvent?.Invoke();
+            if (onConditionEvent != null) { onConditionEvent.Invoke(); }
         }
         if (inferior && counterValue < inferiorTo)
         {
-            onConditionEvent?.Invoke();
+            if (onConditionEvent != null) { onConditionEvent.Invoke(); }
         }
     }
 }

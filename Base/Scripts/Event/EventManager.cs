@@ -15,11 +15,11 @@ public class NamedEvent
 }
 public class EventManager : MonoBehaviour
 {
-    [SerializeField] private List<NamedEvent> events = new();
+    [SerializeField] private List<NamedEvent> events = new List<NamedEvent>();
     public void TriggerEvent(string eventName)
     {
         NamedEvent namedEvent = events.Find(e => e.eventName == eventName);
-        namedEvent?.eventAction.Invoke();
+        if (namedEvent != null ) { namedEvent.eventAction.Invoke(); }
     }
 }
 

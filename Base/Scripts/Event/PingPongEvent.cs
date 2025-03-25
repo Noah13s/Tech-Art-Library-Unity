@@ -16,22 +16,22 @@ public class PingPongEvent : MonoBehaviour
         {
             if (!invert) 
             {
-                eventA?.Invoke();
+                if (eventA != null) { eventA.Invoke(); }
             }
             else
             {
-                eventB?.Invoke();
+                if (eventB != null) { eventB.Invoke(); }                ;
             }
         }
         else
         {
             if (!invert)
             {
-                eventB?.Invoke();
+                if (eventB != null) { eventB.Invoke(); }
             }
             else
             {
-                eventA?.Invoke();
+                if (eventA != null) { eventA.Invoke(); }
             }
         }
 
@@ -41,12 +41,12 @@ public class PingPongEvent : MonoBehaviour
 
     public void TriggerA()
     {
-        eventA?.Invoke();
+        if (eventA != null) { eventA.Invoke(); }
     }
 
     public void TriggerB()
     {
-        eventB?.Invoke();
+        if (eventB != null) { eventB.Invoke(); }
     }
 
     public void SetToggleA()
