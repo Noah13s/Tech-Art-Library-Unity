@@ -88,7 +88,7 @@ public class First_Person_Player : MonoBehaviour
     {
 #if ENABLE_INPUT_SYSTEM
         HandleNewInputSystem();
-#elif ENABLE_LEGACY_INPUT_MANAGER
+#else 
         HandleLegacyInput();
 #endif
     }
@@ -199,7 +199,7 @@ public class First_Person_Player : MonoBehaviour
 #endif
 
 
-#if ENABLE_LEGACY_INPUT_MANAGER
+#if !ENABLE_INPUT_SYSTEM
     // Handle input from the old Input Manager
     private void HandleLegacyInput()
     {
