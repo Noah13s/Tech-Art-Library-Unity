@@ -88,6 +88,7 @@ public class SphereGeneration : MonoBehaviour
 #if UNITY_EDITOR
     // Custom Editor for the script
     [CustomEditor(typeof(SphereGeneration))]
+
     public class CustomViewportEditor : Editor
     {
         public override void OnInspectorGUI()
