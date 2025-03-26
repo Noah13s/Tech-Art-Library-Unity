@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class LocalMultiplayer : MonoBehaviour
 {
-    public GridLayoutGroup gridLayout;
     public Transform gamepadList;
     public GameObject gamepadPrefab; // The prefab to instantiate
 
@@ -20,12 +19,7 @@ public class LocalMultiplayer : MonoBehaviour
     void Update()
     {
 
-        Debug.Log($"Gamepad: {Gamepad.all.Count}");
-        
-        if (gridLayout == null) { return; }
-
-        Vector2 gridLayoutScreenSize = new Vector2(gridLayout.GetComponent<RectTransform>().rect.width, gridLayout.GetComponent<RectTransform>().rect.height);
-        gridLayout.cellSize = new Vector2(gridLayoutScreenSize.x/gridLayout.constraintCount, gridLayoutScreenSize.y / gridLayout.constraintCount);
+        Debug.Log($"Gamepad: {Gamepad.all.Count}");       
     }
 
     public void DetectGamepads()

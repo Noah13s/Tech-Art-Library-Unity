@@ -83,4 +83,5 @@ public class TextChanger : MonoBehaviour
             legacyText.text = text.ToString();
         }
     }
+
 }
