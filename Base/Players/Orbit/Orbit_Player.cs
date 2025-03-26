@@ -1,4 +1,5 @@
 using System;
+using TechArtLibraryUtility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
@@ -117,6 +118,12 @@ public class Orbit_Player : MonoBehaviour
             // Rotate the camera based on mouse input            
             currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
             currentRotationY -= Input.GetAxis("Mouse Y") * sensitivityY;
+            // PSVITA Controls
+            if (UtilityMethods.AxisExists("Right Stick Vertical") && UtilityMethods.AxisExists("Right Stick Horizontal"))
+            {
+                currentRotationX += Input.GetAxis("Right Stick Horizontal");
+                currentRotationY += -Input.GetAxis("Right Stick Vertical");
+            }
 #endif
         }
         currentRotationY = Mathf.Clamp(currentRotationY, -90f, 90f); // Clamp Y rotation
