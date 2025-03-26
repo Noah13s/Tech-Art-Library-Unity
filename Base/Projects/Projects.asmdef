@@ -1,0 +1,16 @@
+{
+    "name": "Projects",
+    "rootNamespace": "",
+    "references": [
+        "GUID:55b31418decf7b54a8be8f3b67acd250"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
