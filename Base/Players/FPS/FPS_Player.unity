@@ -428,6 +428,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: ee57a21a564005248a0adf68c2ca0723, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 2300008, guid: ee57a21a564005248a0adf68c2ca0723, type: 3}
     - {fileID: 2300006, guid: ee57a21a564005248a0adf68c2ca0723, type: 3}
@@ -1258,7 +1262,7 @@ Light:
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1272,7 +1276,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -1490,7 +1494,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2023616573}
   - component: {fileID: 2023616572}
-  - component: {fileID: 2023616571}
+  - component: {fileID: 2023616574}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Player
@@ -1498,17 +1502,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2023616571
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2023616570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e5a2eaf556984143b1bf660af08c6f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!143 &2023616572
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1540,6 +1533,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2023616574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2023616570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 716fd9de2d11c3349b842e95c1e3d1ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showCursor: 0
+  airControl: 0
+  enableSlideBounce: 0
+  decelerationFactor: 30
+  bounceMultiplier: 0.5
+  bounceThreshold: 10
+  walkSpeed: 5
+  runSpeed: 10
+  jumpForce: 10
+  gravity: 20
+  lookSpeed: 2
+  lookXLimit: 80
+  joystick: {fileID: 0}
+  touchControl: {fileID: 0}
 --- !u!1 &2065319636
 GameObject:
   m_ObjectHideFlags: 0

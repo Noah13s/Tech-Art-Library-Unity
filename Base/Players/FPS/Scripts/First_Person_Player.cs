@@ -210,12 +210,12 @@ public class First_Person_Player : MonoBehaviour
         }
         else
         {
-            forwardMovement += Input.GetAxis("Vertical") * moveSpeed;
+            //forwardMovement += Input.GetAxis("Vertical") * moveSpeed;
             rightMovement += Input.GetAxis("Horizontal") * moveSpeed;
             // PSVITA Controls
             if (UtilityMethods.AxisExists("Left Stick Vertical") && UtilityMethods.AxisExists("Left Stick Horizontal"))
             {
-                forwardMovement += Input.GetAxis("Left Stick Vertical") * moveSpeed;
+                forwardMovement += -Input.GetAxis("Left Stick Vertical") * moveSpeed;
                 rightMovement += Input.GetAxis("Left Stick Horizontal") * moveSpeed;
             }
         }
@@ -307,7 +307,7 @@ public class First_Person_Player : MonoBehaviour
             if (UtilityMethods.AxisExists("Right Stick Vertical") && UtilityMethods.AxisExists("Right Stick Horizontal"))
             {
                 lookInput.x += Input.GetAxis("Right Stick Horizontal");
-                lookInput.y += Input.GetAxis("Right Stick Vertical");
+                lookInput.y += -Input.GetAxis("Right Stick Vertical");
             }
         }
         // Update rotation based on touch input
