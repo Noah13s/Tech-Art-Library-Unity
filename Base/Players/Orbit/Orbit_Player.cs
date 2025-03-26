@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 #endif
 
-public class OrbitCamera : MonoBehaviour
+public class Orbit_Player : MonoBehaviour
 {
     public Transform target; // The target object to orbit around
     public Vector3 targetOffset; // Offset for the target position
@@ -68,12 +68,6 @@ public class OrbitCamera : MonoBehaviour
     {
         Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked; // If showCursor true .none else .Locked
         Cursor.visible = showCursor;
-    }
-
-    // Reinitialize on var changed
-    private void OnValidate()
-    {
-        Initialize();
     }
 
     // Start is called before the first frame update
