@@ -1,5 +1,27 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
+
+[System.Serializable]
+public class FloatEvent : UnityEvent<float> { }
+
+public class Utility : MonoBehaviour
+{
+    [SerializeField] private FloatEvent fps;
+
+    private float smoothedFPS = 60f; // Initial FPS assumption
+    private float smoothingFactor = 0.1f; // Adjust between 0.01 (slow) to 1.0 (no smoothing)
+
+    void Update()
+    {
+        if (fps != null)
+        {
+            float currentFPS = 1.0f / Time.deltaTime;
+            smoothedFPS = Mathf.Lerp(smoothedFPS, currentFPS, smoothingFactor);
+            fps.Invoke(Mathf.Round(smoothedFPS)); // Round to whole number
+        }
+    }
+}
 
 namespace TechArtLibraryUtility
 {
@@ -339,5 +361,3 @@ namespace TechArtLibraryUtility
 #endif
     }
 }
-
-
