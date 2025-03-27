@@ -8,6 +8,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
     public double simulationScale = 1f;
     public float maxDistanceFromPlayer = 10000;
     public FloatPrecisionPlayer player;
+    [NonSerialized] public double surfaceDistance;
 
     void Update()
     {
@@ -16,7 +17,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
 
         // Calculate the distance from the object's surface.
         float objectRadius = transform.localScale.x * 0.5f;
-        double surfaceDistance = actualDistance - objectRadius;
+        surfaceDistance = actualDistance - objectRadius;
 
         if (surfaceDistance > maxDistanceFromPlayer)
         {

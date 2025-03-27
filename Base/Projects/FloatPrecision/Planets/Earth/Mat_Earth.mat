@@ -51,6 +51,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BUILTIN_CullMode: 2
     - _ColorTint: 0
     - _Intensity: 1
     - _Metalness: 0

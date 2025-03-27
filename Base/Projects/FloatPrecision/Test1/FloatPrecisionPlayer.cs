@@ -27,9 +27,8 @@ public struct DoubleVector3
 public class FloatPrecisionPlayer : MonoBehaviour
 {
     [SerializeField] GameObject world;
-    [SerializeField] float moveSpeed = 10f;
+    public float moveSpeed = 10f;
     [SerializeField] float sensitivity = 1.0f;
-    [SerializeField] float conversionFactor = 1e-6f; // Must match SimulationPlayerScaler.
 
     public DoubleVector3 playerPosition = new DoubleVector3(0, 0, 0);
 

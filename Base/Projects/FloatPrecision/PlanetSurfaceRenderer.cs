@@ -1,104 +1,99 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
-public class PlanetSurfacePatchRenderer : MonoBehaviour
+public class PlanetSurfaceRenderer : MonoBehaviour
 {
-    public PerspectiveIllusionObject perspectiveObject; // Parent that holds planet simulation info
-    public FloatPrecisionPlayer player;                   // For retrieving player simulation position
+    public PerspectiveIllusionObject perspectiveObject;
+    public double closeUpStartRange = 5000f;
+    public FloatPrecisionPlayer player;
 
-    // Settings for the local patch mesh
-    [SerializeField] private int gridResolution = 20;      // Number of vertices per side
-    [SerializeField] private float patchAngularSize = 10f;   // Angular size in degrees of the patch
+    [SerializeField] private Transform closeUpTarget; // GameObject at (0,0,0) with local mesh
+    [SerializeField] private float detailAngleThreshold = 0.5f;
 
-    private Mesh patchMesh;
-    private MeshFilter meshFilter;
+    private Mesh originalMesh;
+    private Mesh localMesh;
+    private MeshFilter closeUpMeshFilter;
+    private bool meshGenerated = false;
+    private DoubleVector3 referencePlayerPosition;
 
-    // We'll regenerate the patch when the player is close enough
     void Start()
     {
-        meshFilter = GetComponent<MeshFilter>();
-        patchMesh = new Mesh();
-        meshFilter.mesh = patchMesh;
-        GeneratePatchMesh();
+        if (closeUpTarget == null)
+        {
+            Debug.LogError("PlanetSurfaceRenderer: closeUpTarget is not assigned!");
+            return;
+        }
+
+        // Get the mesh filter of the close-up object
+        closeUpMeshFilter = closeUpTarget.GetComponent<MeshFilter>();
+        if (closeUpMeshFilter == null)
+        {
+            Debug.LogError("PlanetSurfaceRenderer: closeUpTarget must have a MeshFilter!");
+            return;
+        }
+
+        // Store the original planet mesh
+        originalMesh = GetComponent<MeshFilter>().sharedMesh;
+
+        // Create a new mesh for close-up rendering
+        localMesh = new Mesh();
+        closeUpMeshFilter.mesh = localMesh;
     }
 
     void Update()
     {
-        // Compute the patch center: find the point on the planet's surface closest to the player.
-        // Use the player's simulation position (converted to world space via PerspectiveIllusionObject)
-        DoubleVector3 planetSimPos = perspectiveObject.simulationPosition;
-        DoubleVector3 playerSimPos = player.playerPosition;
-        DoubleVector3 toPlayer = playerSimPos - planetSimPos;
-        // Get the direction and assume the planet is a sphere with radius based on current scale.
-        float planetRadius = transform.localScale.x * 0.5f;
-        Vector3 patchCenter = transform.position + ((Vector3)toPlayer.Normalized()) * planetRadius;
+        if (perspectiveObject == null || closeUpTarget == null)
+            return;
 
-        // Now, in a local coordinate system centered at patchCenter,
-        // the patch mesh’s vertex values are small, reducing floating‑point issues.
-        // Here we reproject our patch vertices:
-        Vector3[] vertices = patchMesh.vertices;
-        for (int i = 0; i < vertices.Length; i++)
+
+        if (perspectiveObject.surfaceDistance < closeUpStartRange)
         {
-            // Convert the vertex from local space to world space then back to patch-local space.
-            Vector3 worldPos = transform.TransformPoint(vertices[i]);
-            vertices[i] = worldPos - patchCenter;
-        }
-        patchMesh.vertices = vertices;
-        patchMesh.RecalculateNormals();
+            if (!meshGenerated)
+            {
+                GenerateCloseUpMesh();
+                meshGenerated = true;
+            }
 
-        // Optionally, update patch orientation if the player moves significantly.
+        }
+        // Move the close-up mesh to follow the player
+        DoubleVector3 relativePosition = (referencePlayerPosition - player.playerPosition);
+        Vector3 playerLocalPos = (Vector3)relativePosition;
+        closeUpTarget.position = playerLocalPos * 0.01f;
     }
 
-    // Generates a simple grid mesh that approximates a patch of the planet's surface.
-    void GeneratePatchMesh()
+    private void GenerateCloseUpMesh()
     {
-        Vector3[] vertices = new Vector3[(gridResolution + 1) * (gridResolution + 1)];
-        int[] triangles = new int[gridResolution * gridResolution * 6];
+        Vector3 playerLocalPos = transform.InverseTransformPoint(Vector3.zero);
+        Vector3 directionToPlayer = playerLocalPos.normalized;
 
-        // For simplicity, we map the patch to a tangent plane.
-        // The patch covers an angular size, so we convert angular offsets (in radians) to a local grid.
-        float halfAngle = patchAngularSize * 0.5f * Mathf.Deg2Rad;
-        for (int y = 0; y <= gridResolution; y++)
+        // Get original mesh data
+        Vector3[] vertices = originalMesh.vertices;
+        Vector3[] modifiedVertices = new Vector3[vertices.Length];
+
+        for (int i = 0; i < vertices.Length; i++)
         {
-            for (int x = 0; x <= gridResolution; x++)
-            {
-                float u = (float)x / gridResolution;
-                float v = (float)y / gridResolution;
-                // Map u,v to angular offsets in the tangent plane.
-                float angleX = Mathf.Lerp(-halfAngle, halfAngle, u);
-                float angleY = Mathf.Lerp(-halfAngle, halfAngle, v);
+            Vector3 vertexDir = vertices[i].normalized;
+            float dot = Vector3.Dot(vertexDir, directionToPlayer);
 
-                // Use a simple approximation: for small angles, sin(angle) ~ angle.
-                // Define the displacement on the tangent plane.
-                Vector3 offset = new Vector3(Mathf.Sin(angleX), Mathf.Sin(angleY), 0);
-                // Place vertices on a spherical surface patch.
-                // For a sphere of radius R, a point offset by (angleX, angleY) on the tangent plane 
-                // can be approximated by projecting onto the sphere:
-                float R = transform.localScale.x * 0.5f;
-                float z = Mathf.Sqrt(Mathf.Max(R * R - offset.x * offset.x - offset.y * offset.y, 0));
-                vertices[y * (gridResolution + 1) + x] = new Vector3(offset.x, offset.y, z);
+            if (dot > detailAngleThreshold)
+            {
+                // Convert the original planet mesh coordinates into the new local space.
+                modifiedVertices[i] = vertices[i] - playerLocalPos;
+            }
+            else
+            {
+                // Hide the vertex (collapse it to center to remove unwanted areas)
+                modifiedVertices[i] = Vector3.zero;
             }
         }
 
-        // Create triangles for the grid.
-        int triIndex = 0;
-        for (int y = 0; y < gridResolution; y++)
-        {
-            for (int x = 0; x < gridResolution; x++)
-            {
-                int index = y * (gridResolution + 1) + x;
-                triangles[triIndex++] = index;
-                triangles[triIndex++] = index + gridResolution + 1;
-                triangles[triIndex++] = index + 1;
+        // Apply the modified vertices to the close-up mesh
+        localMesh.vertices = modifiedVertices;
+        localMesh.triangles = originalMesh.triangles; // Keep the original connectivity
+        localMesh.normals = originalMesh.normals;
+        localMesh.RecalculateNormals();
+        closeUpTarget.localScale = transform.localScale;
 
-                triangles[triIndex++] = index + 1;
-                triangles[triIndex++] = index + gridResolution + 1;
-                triangles[triIndex++] = index + gridResolution + 2;
-            }
-        }
-
-        patchMesh.vertices = vertices;
-        patchMesh.triangles = triangles;
-        patchMesh.RecalculateNormals();
+        referencePlayerPosition = player.playerPosition;
     }
 }
