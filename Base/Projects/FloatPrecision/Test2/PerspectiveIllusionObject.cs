@@ -1,6 +1,7 @@
 using UnityEngine;
 
 using System;
+using UnityEngine.Events;
 
 public class PerspectiveIllusionObject : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
     public float maxDistanceFromPlayer = 10000;
     public FloatPrecisionPlayer player;
     [NonSerialized] public double surfaceDistance;
+    [SerializeField] private UnityEvent<Int64> altitude;
 
     void Update()
     {
@@ -18,6 +20,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
         // Calculate the distance from the object's surface.
         float objectRadius = transform.localScale.x * 0.5f;
         surfaceDistance = actualDistance - objectRadius;
+        altitude?.Invoke((long)surfaceDistance);
 
         if (surfaceDistance > maxDistanceFromPlayer)
         {

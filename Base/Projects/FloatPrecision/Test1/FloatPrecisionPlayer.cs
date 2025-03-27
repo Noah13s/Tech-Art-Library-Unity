@@ -15,6 +15,7 @@ public struct DoubleVector3
     public static DoubleVector3 operator *(DoubleVector3 a, double d) =>
         new DoubleVector3(a.x * d, a.y * d, a.z * d);
     public double Magnitude() => Math.Sqrt(x * x + y * y + z * z);
+    public DoubleVector3 Negate() => new DoubleVector3(-x, -y, -z);
     public DoubleVector3 Normalized()
     {
         double mag = Magnitude();
@@ -22,6 +23,13 @@ public struct DoubleVector3
     }
     public static explicit operator Vector3(DoubleVector3 d) =>
         new Vector3((float)d.x, (float)d.y, (float)d.z);
+
+    public DoubleVector3 Cross(DoubleVector3 other) =>
+    new DoubleVector3(
+        y * other.z - z * other.y,
+        z * other.x - x * other.z,
+        x * other.y - y * other.x
+    );
 }
 
 public class FloatPrecisionPlayer : MonoBehaviour
@@ -46,6 +54,12 @@ public class FloatPrecisionPlayer : MonoBehaviour
             // Convert transform.forward to DoubleVector3 and update position in double space.
             DoubleVector3 forward = new DoubleVector3(transform.forward.x, transform.forward.y, transform.forward.z);
             playerPosition = playerPosition + forward * (moveSpeed * Time.deltaTime);
+        }
+        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+        {
+            // Convert transform.forward to DoubleVector3 and update position in double space.
+            DoubleVector3 forward = new DoubleVector3(transform.forward.x, transform.forward.y, transform.forward.z);
+            playerPosition = playerPosition + forward.Negate() * (moveSpeed * Time.deltaTime);
         }
     }
 }

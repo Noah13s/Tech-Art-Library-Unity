@@ -1,111 +1,132 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class SphereSurfaceGenerator : MonoBehaviour
+public class SphereSurfacePatchGenerator : MonoBehaviour
 {
-    public double simulationScale = 1.0; // The scale of the simulation (planet) the surface of the planet starts at that value
-    public DoubleVector3 simulationPosition = new DoubleVector3(0, 0, 0); // The center of the simulation (planet)
+    [Header("References")]
+    public PerspectiveIllusionObject planet;
     public FloatPrecisionPlayer player;
-    public double generationRange = 1000.0; // How far to generate the surface around the player
 
-    private Mesh mesh;
+    [Header("Proximity Settings")]
+    public float proximityRange = 50f;    // Range (from planet's surface) to generate the patch
+
+    [Header("Mesh Settings")]
+    public int gridResolution = 10;       // Number of segments for the patch
+    public float minPatchSize = 10f;      // Smallest patch size (when far away)
+    public float maxPatchSize = 100f;     // Largest patch size (when up close)
+
     private MeshFilter meshFilter;
+    private Mesh patchMesh;
 
     void Start()
     {
+        // Get (or add) MeshFilter and MeshRenderer components
         meshFilter = GetComponent<MeshFilter>();
         if (meshFilter == null)
-        {
             meshFilter = gameObject.AddComponent<MeshFilter>();
-        }
 
-        mesh = new Mesh();
-        meshFilter.mesh = mesh;
+        if (GetComponent<MeshRenderer>() == null)
+            gameObject.AddComponent<MeshRenderer>();
+
+        patchMesh = new Mesh();
+        patchMesh.name = "Surface Patch Mesh";
+        meshFilter.mesh = patchMesh;
     }
 
     void Update()
     {
-        // Calculate the distance between the player and the simulation center
-        double distanceToSimulationCenter = (simulationPosition - player.playerPosition).Magnitude();
+        if (planet == null || player == null)
+            return;
 
-        // Generate the surface if the player is within the generation range
-        if (distanceToSimulationCenter <= generationRange)
+        // Use the surfaceDistance computed by the PerspectiveIllusionObject
+        if (planet.surfaceDistance <= proximityRange)
         {
-            GenerateSurface();
+            // Compute the effective planet center in absolute (simulation) coordinates.
+            // planet.transform.position is relative to the player, so add player.playerPosition.
+            Vector3 effectiveCenter = planet.transform.position + (Vector3)player.playerPosition;
+
+            // Calculate patch size based on distance: up close, use maxPatchSize; far away, minPatchSize.
+            float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
+
+            GenerateSurfacePatch(effectiveCenter, patchSize);
         }
         else
         {
-            mesh.Clear(); // Clear the mesh if the player is outside the generation range
+            if (patchMesh != null)
+                patchMesh.Clear();
         }
     }
 
-    void GenerateSurface()
+    void GenerateSurfacePatch(Vector3 effectiveCenter, float patchSize)
     {
-        // Create a list to store the vertices, edges, and faces
-        List<Vector3> vertices = new List<Vector3>();
+        // Convert effective center to DoubleVector3
+        DoubleVector3 effectiveCenterDV = new DoubleVector3(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
+        DoubleVector3 playerPosDV = player.playerPosition;
+
+        // Use the planet's effective scale (set by the PerspectiveIllusionObject) to determine its radius.
+        // Since planet.simulationScale represents half the diameter, the radius is:
+        double effectiveRadius = planet.transform.localScale.x * 0.5;
+
+        // Direction from the planet's center to the player (in absolute coordinates)
+        DoubleVector3 direction = (playerPosDV - effectiveCenterDV).Normalized();
+
+        // Compute the surface point on the planet (the point closest to the player)
+        DoubleVector3 surfacePoint = effectiveCenterDV + direction * effectiveRadius;
+
+        // Build a tangent plane at the surfacePoint.
+        // Use the direction from center to player as the 'up' vector.
+        DoubleVector3 up = direction;
+        // Compute a 'right' vector via cross product with an arbitrary vector.
+        DoubleVector3 right = new DoubleVector3(0, 1, 0).Cross(up);
+        if (right.Magnitude() == 0)
+            right = new DoubleVector3(0, 0, 1).Cross(up);
+        right = right.Normalized();
+        DoubleVector3 forward = right.Cross(up).Normalized();
+
+        List<DoubleVector3> vertices = new List<DoubleVector3>();
         List<int> triangles = new List<int>();
 
-        // Define resolution of the sphere segment (latitude and longitude divisions)
-        int longitudeSegments = 20;  // Number of divisions around the Y axis
-        int latitudeSegments = 10;   // Number of divisions from top to bottom
-
-        double sphereRadius = (simulationPosition - player.playerPosition).Magnitude() * simulationScale; // Scale the radius based on distance and scale
-
-        // Generate vertices for the surface (only the portion within range of the player)
-        for (int lat = 0; lat <= latitudeSegments; lat++)
+        // Create a grid in the tangent plane and project each point onto the sphere.
+        for (int y = 0; y <= gridResolution; y++)
         {
-            double theta = (lat * Mathf.PI) / latitudeSegments; // Latitude angle
-
-            for (int lon = 0; lon <= longitudeSegments; lon++)
+            for (int x = 0; x <= gridResolution; x++)
             {
-                double phi = (lon * 2 * Mathf.PI) / longitudeSegments; // Longitude angle
+                // Offsets in the plane, centered at 0
+                double u = ((double)x / gridResolution - 0.5) * patchSize;
+                double v = ((double)y / gridResolution - 0.5) * patchSize;
 
-                // Calculate the position of the vertex on the sphere's surface
-                double x = sphereRadius * Mathf.Sin((float)theta) * Mathf.Cos((float)phi);
-                double y = sphereRadius * Mathf.Cos((float)theta);
-                double z = sphereRadius * Mathf.Sin((float)theta) * Mathf.Sin((float)phi);
+                // Point on the tangent plane
+                DoubleVector3 pointOnPlane = surfacePoint + right * u + forward * v;
 
-                // Calculate the vertex position and adjust based on the simulation's center
-                DoubleVector3 vertexPosition = new DoubleVector3(x, y, z) + simulationPosition;
+                // Project the point onto the sphere by normalizing the direction from planet center
+                DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
+                DoubleVector3 pointOnSphere = effectiveCenterDV + dirFromCenter * effectiveRadius;
 
-                // Check if the vertex is within the generation range of the player
-                double distanceToPlayer = (vertexPosition - player.playerPosition).Magnitude();
-                if (distanceToPlayer <= generationRange)
-                {
-                    vertices.Add((Vector3)(vertexPosition));
-                }
+                // Make vertex relative to player (for high precision rendering)
+                vertices.Add(pointOnSphere - playerPosDV);
             }
         }
 
-        // Generate faces (triangles) for the generated vertices
-        for (int lat = 0; lat < latitudeSegments; lat++)
+        // Build triangles for the grid
+        for (int y = 0; y < gridResolution; y++)
         {
-            for (int lon = 0; lon < longitudeSegments; lon++)
+            for (int x = 0; x < gridResolution; x++)
             {
-                int current = lat * (longitudeSegments + 1) + lon;
-                int next = current + longitudeSegments + 1;
+                int i = y * (gridResolution + 1) + x;
+                triangles.Add(i);
+                triangles.Add(i + gridResolution + 1);
+                triangles.Add(i + 1);
 
-                // Create triangles for the mesh
-                if (lat != latitudeSegments - 1)
-                {
-                    triangles.Add(current);
-                    triangles.Add(next);
-                    triangles.Add(current + 1);
-                }
-
-                if (lat != 0)
-                {
-                    triangles.Add(current + 1);
-                    triangles.Add(next);
-                    triangles.Add(next + 1);
-                }
+                triangles.Add(i + 1);
+                triangles.Add(i + gridResolution + 1);
+                triangles.Add(i + gridResolution + 2);
             }
         }
 
-        // Apply vertices and triangles to the mesh
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
+        // Update mesh (convert DoubleVector3 to Vector3)
+        patchMesh.Clear();
+        patchMesh.SetVertices(vertices.ConvertAll(v => (Vector3)v));
+        patchMesh.SetTriangles(triangles, 0);
+        patchMesh.RecalculateNormals();
     }
 }
