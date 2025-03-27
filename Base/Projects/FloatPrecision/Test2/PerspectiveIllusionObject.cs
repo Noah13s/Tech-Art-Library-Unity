@@ -1,31 +1,35 @@
 using UnityEngine;
 
+using System;
+
 public class PerspectiveIllusionObject : MonoBehaviour
 {
-    public Vector3 simulationPosition;
-    public float simulationScale = 1f;
+    public DoubleVector3 simulationPosition;
+    public double simulationScale = 1f;
     public float maxDistanceFromPlayer = 10000;
     public FloatPrecisionPlayer player;
 
     void Update()
     {
-        Vector3 relativePosition = simulationPosition - player.playerPosition;
-        float actualDistance = relativePosition.magnitude;
+        DoubleVector3 relativePosition = simulationPosition - player.playerPosition;
+        double actualDistance = relativePosition.Magnitude();
 
-        if (actualDistance > maxDistanceFromPlayer)
+        // Calculate the distance from the object's surface.
+        float objectRadius = transform.localScale.x * 0.5f;
+        double surfaceDistance = actualDistance - objectRadius;
+
+        if (surfaceDistance > maxDistanceFromPlayer)
         {
-            // Position at max distance from visual center (0,0,0)
-            Vector3 direction = relativePosition.normalized;
-            transform.position = direction * maxDistanceFromPlayer;
-
-            // Scale down based on actual distance
-            transform.localScale = Vector3.one * simulationScale * (maxDistanceFromPlayer / actualDistance);
+            DoubleVector3 direction = relativePosition.Normalized();
+            DoubleVector3 newPos = direction * (maxDistanceFromPlayer + objectRadius);
+            transform.position = (Vector3)newPos;
+            float scaleFactor = (float)simulationScale * ((float)maxDistanceFromPlayer / (float)surfaceDistance);
+            transform.localScale = Vector3.one * scaleFactor;
         }
         else
         {
-            // Use relative position and full scale
-            transform.position = relativePosition;
-            transform.localScale = Vector3.one * simulationScale;
+            transform.position = (Vector3)relativePosition;
+            transform.localScale = Vector3.one * (float)simulationScale;
         }
     }
 }

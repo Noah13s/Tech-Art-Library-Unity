@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -7,28 +8,30 @@ using UnityEngine.InputSystem.Controls;
 public class OrbitCamera : MonoBehaviour
 {
     public Transform target; // The target object to orbit around
-    public Vector3 targetOffset; // Offset for the target position
-    public float distance = 10f; // The distance from the target
-    public float sensitivityX = 1f; // Mouse X sensitivity
-    public float sensitivityY = 1f; // Mouse Y sensitivity
-    public bool allowScrolling = true; // Whether scrolling is allowed
-    public float scrollSpeed = 1f; // Scrollwheel sensitivity
-    public bool showCursor = true; // Whether to show the cursor
-    public float cameraLag = 5f; // Camera lag for target position
-    public LayerMask collisionLayer; // Layer mask for collision detection
-    public float collisionOffset = 0.2f; // Offset for collision detection
-    public bool RightClickMove = true; // Whether moving the camera by right-clicking is allowed
+    [SerializeField] private Vector3 positionOffset; // Offset for the target position
+    [SerializeField] private Vector3 rotationOffset; // Offset for the target position
+    [SerializeField] private float distance = 10f; // The distance from the target
+    [SerializeField] private float sensitivityX = 1f; // Mouse X sensitivity
+    [SerializeField] private float sensitivityY = 1f; // Mouse Y sensitivity
+    [SerializeField] private bool allowScrolling = true; // Whether scrolling is allowed
+    [SerializeField] private float scrollSpeed = 1f; // Scrollwheel sensitivity
+    [SerializeField] private bool showCursor = true; // Whether to show the cursor
+    [SerializeField] private float cameraLag = 5f; // Camera lag for target position
+    [SerializeField] private LayerMask collisionLayer; // Layer mask for collision detection
+    [SerializeField] private float collisionOffset = 0.2f; // Offset for collision detection
+    [SerializeField] private bool rightClickMove = true; // Whether moving the camera by right-clicking is allowed
+    [SerializeField] private bool absoluteUp = true; // If true, the camera rotates around world up. If false, it follows the target's rotation.
+    [SerializeField][ConditionalVisibility("rightClickMove")] private UnityEvent onClickMoveEnded;
 
     [NonSerialized]
     public bool lockCamera = false; // Lock the camera movements
+
 
     private float currentRotationX = 0f;
     private float currentRotationY = 0f;
     private Vector3 targetPosition;
 #if ENABLE_INPUT_SYSTEM
-    private InputSystem_Actions PCcontrols;
-    private ControllerInputs ControllerControls;
-    private TouchInputs Touchcontrols;
+    private InputSystem_Actions controls;
 #endif
 
     private void Awake()
@@ -36,9 +39,7 @@ public class OrbitCamera : MonoBehaviour
 
         // Initialize the new input system controls
 #if ENABLE_INPUT_SYSTEM
-        PCcontrols = new ();
-        ControllerControls = new ControllerInputs();
-        Touchcontrols = new TouchInputs();
+        controls = new ();
 #endif
     }
 
@@ -46,9 +47,9 @@ public class OrbitCamera : MonoBehaviour
     {
         // Enable the input controls
 #if ENABLE_INPUT_SYSTEM
-        PCcontrols.Enable();
-        ControllerControls.Enable();
-        Touchcontrols.Enable();
+        controls.Enable();
+        controls.Orbit_Player.LeftButton.performed += OnButtonPressed;
+        controls.Orbit_Player.LeftButton.canceled += OnButtonReleased;
 #endif
     }
 
@@ -56,9 +57,9 @@ public class OrbitCamera : MonoBehaviour
     {
         // Disable the input controls
 #if ENABLE_INPUT_SYSTEM
-        PCcontrols.Disable();
-        ControllerControls.Disable();
-        Touchcontrols.Disable();
+        controls.Disable();
+        controls.Orbit_Player.LeftButton.performed -= OnButtonPressed;
+        controls.Orbit_Player.LeftButton.canceled -= OnButtonReleased;
 #endif
     }
 
@@ -68,35 +69,29 @@ public class OrbitCamera : MonoBehaviour
         Cursor.visible = showCursor;
     }
 
-    // Reinitialize on var changed
-    private void OnValidate()
-    {
-        Initialize();
-    }
-
     // Start is called before the first frame update
     void Start()
     {
         Initialize();
         // Initialize target position
-        targetPosition = target.position + targetOffset;
+        targetPosition = target.position + positionOffset;
 
         // Initialize looking direction 
-        currentRotationX = target.rotation.eulerAngles.y + 180;
+        currentRotationX = target.rotation.eulerAngles.y + rotationOffset.y;
     }
 
     void Update()
     {
         if (lockCamera) return;
 
-        if (RightClickMove)
+        if (rightClickMove)
         {
 #if ENABLE_INPUT_SYSTEM
-            if (PCcontrols.Orbit_Player.LeftButton.IsPressed() && IsCursorOverGameWindow())
+            if (controls.Orbit_Player.LeftButton.IsPressed() && IsCursorOverGameWindow())
             {
                 // Rotate the camera based on mouse input            
-                currentRotationX += PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
-                currentRotationY -= PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
+                currentRotationX += controls.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
+                currentRotationY -= controls.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
             }
 #else
             if (Input.GetMouseButton(1) && IsCursorOverGameWindow())
@@ -111,12 +106,8 @@ public class OrbitCamera : MonoBehaviour
         {
 #if ENABLE_INPUT_SYSTEM
             // Rotate the camera based on input
-            currentRotationX += ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().x * sensitivityX;
-            currentRotationY -= ControllerControls.ControllerActionMap.RightJoystick.ReadValue<Vector2>().y * sensitivityY;
-            currentRotationX += PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
-            currentRotationY -= PCcontrols.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
-            currentRotationX += Touchcontrols.Touch.Delta.ReadValue<Vector2>().x * sensitivityX;
-            currentRotationY -= Touchcontrols.Touch.Delta.ReadValue<Vector2>().y * sensitivityY;
+            currentRotationX += controls.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;
+            currentRotationY -= controls.Orbit_Player.Delta.ReadValue<Vector2>().y * sensitivityY;
 #else
             // Rotate the camera based on mouse input            
             currentRotationX += Input.GetAxis("Mouse X") * sensitivityX;
@@ -129,7 +120,7 @@ public class OrbitCamera : MonoBehaviour
         if (allowScrolling && IsCursorOverGameWindow())
         {
 #if ENABLE_INPUT_SYSTEM
-            distance += PCcontrols.Orbit_Player.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
+            distance += controls.Orbit_Player.ScrollWheel.ReadValue<Vector2>().y * scrollSpeed;
 #else
             distance -= Input.GetAxis("Mouse ScrollWheel") * scrollSpeed;
 #endif
@@ -137,13 +128,19 @@ public class OrbitCamera : MonoBehaviour
         }
 
         // Calculate the rotation and position
-        Quaternion rotation = Quaternion.Euler(currentRotationY, currentRotationX, 0);
+        // Compute the base rotation based on absoluteUp
+        Quaternion baseRotation = absoluteUp ? Quaternion.Euler(0, currentRotationX, 0) : target.rotation * Quaternion.Euler(0, currentRotationX, 0);
+        Quaternion rotation = baseRotation * Quaternion.Euler(currentRotationY, 0, 0);
+
+        // Apply targetOffset relative to the target's local orientation when absoluteUp is false
+        Vector3 effectiveOffset = absoluteUp ? positionOffset : target.rotation * positionOffset;
+
         Vector3 direction = rotation * Vector3.forward * -distance;
-        Vector3 desiredPosition = target.position + targetOffset + direction;
+        Vector3 desiredPosition = target.position + effectiveOffset + direction;
 
         // Handle camera collision
         RaycastHit hit;
-        if (Physics.Linecast(target.position + targetOffset, desiredPosition, out hit, collisionLayer))
+        if (Physics.Linecast(target.position + positionOffset, desiredPosition, out hit, collisionLayer))
         {
             // If collision detected, adjust the desired position
             targetPosition = hit.point + hit.normal * collisionOffset;
@@ -170,10 +167,9 @@ public class OrbitCamera : MonoBehaviour
         transform.rotation = rotation;
     }
 
-    bool IsCursorOverGameWindow()
+    private bool IsCursorOverGameWindow()
     {
-        // Check if EventSystem is used (for UI detection)
-        if (EventSystem.current.IsPointerOverGameObject())
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
             return true;
         }
@@ -183,7 +179,7 @@ public class OrbitCamera : MonoBehaviour
 
 #if ENABLE_INPUT_SYSTEM
         // New Input System
-        mousePosition = PCcontrols.Orbit_Player.Position.ReadValue<Vector2>();
+        mousePosition = controls.Orbit_Player.Position.ReadValue<Vector2>();
 #else
         // Legacy Input System
         mousePosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -197,5 +193,20 @@ public class OrbitCamera : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void ResetCamera()
+    {
+        currentRotationX = target.rotation.eulerAngles.y + rotationOffset.y;
+    }
+
+    private void OnButtonPressed(InputAction.CallbackContext context)
+    {
+        // You can start rotating here if desired
+    }
+
+    private void OnButtonReleased(InputAction.CallbackContext context)
+    {
+        onClickMoveEnded.Invoke();
     }
 }

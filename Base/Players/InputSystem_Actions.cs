@@ -286,6 +286,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""6a3980e7-8970-4d7c-adc5-8826800e2915"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -341,6 +350,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""RightButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3c213b28-bf21-44fc-b31a-0405c53411df"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -994,6 +1014,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Orbit_Player_ScrollWheel = m_Orbit_Player.FindAction("ScrollWheel", throwIfNotFound: true);
         m_Orbit_Player_LeftButton = m_Orbit_Player.FindAction("LeftButton", throwIfNotFound: true);
         m_Orbit_Player_RightButton = m_Orbit_Player.FindAction("RightButton", throwIfNotFound: true);
+        m_Orbit_Player_Look = m_Orbit_Player.FindAction("Look", throwIfNotFound: true);
         // Helicopter_Player
         m_Helicopter_Player = asset.FindActionMap("Helicopter_Player", throwIfNotFound: true);
         m_Helicopter_Player_Tilt = m_Helicopter_Player.FindAction("Tilt", throwIfNotFound: true);
@@ -1209,6 +1230,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Orbit_Player_ScrollWheel;
     private readonly InputAction m_Orbit_Player_LeftButton;
     private readonly InputAction m_Orbit_Player_RightButton;
+    private readonly InputAction m_Orbit_Player_Look;
     public struct Orbit_PlayerActions
     {
         private @InputSystem_Actions m_Wrapper;
@@ -1218,6 +1240,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         public InputAction @ScrollWheel => m_Wrapper.m_Orbit_Player_ScrollWheel;
         public InputAction @LeftButton => m_Wrapper.m_Orbit_Player_LeftButton;
         public InputAction @RightButton => m_Wrapper.m_Orbit_Player_RightButton;
+        public InputAction @Look => m_Wrapper.m_Orbit_Player_Look;
         public InputActionMap Get() { return m_Wrapper.m_Orbit_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1242,6 +1265,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RightButton.started += instance.OnRightButton;
             @RightButton.performed += instance.OnRightButton;
             @RightButton.canceled += instance.OnRightButton;
+            @Look.started += instance.OnLook;
+            @Look.performed += instance.OnLook;
+            @Look.canceled += instance.OnLook;
         }
 
         private void UnregisterCallbacks(IOrbit_PlayerActions instance)
@@ -1261,6 +1287,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @RightButton.started -= instance.OnRightButton;
             @RightButton.performed -= instance.OnRightButton;
             @RightButton.canceled -= instance.OnRightButton;
+            @Look.started -= instance.OnLook;
+            @Look.performed -= instance.OnLook;
+            @Look.canceled -= instance.OnLook;
         }
 
         public void RemoveCallbacks(IOrbit_PlayerActions instance)
@@ -1564,6 +1593,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnScrollWheel(InputAction.CallbackContext context);
         void OnLeftButton(InputAction.CallbackContext context);
         void OnRightButton(InputAction.CallbackContext context);
+        void OnLook(InputAction.CallbackContext context);
     }
     public interface IHelicopter_PlayerActions
     {
