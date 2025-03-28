@@ -1,6 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+
+/// <summary>
+/// Vector 3 based on doubles instead of floats for handling very large values.<br></br>
+/// </summary>
 [System.Serializable]
 public struct DoubleVector3
 {
@@ -45,10 +49,12 @@ public struct DoubleVector3
 
 public class FloatPrecisionPlayer : MonoBehaviour
 {
-    [SerializeField] GameObject world;
+    [Tooltip("Position movement speed in m/s.")]
     [SerializeField] private float moveSpeed = 10f;
+    [Tooltip("Angular movement speed.")]
     [SerializeField] float sensitivity = 1.0f;
 
+    [Tooltip("Actual DoubleVector3 player position in the world.\nNot to confuse with the transforms position.")]
     public DoubleVector3 playerPosition = new (0, 0, 0);
 
     [SerializeField] private UnityEvent<string> playerPositionEvent;
@@ -80,6 +86,10 @@ public class FloatPrecisionPlayer : MonoBehaviour
         playerSpeed?.Invoke(moveSpeed);
     }
 
+    /// <summary>
+    /// Sets the position movement speed.<br></br>
+    /// </summary>
+    /// <param name="_speed">New speed value in m/s</param>
     public void SetSpeed(float _speed)
     {
         moveSpeed = _speed;

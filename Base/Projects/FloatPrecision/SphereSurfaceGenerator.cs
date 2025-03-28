@@ -7,7 +7,6 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public PerspectiveIllusionObject planet;
     public FloatPrecisionPlayer player;
     public Texture2D heightMap;             // Height map texture
-    public float elevationIntensity = 10f;  // Controls how much the height map affects the mesh
 
     [Header("Proximity Settings")]
     public float proximityRange = 50f;      // Range (from planet's surface) to generate the patch
@@ -16,6 +15,12 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public int gridResolution = 10;         // Number of segments for the patch
     public float minPatchSize = 10f;        // Smallest patch size (when far away)
     public float maxPatchSize = 100f;       // Largest patch size (up close)
+
+    [Header("Height Map Control")]
+    public float elevationStrength = 10f;   // Maximum elevation displacement from height map
+    public Vector2 heightMapUVScale = Vector2.one;  // Scale the UV coordinates for height map sampling
+    public Vector2 heightMapUVOffset = Vector2.zero;  // Offset for UV coordinates for height map sampling
+    public AnimationCurve heightMapRemapCurve = AnimationCurve.Linear(0, 0, 1, 1); // Remaps the raw height value
 
     private MeshFilter meshFilter;
     private Mesh patchMesh;
@@ -61,24 +66,16 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
     void GenerateSurfacePatch(Vector3 effectiveCenter, float patchSize)
     {
-        // Convert effective center to DoubleVector3
         DoubleVector3 effectiveCenterDV = new DoubleVector3(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
         DoubleVector3 playerPosDV = player.playerPosition;
 
-        // Use the planet's effective scale to determine its radius.
-        // Assuming planet.simulationScale represents the full diameter, the radius is:
+        // Planet's radius (assuming simulationScale represents full diameter)
         double effectiveRadius = planet.transform.localScale.x * 0.5;
-
-        // Direction from the planet's center to the player (in absolute coordinates)
         DoubleVector3 direction = (playerPosDV - effectiveCenterDV).Normalized();
-
-        // Compute the surface point on the planet (the point closest to the player)
         DoubleVector3 surfacePoint = effectiveCenterDV + direction * effectiveRadius;
 
-        // Build a tangent plane at the surfacePoint.
-        // Use the direction from center to player as the 'up' vector.
+        // Build a tangent plane at surfacePoint
         DoubleVector3 up = direction;
-        // Compute a 'right' vector via cross product with an arbitrary vector.
         DoubleVector3 right = new DoubleVector3(0, 1, 0).Cross(up);
         if (right.Magnitude() == 0)
             right = new DoubleVector3(0, 0, 1).Cross(up);
@@ -94,35 +91,37 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         {
             for (int x = 0; x <= gridResolution; x++)
             {
-                // Offsets in the plane, centered at 0
                 double offsetU = ((double)x / gridResolution - 0.5) * patchSize;
                 double offsetV = ((double)y / gridResolution - 0.5) * patchSize;
-
-                // Point on the tangent plane
                 DoubleVector3 pointOnPlane = surfacePoint + right * offsetU + forward * offsetV;
-
-                // Project the point onto the sphere by normalizing the direction from planet center
                 DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
                 DoubleVector3 pointOnSphere = effectiveCenterDV + dirFromCenter * effectiveRadius;
 
-                // --- Elevation from Height Map ---
+                // --- Elevation from Height Map with More Control ---
                 if (heightMap != null)
                 {
-                    // Calculate spherical UV coordinates based on the planet's actual simulation center.
-                    // This ensures the correct area of the height map is sampled.
+                    // Calculate spherical UV coordinates based on the planet's simulation center.
                     Vector3 normalForUV = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
                     float texU = Mathf.Atan2(normalForUV.z, normalForUV.x) / (2 * Mathf.PI) + 0.5f;
                     float texV = 1 - (Mathf.Acos(normalForUV.y) / Mathf.PI);
-                    // Sample the height map (assuming height is stored in the red channel)
-                    float elevation = heightMap.GetPixelBilinear(texU, texV).r * elevationIntensity;
-                    // Displace the point along its normal.
+
+                    // Apply additional UV scale and offset.
+                    texU = texU * heightMapUVScale.x + heightMapUVOffset.x;
+                    texV = texV * heightMapUVScale.y + heightMapUVOffset.y;
+
+                    // Sample height map (red channel)
+                    float rawHeight = heightMap.GetPixelBilinear(texU, texV).r;
+                    // Remap the raw height value via an AnimationCurve for finer control.
+                    float remappedHeight = heightMapRemapCurve.Evaluate(rawHeight);
+                    // Use the remapped height to compute the elevation.
+                    float elevation = remappedHeight * elevationStrength;
+
+                    // Apply elevation (only positive displacement).
                     Vector3 displacement = normalForUV * elevation;
                     pointOnSphere = pointOnSphere + new DoubleVector3(displacement.x, displacement.y, displacement.z);
                 }
 
-                // --- Generate UVs for the Patch ---
-                // Compute UVs using the planet's simulation center as the reference.
-                // The spherical mapping (equirectangular) is used:
+                // --- Generate UVs for the Patch (match planet's texture mapping) ---
                 Vector3 uvNormal = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
                 float uvX = Mathf.Atan2(uvNormal.z, uvNormal.x) / (2 * Mathf.PI) + 0.5f;
                 float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
@@ -149,7 +148,6 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             }
         }
 
-        // Update mesh: assign vertices, triangles, and UVs
         patchMesh.Clear();
         patchMesh.SetVertices(vertices.ConvertAll(v => (Vector3)v));
         patchMesh.SetTriangles(triangles, 0);
