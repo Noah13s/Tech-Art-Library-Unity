@@ -30,12 +30,11 @@ public class PerspectiveIllusionObject : MonoBehaviour
         centerDistance?.Invoke((long)actualDistance);
 
         // --- Compute far mode (illusion) values ---
-        // In far mode, we force the planet to appear at a fixed distance:
-        double fixedDistance = maxDistanceFromPlayer + objectRadius;
-        // Far mode position is the planet's direction scaled to fixedDistance.
+        // In far mode, we want the object's center to be exactly maxDistanceFromPlayer from the player.
+        double fixedDistance = maxDistanceFromPlayer; // use maxDistanceFromPlayer directly
+        // Far mode position: along the same direction, clamped to fixedDistance.
         DoubleVector3 farPosition = relativePosition.Normalized() * fixedDistance;
-        // Far mode scale is computed so that the planet's apparent size remains constant:
-        // (apparent size ~ scale/distance). We want farScale / fixedDistance == simulationScale / actualDistance.
+        // Far mode scale: we want the apparent size (scale/distance) to remain constant.
         float farScale = (float)(simulationScale * (fixedDistance / actualDistance));
 
         // --- Near mode values (true mode) ---
@@ -43,8 +42,8 @@ public class PerspectiveIllusionObject : MonoBehaviour
         float nearScale = (float)simulationScale;
 
         // --- Determine blending factor ---
-        // When surfaceDistance is greater than maxDistanceFromPlayer, we want full far mode (t = 0).
-        // When surfaceDistance is below (maxDistanceFromPlayer - transitionRange), we want full near mode (t = 1).
+        // When surfaceDistance >= maxDistanceFromPlayer, use full far mode (t = 0).
+        // When surfaceDistance <= maxDistanceFromPlayer - transitionRange, use full near mode (t = 1).
         float t;
         if (surfaceDistance >= maxDistanceFromPlayer)
         {
@@ -56,7 +55,6 @@ public class PerspectiveIllusionObject : MonoBehaviour
         }
         else
         {
-            // Blend linearly between these extremes.
             t = Mathf.InverseLerp(maxDistanceFromPlayer, maxDistanceFromPlayer - transitionRange, (float)surfaceDistance);
         }
 
