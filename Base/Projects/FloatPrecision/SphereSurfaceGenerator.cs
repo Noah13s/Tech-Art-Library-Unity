@@ -87,6 +87,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
         List<DoubleVector3> vertices = new List<DoubleVector3>();
         List<int> triangles = new List<int>();
+        List<Vector2> uvs = new List<Vector2>();
 
         // Create a grid in the tangent plane and project each point onto the sphere.
         for (int y = 0; y <= gridResolution; y++)
@@ -94,11 +95,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             for (int x = 0; x <= gridResolution; x++)
             {
                 // Offsets in the plane, centered at 0
-                double u = ((double)x / gridResolution - 0.5) * patchSize;
-                double v = ((double)y / gridResolution - 0.5) * patchSize;
+                double offsetU = ((double)x / gridResolution - 0.5) * patchSize;
+                double offsetV = ((double)y / gridResolution - 0.5) * patchSize;
 
                 // Point on the tangent plane
-                DoubleVector3 pointOnPlane = surfacePoint + right * u + forward * v;
+                DoubleVector3 pointOnPlane = surfacePoint + right * offsetU + forward * offsetV;
 
                 // Project the point onto the sphere by normalizing the direction from planet center
                 DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
@@ -107,17 +108,25 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 // --- Elevation from Height Map ---
                 if (heightMap != null)
                 {
-                    // Calculate spherical UV coordinates from the normalized direction
-                    // Use the planet's actual simulationPosition as the center for UV calculation.
-                    Vector3 normalV3 = (Vector3)(pointOnSphere - planet.simulationPosition).Normalized();
-                    float texU = Mathf.Atan2(normalV3.z, normalV3.x) / (2 * Mathf.PI) + 0.5f;
-                    float texV = Mathf.Acos(normalV3.y) / Mathf.PI;
+                    // Calculate spherical UV coordinates based on the planet's actual simulation center.
+                    // This ensures the correct area of the height map is sampled.
+                    Vector3 normalForUV = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
+                    float texU = Mathf.Atan2(normalForUV.z, normalForUV.x) / (2 * Mathf.PI) + 0.5f;
+                    float texV = 1 - (Mathf.Acos(normalForUV.y) / Mathf.PI);
                     // Sample the height map (assuming height is stored in the red channel)
                     float elevation = heightMap.GetPixelBilinear(texU, texV).r * elevationIntensity;
-                    // Displace the point along the normal.
-                    Vector3 displacement = normalV3 * elevation;
+                    // Displace the point along its normal.
+                    Vector3 displacement = normalForUV * elevation;
                     pointOnSphere = pointOnSphere + new DoubleVector3(displacement.x, displacement.y, displacement.z);
                 }
+
+                // --- Generate UVs for the Patch ---
+                // Compute UVs using the planet's simulation center as the reference.
+                // The spherical mapping (equirectangular) is used:
+                Vector3 uvNormal = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
+                float uvX = Mathf.Atan2(uvNormal.z, uvNormal.x) / (2 * Mathf.PI) + 0.5f;
+                float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
+                uvs.Add(new Vector2(uvX, uvY));
 
                 // Make vertex relative to player (for high precision rendering)
                 vertices.Add(pointOnSphere - playerPosDV);
@@ -140,10 +149,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             }
         }
 
-        // Update mesh (convert DoubleVector3 to Vector3)
+        // Update mesh: assign vertices, triangles, and UVs
         patchMesh.Clear();
         patchMesh.SetVertices(vertices.ConvertAll(v => (Vector3)v));
         patchMesh.SetTriangles(triangles, 0);
+        patchMesh.SetUVs(0, uvs);
         patchMesh.RecalculateNormals();
     }
 }
