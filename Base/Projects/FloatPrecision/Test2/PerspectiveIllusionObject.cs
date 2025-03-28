@@ -11,6 +11,8 @@ public class PerspectiveIllusionObject : MonoBehaviour
     public FloatPrecisionPlayer player;
     [NonSerialized] public double surfaceDistance;
     [SerializeField] private UnityEvent<Int64> altitude;
+    [SerializeField] private UnityEvent<Int64> centerDistance;
+
 
     void Update()
     {
@@ -21,6 +23,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
         float objectRadius = transform.localScale.x * 0.5f;
         surfaceDistance = actualDistance - objectRadius;
         altitude?.Invoke((long)surfaceDistance);
+        centerDistance?.Invoke((long)actualDistance);
 
         if (surfaceDistance > maxDistanceFromPlayer)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
 [System.Serializable]
 public struct DoubleVector3
 {
@@ -40,6 +41,8 @@ public class FloatPrecisionPlayer : MonoBehaviour
 
     public DoubleVector3 playerPosition = new DoubleVector3(0, 0, 0);
 
+    [SerializeField] private UnityEvent<string> playerPositionEvent;
+
     void Update()
     {
         if (Input.GetKey(KeyCode.W)) { transform.Rotate(sensitivity, 0, 0, Space.Self); }
@@ -61,5 +64,7 @@ public class FloatPrecisionPlayer : MonoBehaviour
             DoubleVector3 forward = new DoubleVector3(transform.forward.x, transform.forward.y, transform.forward.z);
             playerPosition = playerPosition + forward.Negate() * (moveSpeed * Time.deltaTime);
         }
+
+        if (playerPositionEvent != null) { playerPositionEvent.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}"); }
     }
 }
