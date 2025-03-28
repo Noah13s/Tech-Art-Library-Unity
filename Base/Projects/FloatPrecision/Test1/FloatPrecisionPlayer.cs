@@ -46,10 +46,10 @@ public struct DoubleVector3
 public class FloatPrecisionPlayer : MonoBehaviour
 {
     [SerializeField] GameObject world;
-    public float moveSpeed = 10f;
+    [SerializeField] private float moveSpeed = 10f;
     [SerializeField] float sensitivity = 1.0f;
 
-    public DoubleVector3 playerPosition = new DoubleVector3(0, 0, 0);
+    public DoubleVector3 playerPosition = new (0, 0, 0);
 
     [SerializeField] private UnityEvent<string> playerPositionEvent;
     [SerializeField] private UnityEvent<float> playerSpeed;
@@ -66,17 +66,22 @@ public class FloatPrecisionPlayer : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
             // Convert transform.forward to DoubleVector3 and update position in double space.
-            DoubleVector3 forward = new DoubleVector3(transform.forward.x, transform.forward.y, transform.forward.z);
-            playerPosition = playerPosition + forward * (moveSpeed * Time.deltaTime);
+            DoubleVector3 forward = new (transform.forward.x, transform.forward.y, transform.forward.z);
+            playerPosition += forward * (moveSpeed * Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
             // Convert transform.forward to DoubleVector3 and update position in double space.
-            DoubleVector3 forward = new DoubleVector3(transform.forward.x, transform.forward.y, transform.forward.z);
-            playerPosition = playerPosition + forward.Negate() * (moveSpeed * Time.deltaTime);
+            DoubleVector3 forward = new(transform.forward.x, transform.forward.y, transform.forward.z);
+            playerPosition += forward.Negate() * (moveSpeed * Time.deltaTime);
         }
 
-        if (playerPositionEvent != null) { playerPositionEvent.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}"); }
-        if (playerSpeed != null) { playerSpeed.Invoke(moveSpeed); }
+        playerPositionEvent?.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}");
+        playerSpeed?.Invoke(moveSpeed);
+    }
+
+    public void SetSpeed(float _speed)
+    {
+        moveSpeed = _speed;
     }
 }
