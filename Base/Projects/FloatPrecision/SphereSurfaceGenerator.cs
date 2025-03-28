@@ -6,14 +6,16 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     [Header("References")]
     public PerspectiveIllusionObject planet;
     public FloatPrecisionPlayer player;
+    public Texture2D heightMap;             // Height map texture
+    public float elevationIntensity = 10f;  // Controls how much the height map affects the mesh
 
     [Header("Proximity Settings")]
-    public float proximityRange = 50f;    // Range (from planet's surface) to generate the patch
+    public float proximityRange = 50f;      // Range (from planet's surface) to generate the patch
 
     [Header("Mesh Settings")]
-    public int gridResolution = 10;       // Number of segments for the patch
-    public float minPatchSize = 10f;      // Smallest patch size (when far away)
-    public float maxPatchSize = 100f;     // Largest patch size (when up close)
+    public int gridResolution = 10;         // Number of segments for the patch
+    public float minPatchSize = 10f;        // Smallest patch size (when far away)
+    public float maxPatchSize = 100f;       // Largest patch size (up close)
 
     private MeshFilter meshFilter;
     private Mesh patchMesh;
@@ -41,11 +43,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         // Use the surfaceDistance computed by the PerspectiveIllusionObject
         if (planet.surfaceDistance <= proximityRange)
         {
-            // Compute the effective planet center in absolute (simulation) coordinates.
+            // Compute the effective planet center in absolute coordinates.
             // planet.transform.position is relative to the player, so add player.playerPosition.
             Vector3 effectiveCenter = planet.transform.position + (Vector3)player.playerPosition;
 
-            // Calculate patch size based on distance: up close, use maxPatchSize; far away, minPatchSize.
+            // Calculate patch size based on distance: up close, use maxPatchSize; far away, use minPatchSize.
             float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
 
             GenerateSurfacePatch(effectiveCenter, patchSize);
@@ -63,8 +65,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         DoubleVector3 effectiveCenterDV = new DoubleVector3(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
         DoubleVector3 playerPosDV = player.playerPosition;
 
-        // Use the planet's effective scale (set by the PerspectiveIllusionObject) to determine its radius.
-        // Since planet.simulationScale represents half the diameter, the radius is:
+        // Use the planet's effective scale to determine its radius.
+        // Assuming planet.simulationScale represents the full diameter, the radius is:
         double effectiveRadius = planet.transform.localScale.x * 0.5;
 
         // Direction from the planet's center to the player (in absolute coordinates)
@@ -101,6 +103,21 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 // Project the point onto the sphere by normalizing the direction from planet center
                 DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
                 DoubleVector3 pointOnSphere = effectiveCenterDV + dirFromCenter * effectiveRadius;
+
+                // --- Elevation from Height Map ---
+                if (heightMap != null)
+                {
+                    // Calculate spherical UV coordinates from the normalized direction
+                    // Use the planet's actual simulationPosition as the center for UV calculation.
+                    Vector3 normalV3 = (Vector3)(pointOnSphere - planet.simulationPosition).Normalized();
+                    float texU = Mathf.Atan2(normalV3.z, normalV3.x) / (2 * Mathf.PI) + 0.5f;
+                    float texV = Mathf.Acos(normalV3.y) / Mathf.PI;
+                    // Sample the height map (assuming height is stored in the red channel)
+                    float elevation = heightMap.GetPixelBilinear(texU, texV).r * elevationIntensity;
+                    // Displace the point along the normal.
+                    Vector3 displacement = normalV3 * elevation;
+                    pointOnSphere = pointOnSphere + new DoubleVector3(displacement.x, displacement.y, displacement.z);
+                }
 
                 // Make vertex relative to player (for high precision rendering)
                 vertices.Add(pointOnSphere - playerPosDV);

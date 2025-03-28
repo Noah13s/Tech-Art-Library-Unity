@@ -31,6 +31,16 @@ public struct DoubleVector3
         z * other.x - x * other.z,
         x * other.y - y * other.x
     );
+
+    public static DoubleVector3 Lerp(DoubleVector3 a, DoubleVector3 b, double t)
+    {
+        t = Math.Clamp(t, 0.0, 1.0);
+        return new DoubleVector3(
+            a.x + (b.x - a.x) * t,
+            a.y + (b.y - a.y) * t,
+            a.z + (b.z - a.z) * t
+        );
+    }
 }
 
 public class FloatPrecisionPlayer : MonoBehaviour
