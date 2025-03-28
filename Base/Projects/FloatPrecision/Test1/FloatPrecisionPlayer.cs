@@ -52,6 +52,7 @@ public class FloatPrecisionPlayer : MonoBehaviour
     public DoubleVector3 playerPosition = new DoubleVector3(0, 0, 0);
 
     [SerializeField] private UnityEvent<string> playerPositionEvent;
+    [SerializeField] private UnityEvent<float> playerSpeed;
 
     void Update()
     {
@@ -76,5 +77,6 @@ public class FloatPrecisionPlayer : MonoBehaviour
         }
 
         if (playerPositionEvent != null) { playerPositionEvent.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}"); }
+        if (playerSpeed != null) { playerSpeed.Invoke(moveSpeed); }
     }
 }
