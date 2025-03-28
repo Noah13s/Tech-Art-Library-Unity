@@ -103,4 +103,25 @@ public class TextChanger : MonoBehaviour
         }
     }
 
+    public void SetString(params string[] texts)
+    {
+        foreach (var text in texts)
+        {
+            // If TMP is available, set its text using reflection
+            if (tmpTextComponent != null)
+            {
+                var textProperty = tmpType.GetProperty("text");
+                if (textProperty != null)
+                {
+                    textProperty.SetValue(tmpTextComponent, text.ToString());
+                }
+            }
+
+            // Set legacy text (always available)
+            if (legacyText != null)
+            {
+                legacyText.text = text.ToString();
+            }
+        }
+    }
 }
