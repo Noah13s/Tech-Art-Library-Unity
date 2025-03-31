@@ -32,6 +32,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public Vector2 uvOffset = Vector2.zero;
     public Material material;
 
+    public Collider Collider;
+
     private MeshFilter meshFilter;
     private Mesh patchMesh;
 
@@ -69,7 +71,12 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             // Calculate patch size based on distance: up close, use maxPatchSize; far away, use minPatchSize.
             float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
 
+
+
+
             GenerateSurfacePatch(effectiveCenter, patchSize);
+            Collider.transform.position = patchMesh.bounds.center;
+            Collider.transform.localScale = patchMesh.bounds.size;
         }
         else
         {
