@@ -2,10 +2,20 @@ using UnityEngine;
 using System;
 using UnityEngine.Events;
 
+/// <summary>
+/// Script that handles the unity transform of a gameobject to represent
+/// a very large or far away object such as a planet.<br></br>
+/// To do so it uses perspective to give the illusion of distance while 
+/// staying within maximum distance from the player.
+/// </summary>
 public class PerspectiveIllusionObject : MonoBehaviour
 {
+    [Header("Data")]
+    [Tooltip("World position of the planet")]
     public DoubleVector3 simulationPosition;
+    [Tooltip("Diameter of the planet in meters.")]
     public double simulationScale = 1f;  // True planet scale (diameter)
+    [Tooltip("The maximum distance from the player the Gameobject can have.")]
     public float maxDistanceFromPlayer = 10000;
     public FloatPrecisionPlayer player;
     [NonSerialized] public double surfaceDistance;

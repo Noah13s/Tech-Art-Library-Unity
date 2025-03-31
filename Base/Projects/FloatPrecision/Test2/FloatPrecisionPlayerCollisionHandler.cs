@@ -24,23 +24,16 @@ public class FloatPrecisionPlayerCollisionHandler : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
     }
-
-    void OnCollisionStay(Collision collision)
+    private void OnTriggerStay(Collider other)
     {
-        Debug.Log("test");
-        // Compute an average contact normal from all contacts
-        Vector3 averageNormal = Vector3.zero;
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            averageNormal += contact.normal;
-        }
-        if (collision.contacts.Length > 0)
-        {
-            averageNormal /= collision.contacts.Length;
-            // Create a correction vector in double precision
-            DoubleVector3 correction = new DoubleVector3(averageNormal.x, averageNormal.y, averageNormal.z) * collisionPushStrength;
-            // Adjust the player's logical (double precision) position
-            floatPrecisionPlayer.playerPosition += correction;
-        }
+        // Compute an average normal based on the closest point on the collider
+        Vector3 closestPoint = other.ClosestPoint(transform.position);
+        Vector3 normal = (transform.position - closestPoint).normalized;
+
+        // Create a correction vector in double precision
+        DoubleVector3 correction = new DoubleVector3(normal.x, normal.y, normal.z) * collisionPushStrength;
+
+        // Adjust the player's logical (double precision) position
+        floatPrecisionPlayer.playerPosition += correction;
     }
 }

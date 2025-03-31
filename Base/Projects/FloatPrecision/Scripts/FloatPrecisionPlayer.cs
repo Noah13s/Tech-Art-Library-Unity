@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// Vector 3 based on doubles instead of floats for handling very large values.<br></br>
+/// Vector 3 based on doubles instead of floats for handling very large values.
 /// </summary>
 [System.Serializable]
 public struct DoubleVector3
@@ -50,6 +50,9 @@ public struct DoubleVector3
         x * other.x + y * other.y + z * other.z;
 }
 
+/// <summary>
+/// Simple world space static spaceship player that moves via a <seealso cref="DoubleVector3"/> playerPosition parameter.
+/// </summary>
 public class FloatPrecisionPlayer : MonoBehaviour
 {
     [Tooltip("Position movement speed in m/s.")]
@@ -58,13 +61,18 @@ public class FloatPrecisionPlayer : MonoBehaviour
     [SerializeField] float sensitivity = 1.0f;
 
     [Tooltip("Actual DoubleVector3 player position in the world.\nNot to confuse with the transforms position.")]
-    public DoubleVector3 playerPosition = new (0, 0, 0);
+    public DoubleVector3 playerPosition = new(0, 0, 0);
 
+    [SerializeField] bool velocityActive = false;
+    [ConditionalVisibility("velocityActive")]
+    [SerializeField] private DoubleVector3 velocity;
+    
     [SerializeField] private UnityEvent<string> playerPositionEvent;
     [SerializeField] private UnityEvent<float> playerSpeed;
 
     void Update()
     {
+        HandleVelocity();
         if (Input.GetKey(KeyCode.W)) { transform.Rotate(sensitivity, 0, 0, Space.Self); }
         if (Input.GetKey(KeyCode.S)) { transform.Rotate(-sensitivity, 0, 0, Space.Self); }
         if (Input.GetKey(KeyCode.D)) { transform.Rotate(0, sensitivity, 0, Space.Self); }
@@ -76,13 +84,26 @@ public class FloatPrecisionPlayer : MonoBehaviour
         {
             // Convert transform.forward to DoubleVector3 and update position in double space.
             DoubleVector3 forward = new (transform.forward.x, transform.forward.y, transform.forward.z);
-            playerPosition += forward * (moveSpeed * Time.deltaTime);
+            if (velocityActive)
+            {
+                velocity += forward * (moveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                playerPosition += forward * (moveSpeed * Time.deltaTime);
+            }
         }
         if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
         {
             // Convert transform.forward to DoubleVector3 and update position in double space.
             DoubleVector3 forward = new(transform.forward.x, transform.forward.y, transform.forward.z);
-            playerPosition += forward.Negate() * (moveSpeed * Time.deltaTime);
+            if (velocityActive)
+            {
+                velocity += forward.Negate() * (moveSpeed * Time.deltaTime);
+            } else
+            {
+                playerPosition += forward.Negate() * (moveSpeed * Time.deltaTime);
+            }
         }
 
         playerPositionEvent?.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}");
@@ -90,7 +111,7 @@ public class FloatPrecisionPlayer : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets the position movement speed.<br></br>
+    /// Sets the position movement speed.
     /// </summary>
     /// <param name="_speed">New speed value in m/s</param>
     public void SetSpeed(float _speed)
@@ -98,12 +119,33 @@ public class FloatPrecisionPlayer : MonoBehaviour
         moveSpeed = _speed;
     }
 
-    public void AddPosition(Vector3 position)
+    /// <summary>
+    /// Adds position to the current player position.
+    /// </summary>
+    /// <param name="_position">Position vector to increment to the current position.</param>
+    public void AddPosition(Vector3 _position)
     {
-        playerPosition += new DoubleVector3(position.x,position.y, position.z);
+        playerPosition += new DoubleVector3(_position.x,_position.y, _position.z);
     }
-    public void AddPosition(DoubleVector3 position)
+
+    /// <summary>
+    /// Adds position to the current player position.
+    /// </summary>
+    /// <param name="_position">Position vector to increment to the current position.</param>
+    public void AddPosition(DoubleVector3 _position)
     {
-        playerPosition += position;
+        playerPosition += _position;
+    }
+
+    private void HandleVelocity()
+    {
+        if (!velocityActive) { return; }
+
+        AddPosition(velocity);
+    }
+
+    public void AddVelocity(DoubleVector3 _velocity)
+    {
+        velocity += _velocity;
     }
 }

@@ -72,17 +72,19 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
 
 
-
-
             GenerateSurfacePatch(effectiveCenter, patchSize);
-            Collider.transform.position = patchMesh.bounds.center;
-            Collider.transform.localScale = patchMesh.bounds.size;
         }
         else
         {
             if (patchMesh != null)
                 patchMesh.Clear();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        Collider.transform.position = patchMesh.bounds.center;
+        Collider.transform.localScale = patchMesh.bounds.size;
     }
 
     void GenerateSurfacePatch(Vector3 effectiveCenter, float patchSize)
