@@ -45,6 +45,9 @@ public struct DoubleVector3
             a.z + (b.z - a.z) * t
         );
     }
+
+    public double Dot(DoubleVector3 other) =>
+        x * other.x + y * other.y + z * other.z;
 }
 
 public class FloatPrecisionPlayer : MonoBehaviour

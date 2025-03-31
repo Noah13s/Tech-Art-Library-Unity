@@ -37,11 +37,27 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BUILTIN_QueueControl: 0
+    - _BUILTIN_QueueOffset: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Tiling: 1000000
-    m_Colors: []
+    - _Tiling: 1
+    m_Colors:
+    - _Offset: {r: -35.24628, g: 1222.7482, b: 0, a: 0}
   m_BuildTextureStacks: []
+--- !u!114 &34710024946034202
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 639247ca83abc874e893eb93af2b5e44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 0
 --- !u!114 &7593902099457206053
 MonoBehaviour:
   m_ObjectHideFlags: 11

@@ -27,6 +27,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public UVMappingMode uvMappingMode = UVMappingMode.Spherical;
     public Vector2 uvScale = Vector2.one;
     public Vector2 uvOffset = Vector2.zero;
+    public Material material;
 
     private MeshFilter meshFilter;
     private Mesh patchMesh;
@@ -57,6 +58,9 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             // Compute the effective planet center in absolute coordinates.
             // planet.transform.position is relative to the player, so add player.playerPosition.
             Vector3 effectiveCenter = planet.transform.position + (Vector3)player.playerPosition;
+
+            DoubleVector3 offset = player.playerPosition - planet.simulationPosition;
+            material.SetVector("_Offset", new Vector2((float)offset.x, (float)offset.y));
 
             // Calculate patch size based on distance: up close, use maxPatchSize; far away, use minPatchSize.
             float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
@@ -138,8 +142,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                     float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
                     uvCoord = new Vector2(uvX, uvY);
                 }
-                else // Planar mode: use true patch dimensions.
                 {
+                    // Calculate relative position to surfacePoint in the tangent plane.
                     // Map the offset values from [-patchSize/2, patchSize/2] to [0,1]
                     float planarU = (float)(offsetU / patchSize + 0.5);
                     float planarV = (float)(offsetV / patchSize + 0.5);
