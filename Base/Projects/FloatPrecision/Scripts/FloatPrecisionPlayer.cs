@@ -97,4 +97,13 @@ public class FloatPrecisionPlayer : MonoBehaviour
     {
         moveSpeed = _speed;
     }
+
+    public void AddPosition(Vector3 position)
+    {
+        playerPosition += new DoubleVector3(position.x,position.y, position.z);
+    }
+    public void AddPosition(DoubleVector3 position)
+    {
+        playerPosition += position;
+    }
 }
