@@ -20,7 +20,10 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public float elevationStrength = 10f;   // Maximum elevation displacement from height map
     public Vector2 heightMapUVScale = Vector2.one;  // Scale for height map UV sampling
     public Vector2 heightMapUVOffset = Vector2.zero;  // Offset for height map UV sampling
-    public AnimationCurve heightMapRemapCurve = AnimationCurve.Linear(0, 0, 1, 1); // Remaps the raw height value
+    [Range(0f, 1f)]
+    public float displacementMin = 0f;      // Raw height value corresponding to ground level (0 elevation)
+    [Range(0f, 1f)]
+    public float displacementMax = 1f;      // Raw height value corresponding to peak elevation (full displacement)
 
     public enum UVMappingMode { Spherical, Planar }
     [Header("UV Mapping Control")]
@@ -59,6 +62,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             // planet.transform.position is relative to the player, so add player.playerPosition.
             Vector3 effectiveCenter = planet.transform.position + (Vector3)player.playerPosition;
 
+            // Update material offset (if needed)
             DoubleVector3 offset = player.playerPosition - planet.simulationPosition;
             material.SetVector("_Offset", new Vector2((float)offset.x, (float)offset.y));
 
@@ -76,15 +80,18 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
     void GenerateSurfacePatch(Vector3 effectiveCenter, float patchSize)
     {
+        // Convert effective center to DoubleVector3 for high-precision math.
         DoubleVector3 effectiveCenterDV = new DoubleVector3(effectiveCenter.x, effectiveCenter.y, effectiveCenter.z);
         DoubleVector3 playerPosDV = player.playerPosition;
 
-        // Planet's radius (assuming simulationScale represents full diameter)
+        // Planet's radius (assuming planet.simulationScale represents the full diameter)
         double effectiveRadius = planet.transform.localScale.x * 0.5;
+        // Direction from the planet's center to the player (in absolute coordinates)
         DoubleVector3 direction = (playerPosDV - effectiveCenterDV).Normalized();
+        // Compute the point on the sphere closest to the player.
         DoubleVector3 surfacePoint = effectiveCenterDV + direction * effectiveRadius;
 
-        // Build a tangent plane at surfacePoint
+        // Build a tangent plane at surfacePoint.
         DoubleVector3 up = direction;
         DoubleVector3 right = new DoubleVector3(0, 1, 0).Cross(up);
         if (right.Magnitude() == 0)
@@ -109,10 +116,10 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
                 DoubleVector3 pointOnSphere = effectiveCenterDV + dirFromCenter * effectiveRadius;
 
-                // --- Elevation from Height Map with More Control ---
+                // --- Elevation from Height Map with Displacement Min/Max ---
                 if (heightMap != null)
                 {
-                    // Calculate spherical UV coordinates based on the planet's simulation center.
+                    // Compute spherical UV coordinates based on the planet's simulation center.
                     Vector3 normalForUV = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
                     float texU = Mathf.Atan2(normalForUV.z, normalForUV.x) / (2 * Mathf.PI) + 0.5f;
                     float texV = 1 - (Mathf.Acos(normalForUV.y) / Mathf.PI);
@@ -123,17 +130,16 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
                     // Sample height map (red channel)
                     float rawHeight = heightMap.GetPixelBilinear(texU, texV).r;
-                    // Remap the raw height value via an AnimationCurve for finer control.
-                    float remappedHeight = heightMapRemapCurve.Evaluate(rawHeight);
-                    // Use the remapped height to compute the elevation.
+                    // Remap rawHeight using displacementMin and displacementMax.
+                    float remappedHeight = Mathf.InverseLerp(displacementMin, displacementMax, rawHeight);
+                    // Compute elevation (only positive displacement; ground level remains 0).
                     float elevation = remappedHeight * elevationStrength;
-
-                    // Apply elevation (only positive displacement).
+                    // Apply displacement along the vertex normal.
                     Vector3 displacement = normalForUV * elevation;
                     pointOnSphere = pointOnSphere + new DoubleVector3(displacement.x, displacement.y, displacement.z);
                 }
 
-                // --- Generate UVs for the Patch with extra controls ---
+                // --- Generate UVs for the Patch ---
                 Vector2 uvCoord;
                 if (uvMappingMode == UVMappingMode.Spherical)
                 {
@@ -142,14 +148,13 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                     float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
                     uvCoord = new Vector2(uvX, uvY);
                 }
+                else // Planar mapping
                 {
-                    // Calculate relative position to surfacePoint in the tangent plane.
-                    // Map the offset values from [-patchSize/2, patchSize/2] to [0,1]
                     float planarU = (float)(offsetU / patchSize + 0.5);
                     float planarV = (float)(offsetV / patchSize + 0.5);
                     uvCoord = new Vector2(planarU, planarV);
                 }
-                // Apply the global tiling and offset parameters.
+                // Apply global UV tiling and offset.
                 uvCoord = new Vector2(uvCoord.x * uvScale.x + uvOffset.x, uvCoord.y * uvScale.y + uvOffset.y);
                 uvs.Add(uvCoord);
 
@@ -158,7 +163,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             }
         }
 
-        // Build triangles for the grid
+        // Build triangles for the grid.
         for (int y = 0; y < gridResolution; y++)
         {
             for (int x = 0; x < gridResolution; x++)
