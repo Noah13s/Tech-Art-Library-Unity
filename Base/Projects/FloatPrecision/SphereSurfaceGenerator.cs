@@ -18,9 +18,15 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
     [Header("Height Map Control")]
     public float elevationStrength = 10f;   // Maximum elevation displacement from height map
-    public Vector2 heightMapUVScale = Vector2.one;  // Scale the UV coordinates for height map sampling
-    public Vector2 heightMapUVOffset = Vector2.zero;  // Offset for UV coordinates for height map sampling
+    public Vector2 heightMapUVScale = Vector2.one;  // Scale for height map UV sampling
+    public Vector2 heightMapUVOffset = Vector2.zero;  // Offset for height map UV sampling
     public AnimationCurve heightMapRemapCurve = AnimationCurve.Linear(0, 0, 1, 1); // Remaps the raw height value
+
+    public enum UVMappingMode { Spherical, Planar }
+    [Header("UV Mapping Control")]
+    public UVMappingMode uvMappingMode = UVMappingMode.Spherical;
+    public Vector2 uvScale = Vector2.one;
+    public Vector2 uvOffset = Vector2.zero;
 
     private MeshFilter meshFilter;
     private Mesh patchMesh;
@@ -91,8 +97,10 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         {
             for (int x = 0; x <= gridResolution; x++)
             {
-                double offsetU = ((double)x / gridResolution - 0.5) * patchSize;
-                double offsetV = ((double)y / gridResolution - 0.5) * patchSize;
+                double tX = (double)x / gridResolution;
+                double tY = (double)y / gridResolution;
+                double offsetU = (tX - 0.5) * patchSize;
+                double offsetV = (tY - 0.5) * patchSize;
                 DoubleVector3 pointOnPlane = surfacePoint + right * offsetU + forward * offsetV;
                 DoubleVector3 dirFromCenter = (pointOnPlane - effectiveCenterDV).Normalized();
                 DoubleVector3 pointOnSphere = effectiveCenterDV + dirFromCenter * effectiveRadius;
@@ -121,11 +129,25 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                     pointOnSphere = pointOnSphere + new DoubleVector3(displacement.x, displacement.y, displacement.z);
                 }
 
-                // --- Generate UVs for the Patch (match planet's texture mapping) ---
-                Vector3 uvNormal = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
-                float uvX = Mathf.Atan2(uvNormal.z, uvNormal.x) / (2 * Mathf.PI) + 0.5f;
-                float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
-                uvs.Add(new Vector2(uvX, uvY));
+                // --- Generate UVs for the Patch with extra controls ---
+                Vector2 uvCoord;
+                if (uvMappingMode == UVMappingMode.Spherical)
+                {
+                    Vector3 uvNormal = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
+                    float uvX = Mathf.Atan2(uvNormal.z, uvNormal.x) / (2 * Mathf.PI) + 0.5f;
+                    float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
+                    uvCoord = new Vector2(uvX, uvY);
+                }
+                else // Planar mode: use true patch dimensions.
+                {
+                    // Map the offset values from [-patchSize/2, patchSize/2] to [0,1]
+                    float planarU = (float)(offsetU / patchSize + 0.5);
+                    float planarV = (float)(offsetV / patchSize + 0.5);
+                    uvCoord = new Vector2(planarU, planarV);
+                }
+                // Apply the global tiling and offset parameters.
+                uvCoord = new Vector2(uvCoord.x * uvScale.x + uvOffset.x, uvCoord.y * uvScale.y + uvOffset.y);
+                uvs.Add(uvCoord);
 
                 // Make vertex relative to player (for high precision rendering)
                 vertices.Add(pointOnSphere - playerPosDV);
