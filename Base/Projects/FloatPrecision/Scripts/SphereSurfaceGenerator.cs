@@ -66,14 +66,13 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
             // Update material offset (if needed)
             DoubleVector3 offset = player.playerPosition - planet.simulationPosition;
-            if (material!=null)
+            if (material != null)
             {
                 material.SetVector("_Offset", new Vector2((float)offset.x, (float)offset.y));
             }
 
             // Calculate patch size based on distance: up close, use maxPatchSize; far away, use minPatchSize.
             float patchSize = Mathf.Lerp(maxPatchSize, minPatchSize, (float)planet.surfaceDistance / proximityRange);
-
 
             GenerateSurfacePatch(effectiveCenter, patchSize);
         }
@@ -118,6 +117,14 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         List<int> triangles = new List<int>();
         List<Vector2> uvs = new List<Vector2>();
 
+        // Decide which center to use for UV generation.
+        // If the planet is in far mode (surfaceDistance >= maxDistanceFromPlayer),
+        // use the effectiveCenter (the world-space center used to position the patch);
+        // otherwise, use the planet's simulationPosition.
+        Vector3 uvCenter = (planet.surfaceDistance >= planet.maxDistanceFromPlayer)
+            ? effectiveCenter
+            : (Vector3)planet.simulationPosition;
+
         // Create a grid in the tangent plane and project each point onto the sphere.
         for (int y = 0; y <= gridResolution; y++)
         {
@@ -134,8 +141,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 // --- Elevation from Height Map with Displacement Min/Max ---
                 if (heightMap != null)
                 {
-                    // Compute spherical UV coordinates based on the planet's simulation center.
-                    Vector3 normalForUV = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
+                    // Compute spherical UV coordinates based on the chosen UV center.
+                    Vector3 normalForUV = ((Vector3)((Vector3)pointOnSphere - uvCenter)).normalized;
                     float texU = Mathf.Atan2(normalForUV.z, normalForUV.x) / (2 * Mathf.PI) + 0.5f;
                     float texV = 1 - (Mathf.Acos(normalForUV.y) / Mathf.PI);
 
@@ -158,7 +165,9 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 Vector2 uvCoord;
                 if (uvMappingMode == UVMappingMode.Spherical)
                 {
-                    Vector3 uvNormal = ((Vector3)(pointOnSphere - planet.simulationPosition)).normalized;
+                    // Use effectiveCenterDV (the actual center used for mesh generation)
+                    // instead of planet.simulationPosition for consistency
+                    Vector3 uvNormal = ((Vector3)(pointOnSphere - effectiveCenterDV)).normalized;
                     float uvX = Mathf.Atan2(uvNormal.z, uvNormal.x) / (2 * Mathf.PI) + 0.5f;
                     float uvY = 1 - (Mathf.Acos(uvNormal.y) / Mathf.PI);
                     uvCoord = new Vector2(uvX, uvY);
@@ -173,7 +182,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 uvCoord = new Vector2(uvCoord.x * uvScale.x + uvOffset.x, uvCoord.y * uvScale.y + uvOffset.y);
                 uvs.Add(uvCoord);
 
-                // Make vertex relative to player (for high precision rendering)
+                // Make vertex relative to player (for high-precision rendering)
                 vertices.Add(pointOnSphere - playerPosDV);
             }
         }
