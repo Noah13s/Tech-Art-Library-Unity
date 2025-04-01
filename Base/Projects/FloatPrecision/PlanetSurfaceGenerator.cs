@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
+[Obsolete("Not used any more", true)]
 public class PlanetSurfaceGenerator : MonoBehaviour
 {
     [Header("References")]

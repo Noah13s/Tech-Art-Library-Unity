@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
+[Obsolete("Not used any more", true)]
 public class PlanetSurfaceRenderer : MonoBehaviour
 {
     public PerspectiveIllusionObject perspectiveObject;
