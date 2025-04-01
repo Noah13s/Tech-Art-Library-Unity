@@ -42,4 +42,31 @@ public class PlanetGravityHandler : MonoBehaviour
         // Apply gravity to player
         player.AddVelocity(gravityForce * Time.deltaTime);
     }
+
+    public double CalculateGravityAtPosition(DoubleVector3 position)
+    {
+        DoubleVector3 planetPosition = planet.simulationPosition;
+        DoubleVector3 direction = planetPosition - position;
+        double distanceSquared = direction.Dot(direction); // Equivalent to Vector3.sqrMagnitude
+
+        if (distanceSquared < 1e-6) return 0; // Prevent division by zero
+
+        // Compute gravitational force magnitude: F = G * (m / r²)
+        return G * mass / distanceSquared;
+    }
+
+    public DoubleVector3 CalculateGravityForceAtPosition(DoubleVector3 position)
+    {
+        DoubleVector3 planetPosition = planet.simulationPosition;
+        DoubleVector3 direction = planetPosition - position;
+        double distanceSquared = direction.Dot(direction); // Equivalent to Vector3.sqrMagnitude
+
+        if (distanceSquared < 1e-6) return new DoubleVector3(0, 0, 0); // Prevent division by zero
+
+        // Normalize direction
+        DoubleVector3 gravityDirection = direction.Normalized();
+
+        // Compute gravitational force vector: F = G * (m / r²) * direction
+        return gravityDirection * (G * mass / distanceSquared);
+    }
 }

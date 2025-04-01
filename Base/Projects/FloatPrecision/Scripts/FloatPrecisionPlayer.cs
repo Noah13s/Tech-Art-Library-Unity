@@ -148,4 +148,9 @@ public class FloatPrecisionPlayer : MonoBehaviour
     {
         velocity += _velocity;
     }
+
+    public DoubleVector3 GetVelocity()
+    {
+        return velocity;
+    }
 }
