@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Collections;
 
 public class TextChanger : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class TextChanger : MonoBehaviour
     private Type tmpType;
     private object tmpTextComponent;
 
-    private void Start()
+    private void Awake()
     {
         // Check for legacy Text component
         if (legacyText == null && gameObject.GetComponent<Text>() != null)
@@ -17,13 +18,25 @@ public class TextChanger : MonoBehaviour
             legacyText = GetComponent<Text>();
         }
 
-        // Check if TextMesh Pro is available at runtime using reflection
+        // Check if TextMeshPro is available at runtime using reflection
         tmpType = Type.GetType("TMPro.TextMeshProUGUI, Unity.TextMeshPro");
 
         // If TMP is available, get the TMP component at runtime
         if (tmpType != null)
         {
             tmpTextComponent = gameObject.GetComponent(tmpType);
+        }
+    }
+
+    private IEnumerator ForceLayoutUpdate()
+    {
+        // Wait one frame for the text change to take effect
+        yield return null;
+
+        RectTransform rectTransform = GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            UnityEngine.UI.LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
         }
     }
 
@@ -44,84 +57,31 @@ public class TextChanger : MonoBehaviour
         {
             legacyText.text = text;
         }
+
+        // Force layout update on the next frame
+        StartCoroutine(ForceLayoutUpdate());
     }
 
+    // Overloads for other types
     public void SetText(int text)
     {
-        // If TMP is available, set its text using reflection
-        if (tmpTextComponent != null)
-        {
-            var textProperty = tmpType.GetProperty("text");
-            if (textProperty != null)
-            {
-                textProperty.SetValue(tmpTextComponent, text.ToString());
-            }
-        }
-
-        // Set legacy text (always available)
-        if (legacyText != null)
-        {
-            legacyText.text = text.ToString();
-        }
+        SetText(text.ToString());
     }
 
     public void SetText(Int64 text)
     {
-        // If TMP is available, set its text using reflection
-        if (tmpTextComponent != null)
-        {
-            var textProperty = tmpType.GetProperty("text");
-            if (textProperty != null)
-            {
-                textProperty.SetValue(tmpTextComponent, text.ToString());
-            }
-        }
-
-        // Set legacy text (always available)
-        if (legacyText != null)
-        {
-            legacyText.text = text.ToString();
-        }
+        SetText(text.ToString());
     }
 
     public void SetText(float text)
     {
-        // If TMP is available, set its text using reflection
-        if (tmpTextComponent != null)
-        {
-            var textProperty = tmpType.GetProperty("text");
-            if (textProperty != null)
-            {
-                textProperty.SetValue(tmpTextComponent, text.ToString());
-            }
-        }
-
-        // Set legacy text (always available)
-        if (legacyText != null)
-        {
-            legacyText.text = text.ToString();
-        }
+        SetText(text.ToString());
     }
 
     public void SetString(params string[] texts)
     {
-        foreach (var text in texts)
-        {
-            // If TMP is available, set its text using reflection
-            if (tmpTextComponent != null)
-            {
-                var textProperty = tmpType.GetProperty("text");
-                if (textProperty != null)
-                {
-                    textProperty.SetValue(tmpTextComponent, text.ToString());
-                }
-            }
-
-            // Set legacy text (always available)
-            if (legacyText != null)
-            {
-                legacyText.text = text.ToString();
-            }
-        }
+        // Example: Concatenate texts and update once
+        string combined = string.Join(" ", texts);
+        SetText(combined);
     }
 }
