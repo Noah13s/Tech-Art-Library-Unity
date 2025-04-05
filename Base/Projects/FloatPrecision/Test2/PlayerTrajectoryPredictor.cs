@@ -25,6 +25,7 @@ public class PlayerTrajectoryPredictorFixedPoints : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if (!Application.isPlaying) { return; }
         if (player == null || planetGravity == null)
             return;
 

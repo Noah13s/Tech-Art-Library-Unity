@@ -1,13 +1,13 @@
 {
-    "name": "Projects",
+    "name": "DepthStack",
     "rootNamespace": "",
     "references": [
-        "GUID:55b31418decf7b54a8be8f3b67acd250",
-        "GUID:539f265ea35515f45bbeb4a9cf080c04"
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:15fc0a57446b3144c949da3e2b9737a9"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
