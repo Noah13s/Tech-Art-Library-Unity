@@ -41,7 +41,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-camera.position.set(0, 5, 15);
+camera.position.set(0, 50, 100);
 controls.update();
 
 // --- Helper to create celestial objects ---
@@ -251,6 +251,7 @@ function animate() {
     axesHelper.quaternion.copy(camera.quaternion).invert();
     axesRenderer.render(axesScene, axesCamera);
     updateAxisLabels();
+    console.log("Camera Zoom:"+controls.getDistance());
 
     // Update label position
     // If in focus mode, always show the label for focused object
