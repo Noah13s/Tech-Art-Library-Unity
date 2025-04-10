@@ -2,8 +2,9 @@
     "name": "Projects",
     "rootNamespace": "",
     "references": [
-        "GUID:55b31418decf7b54a8be8f3b67acd250",
-        "GUID:539f265ea35515f45bbeb4a9cf080c04"
+        "Assembly",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

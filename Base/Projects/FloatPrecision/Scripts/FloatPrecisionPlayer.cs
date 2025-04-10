@@ -72,6 +72,7 @@ public class FloatPrecisionPlayer : MonoBehaviour
 
     void Update()
     {
+
         HandleVelocity();
         if (Input.GetKey(KeyCode.W)) { transform.Rotate(sensitivity, 0, 0, Space.Self); }
         if (Input.GetKey(KeyCode.S)) { transform.Rotate(-sensitivity, 0, 0, Space.Self); }
@@ -152,5 +153,10 @@ public class FloatPrecisionPlayer : MonoBehaviour
     public DoubleVector3 GetVelocity()
     {
         return velocity;
+    }
+
+    public DoubleVector3 GetPosition()
+    {
+        return playerPosition;
     }
 }
