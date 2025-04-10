@@ -1,11 +1,19 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TWEEN } from 'three/addons/libs/tween.module.min.js';
 
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const textureLoader = new THREE.TextureLoader();
 const socket = new WebSocket('ws://localhost:3000');
 const scaleFactor = 1 / 1e9;
 
 // Listen for messages
 socket.onmessage = function(event) {
+    // Check if the message is a Blob (which it is if it's binary data)
     if (event.data instanceof Blob) {
         const reader = new FileReader();
         reader.onloadend = function() {
@@ -13,14 +21,23 @@ socket.onmessage = function(event) {
                 const msg = JSON.parse(reader.result);
                 if (msg.type === "playerPosition") {
                     // Process the player's position here
+                    const playerPosition = msg;
                     player.position.set(msg.x * scaleFactor, msg.y * scaleFactor, msg.z * scaleFactor);
-                    console.log(`Player position: X=${msg.x * scaleFactor}, Y=${msg.y * scaleFactor}, Z=${msg.z * scaleFactor}`);
+                    console.log(`Player position: X=${playerPosition.x}, Y=${playerPosition.y}, Z=${playerPosition.z}`);
+                    
+                    // If the player is in focus, update camera target
+                    if (focusedObject && focusedObject.name === 'Player') {
+                        if (!isTransitioning) {
+                            // Only update directly if not in transition
+                            controls.target.copy(player.position);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Failed to parse WebSocket message:", err);
             }
         };
-        reader.readAsText(event.data);
+        reader.readAsText(event.data); // Convert the Blob to text
     }
 };
 
@@ -28,13 +45,29 @@ socket.onmessage = function(event) {
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
+const ambientLight = new THREE.AmbientLight(0xffffff, 1); // soft white light
+scene.add(ambientLight);
+
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-camera.position.set(0, 5, 15);
+camera.position.set(0, 50, 100);
 controls.update();
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+// Add bloom effect (glow)
+const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.5, // strength
+    0.4, // radius
+    0.85 // threshold
+);
+composer.addPass(bloomPass);
+
 
 // --- Helper to create celestial objects ---
 function createObject(name, geometry, material, position) {
@@ -46,35 +79,98 @@ function createObject(name, geometry, material, position) {
 }
 
 // --- Objects ---
-const sun = createObject('Sun', new THREE.SphereGeometry(2, 32, 32), new THREE.MeshStandardMaterial({
-    color: 0xffff00,
-    emissive: 0xffff00,
-    emissiveIntensity: 10
-}), [0, 0, 0]);
+textureLoader.load('/textures/2k_sun.jpg', (sunTexture) => {
+    const sunMaterial = new THREE.MeshStandardMaterial({
+        map: sunTexture,
+        emissive: 0xffff00,
+        emissiveIntensity: .5
+    });
 
-const earth = createObject('Earth', new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshStandardMaterial({
-    color: 0x0000ff,
-    emissive: 0x0000ff,
-    emissiveIntensity: 10
-}), [149.5978707, 0, 0]);
+    const sun = createObject('Sun', new THREE.SphereGeometry(2, 32, 32), sunMaterial, [0, 0, 0]);
+    const defaultFocusObject = sun;
+});
+textureLoader.load('/textures/2k_earth_daymap.jpg', (earthTexture) => {
+    const earthMaterial = new THREE.MeshStandardMaterial({
+        map: earthTexture,
+        emissive: 0x0000ff,
+        emissiveIntensity: 0
+    });
 
+    const earth = createObject(
+        'Earth',
+        new THREE.SphereGeometry(0.5, 32, 32),
+        earthMaterial,
+        [149.5978707, 0, 0]
+    );
+});
 const moon = createObject('Moon', new THREE.SphereGeometry(0.2, 32, 32), new THREE.MeshStandardMaterial({
     color: 0x888888,
     emissive: 0x888888,
     emissiveIntensity: 10
 }), [149.9822707, 0, 0]);
-
 const player = createObject('Player', new THREE.SphereGeometry(0.3, 32, 32), new THREE.MeshStandardMaterial({
     color: 0xff0000,
     emissive: 0xff0000,
     emissiveIntensity: 10
 }), [8, 2, 0]);
 
+// --- Focus Mode Variables ---
+let focusedObject = null;
+let isTransitioning = false;
+const transitionDuration = 1500; // Transition time in milliseconds
+
+// --- Function to smoothly transition camera to focus on object ---
+function smoothCameraTransition(targetObject) {
+    if (isTransitioning) return; // Prevent overlapping transitions
+    
+    isTransitioning = true;
+    controls.enabled = false; // Temporarily disable orbit controls during transition
+    
+    // Store current camera position and target
+    const startPosition = camera.position.clone();
+    const startTarget = controls.target.clone();
+    
+    // Calculate target position (keep same relative distance)
+    const targetPosition = targetObject.position.clone();
+    const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+    
+    // Get current distance from camera to target
+    const distance = camera.position.distanceTo(controls.target);
+    
+    // Calculate new camera position based on same distance but centered on new target
+    const endPosition = targetPosition.clone().add(direction.multiplyScalar(distance));
+    
+    // Create tweens for smooth transition
+    const positionTween = new TWEEN.Tween(startPosition)
+        .to(endPosition, transitionDuration)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .onUpdate(() => {
+            camera.position.copy(startPosition);
+        });
+    
+    const targetTween = new TWEEN.Tween(startTarget)
+        .to(targetPosition, transitionDuration)
+        .easing(TWEEN.Easing.Cubic.InOut)
+        .onUpdate(() => {
+            controls.target.copy(startTarget);
+            controls.update();
+        })
+        .onComplete(() => {
+            isTransitioning = false;
+            controls.enabled = true; // Re-enable controls after transition
+            controls.update();
+            console.log(`Camera transition to ${targetObject.name} complete`);
+        });
+    
+    // Start both tweens simultaneously
+    positionTween.start();
+    targetTween.start();
+}
+
 // --- Raycasting Setup ---
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredObject = null;
-let stickyObject = null;
 
 // --- Label UI ---
 const label = document.createElement('div');
@@ -97,8 +193,59 @@ function updateLabelContent(obj) {
     `;
 }
 
+// --- Create Orientation Axes ---
+// Create a separate scene for the orientation axes
+const axesScene = new THREE.Scene();
+const axesCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 10);
+axesCamera.position.set(0, 0, 2);
+
+// Create orientation axes with label meshes
+const axesHelper = new THREE.AxesHelper(1);
+axesScene.add(axesHelper);
+
+// Create text meshes for axes labels
+const axesContainer = document.createElement('div');
+axesContainer.style.position = 'absolute';
+axesContainer.style.top = '10px';
+axesContainer.style.right = '10px';
+axesContainer.style.width = '100px';
+axesContainer.style.height = '100px';
+axesContainer.style.pointerEvents = 'none';
+document.body.appendChild(axesContainer);
+
+// Create a renderer for the axes
+const axesRenderer = new THREE.WebGLRenderer({ alpha: true });
+axesRenderer.setSize(100, 100);
+axesRenderer.setClearColor(0x000000, 0);
+axesContainer.appendChild(axesRenderer.domElement);
+
+// Create 3D text meshes for the axes labels
+function createAxisLabelMesh(text, color, position) {
+    const fontLoader = new FontLoader();
+    // Use a simple div element as a placeholder instead of 3D text
+    const labelElem = document.createElement('div');
+    labelElem.textContent = text;
+    labelElem.style.position = 'absolute';
+    labelElem.style.color = color;
+    labelElem.style.fontWeight = 'bold';
+    labelElem.style.fontSize = '12px';
+    labelElem.style.pointerEvents = 'none';
+    axesContainer.appendChild(labelElem);
+    return { element: labelElem, position: position };
+}
+
+// Create axis label objects
+const axisLabels = [
+    createAxisLabelMesh('X', '#ff0000', new THREE.Vector3(1.2, 0, 0)),
+    createAxisLabelMesh('Y', '#00ff00', new THREE.Vector3(0, 1.2, 0)),
+    createAxisLabelMesh('Z', '#0000ff', new THREE.Vector3(0, 0, 1.2))
+];
+
 // --- Mouse Move (hover logic) ---
 window.addEventListener('mousemove', (event) => {
+    // Skip hover detection during camera transitions
+    if (isTransitioning) return;
+    
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -107,42 +254,101 @@ window.addEventListener('mousemove', (event) => {
 
     if (intersects.length > 0) {
         const obj = intersects[0].object;
-        if (!stickyObject) {
+        // If we're not in focus mode or hovering over different object than focused
+        if (!focusedObject || focusedObject !== obj) {
             hoveredObject = obj;
-            label.style.display = 'block';
-            updateLabelContent(obj);
+            // Only show label for hovered object if we're not in focus mode
+            if (!focusedObject) {
+                label.style.display = 'block';
+                updateLabelContent(obj);
+            }
         }
     } else {
-        if (!stickyObject) {
-            hoveredObject = null;
+        hoveredObject = null;
+        // Only hide label if we're not in focus mode
+        if (!focusedObject) {
             label.style.display = 'none';
         }
     }
 });
 
-// --- Click to toggle stickiness ---
-// Modified: Only toggle label when an object is selected; if nothing is hovered, do nothing.
+// --- Click to toggle focus mode ---
 window.addEventListener('click', () => {
+    // Prevent clicking during transitions
+    if (isTransitioning) return;
+    
     if (hoveredObject) {
-        if (stickyObject && stickyObject === hoveredObject) {
-            // Toggle off sticky but do not hide the label immediately
-            stickyObject = null;
-            updateLabelContent(hoveredObject);
+        if (focusedObject && focusedObject === hoveredObject) {
+            // Exit focus mode and return to default (sun)
+            focusedObject = null;
+            smoothCameraTransition(defaultFocusObject);
+            label.style.display = 'none';
+            console.log("Exiting focus mode, centering on sun");
         } else {
-            stickyObject = hoveredObject;
-            updateLabelContent(stickyObject);
+            // Enter focus mode on clicked object
+            focusedObject = hoveredObject;
+            smoothCameraTransition(focusedObject);
+            updateLabelContent(focusedObject);
             label.style.display = 'block';
+            console.log(`Entering focus mode on: ${focusedObject.name}`);
         }
     }
-    // If nothing is hovered, do nothing (the label remains as is).
 });
+
+// --- Handle window resizing ---
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// --- Function to update axis labels positions ---
+function updateAxisLabels() {
+    // Center point of the axes widget
+    const centerX = 50;
+    const centerY = 50;
+    const scale = 35; // Scale factor for axis visibility
+    
+    // For each axis label
+    axisLabels.forEach(label => {
+        // Create a copy of the position vector
+        const pos = label.position.clone();
+        
+        // Apply the camera's rotation
+        pos.applyQuaternion(axesHelper.quaternion);
+        
+        // Project to 2D space and position the label accordingly
+        label.element.style.left = `${centerX + pos.x * scale}px`;
+        label.element.style.top = `${centerY - pos.y * scale}px`;
+        
+        // Handle visibility - hide labels that are pointing away (z < 0)
+        if (pos.z < 0) {
+            label.element.style.opacity = '0.3'; // Dim labels pointing away
+        } else {
+            label.element.style.opacity = '1';
+        }
+    });
+}
 
 // --- Animate loop ---
 function animate() {
-    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    
+    // Update TWEEN animations
+    TWEEN.update();
+    
     controls.update();
+    composer.render();
 
-    const targetObj = stickyObject || hoveredObject;
+    // Update orientation axes to match camera rotation
+    axesHelper.quaternion.copy(camera.quaternion).invert();
+    axesRenderer.render(axesScene, axesCamera);
+    updateAxisLabels();
+
+    // Update label position
+    // If in focus mode, always show the label for focused object
+    // If not in focus mode but hovering over an object, show label for hovered object
+    const targetObj = focusedObject || hoveredObject;
 
     if (targetObj) {
         const vector = targetObj.position.clone().project(camera);
@@ -155,4 +361,5 @@ function animate() {
     }
 }
 
-renderer.setAnimationLoop(animate);
+// Start the animation loop
+animate();
