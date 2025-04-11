@@ -1,0 +1,56 @@
+/* style.css */
+/* Apply Roboto font to all elements */
+* {
+    font-family: 'Roboto', sans-serif;
+  }
+
+body {
+    margin: 0;
+    overflow: hidden;
+  }
+  
+#sideBar {
+    position: fixed;
+    top: 50vh;
+    border-radius: 5px;
+    left: 30px;
+    width: 20vw;
+    height: 90vh;
+    background: linear-gradient(180deg, #272527, rgba(37, 37, 39, .8) 52.08%, rgba(37, 37, 39, 0));
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.title {
+    font-weight: 600;
+    font-size: 36px;
+}
+
+#panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#panelContent {
+margin-top: 10px;
+}
+
+button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button:hover {
+    color: lightgray;
+}
+
+#panelContent.collapsed {
+    display: none;
+}

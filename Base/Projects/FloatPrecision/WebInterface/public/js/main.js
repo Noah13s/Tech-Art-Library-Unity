@@ -7,42 +7,10 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-const textureLoader = new THREE.TextureLoader();
-const socket = new WebSocket('ws://localhost:3000');
-const scaleFactor = 1 / 1e9;
-
-// Listen for messages
-socket.onmessage = function(event) {
-    // Check if the message is a Blob (which it is if it's binary data)
-    if (event.data instanceof Blob) {
-        const reader = new FileReader();
-        reader.onloadend = function() {
-            try {
-                const msg = JSON.parse(reader.result);
-                if (msg.type === "playerPosition") {
-                    // Process the player's position here
-                    const playerPosition = msg;
-                    player.position.set(msg.x * scaleFactor, msg.y * scaleFactor, msg.z * scaleFactor);
-                    console.log(`Player position: X=${playerPosition.x}, Y=${playerPosition.y}, Z=${playerPosition.z}`);
-                    
-                    // If the player is in focus, update camera target
-                    if (focusedObject && focusedObject.name === 'Player') {
-                        if (!isTransitioning) {
-                            // Only update directly if not in transition
-                            controls.target.copy(player.position);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("Failed to parse WebSocket message:", err);
-            }
-        };
-        reader.readAsText(event.data); // Convert the Blob to text
-    }
-};
 
 // --- Scene Setup ---
 const scene = new THREE.Scene();
+export { scene };
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1); // soft white light
@@ -68,51 +36,6 @@ const bloomPass = new UnrealBloomPass(
 );
 composer.addPass(bloomPass);
 
-
-// --- Helper to create celestial objects ---
-function createObject(name, geometry, material, position) {
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.name = name;
-    mesh.position.set(...position);
-    scene.add(mesh);
-    return mesh;
-}
-
-// --- Objects ---
-textureLoader.load('/textures/2k_sun.jpg', (sunTexture) => {
-    const sunMaterial = new THREE.MeshStandardMaterial({
-        map: sunTexture,
-        emissive: 0xffff00,
-        emissiveIntensity: .5
-    });
-
-    const sun = createObject('Sun', new THREE.SphereGeometry(2, 32, 32), sunMaterial, [0, 0, 0]);
-    const defaultFocusObject = sun;
-});
-textureLoader.load('/textures/2k_earth_daymap.jpg', (earthTexture) => {
-    const earthMaterial = new THREE.MeshStandardMaterial({
-        map: earthTexture,
-        emissive: 0x0000ff,
-        emissiveIntensity: 0
-    });
-
-    const earth = createObject(
-        'Earth',
-        new THREE.SphereGeometry(0.5, 32, 32),
-        earthMaterial,
-        [149.5978707, 0, 0]
-    );
-});
-const moon = createObject('Moon', new THREE.SphereGeometry(0.2, 32, 32), new THREE.MeshStandardMaterial({
-    color: 0x888888,
-    emissive: 0x888888,
-    emissiveIntensity: 10
-}), [149.9822707, 0, 0]);
-const player = createObject('Player', new THREE.SphereGeometry(0.3, 32, 32), new THREE.MeshStandardMaterial({
-    color: 0xff0000,
-    emissive: 0xff0000,
-    emissiveIntensity: 10
-}), [8, 2, 0]);
 
 // --- Focus Mode Variables ---
 let focusedObject = null;
@@ -360,6 +283,7 @@ function animate() {
         label.style.top = `${y + 10}px`;
     }
 }
+
 
 // Start the animation loop
 animate();

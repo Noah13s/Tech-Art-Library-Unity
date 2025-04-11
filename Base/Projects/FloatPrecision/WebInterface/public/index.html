@@ -2,10 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My first three.js app</title>
     <style>
       body { margin: 0; }
     </style>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script type="importmap">
       {
         "imports": {
@@ -16,7 +19,31 @@
       </script>
   </head>
   <body>
+  <!-- Collapsible Floating Panel -->
+  <div id="sideBar">
+    <div id="panelHeader">
+      <span class="title">Object Details</span>
+      <button id="collapseBtn" onclick="togglePanel()">-</button>
+    </div>
+    <div id="panelContent">
+      <p id="objectDetails">Select an object to see details.</p>
+      <p id="objectDetails">Select an object to see details.</p>
+      <p id="objectDetails">Select an object to see details.</p>
+      <p id="objectDetails">Select an object to see details.</p>
+      <p id="objectDetails">Select an object to see details.</p>
+    </div>
+  </div>
+
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/scene.js"></script>
+    <script type="module" src="js/websocket.js"></script>
+    <script>
+      // Toggle the collapsible panel
+      function togglePanel() {
+          const panelContentDiv = document.getElementById('panelContent');
+          panelContentDiv.classList.toggle('collapsed');
+      }
+    </script>
   </body>
   
 </html>
