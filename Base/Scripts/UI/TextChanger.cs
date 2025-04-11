@@ -73,6 +73,11 @@ public class TextChanger : MonoBehaviour
         SetText(text.ToString());
     }
 
+    public void SetText(double text)
+    {
+        SetText(text.ToString());
+    }
+
     public void SetText(float text)
     {
         SetText(text.ToString());

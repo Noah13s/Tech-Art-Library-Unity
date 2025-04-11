@@ -56,7 +56,7 @@ public struct DoubleVector3
 public class FloatPrecisionPlayer : MonoBehaviour
 {
     [Tooltip("Position movement speed in m/s.")]
-    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private double moveSpeed = 10f;
     [Tooltip("Angular movement speed.")]
     [SerializeField] float sensitivity = 1.0f;
 
@@ -68,7 +68,7 @@ public class FloatPrecisionPlayer : MonoBehaviour
     [SerializeField] private DoubleVector3 velocity;
     
     [SerializeField] private UnityEvent<string> playerPositionEvent;
-    [SerializeField] private UnityEvent<float> playerSpeed;
+    [SerializeField] private UnityEvent<double> playerSpeed;
 
     void Update()
     {
