@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>My first three.js app</title>
     <style>
       body { margin: 0; }
@@ -22,8 +22,13 @@
   <!-- Collapsible Floating Panel -->
   <div id="sideBar">
     <div id="panelHeader">
-      <span class="title">Object Details</span>
-      <button id="collapseBtn" onclick="togglePanel()">-</button>
+      <div class="verticalGroup">
+        <span class="title">Object title</span>
+        <span class="subTitle">Object subtitle</span>
+      </div>
+      <div id="collapseBtn" onclick="togglePanel()" style="transform: rotate(0deg); transition: transform 0.3s ease; height: 24px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16" ><path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/></svg>
+      </div>
     </div>
     <div id="panelContent">
       <p id="objectDetails">Select an object to see details.</p>
@@ -42,6 +47,12 @@
       function togglePanel() {
           const panelContentDiv = document.getElementById('panelContent');
           panelContentDiv.classList.toggle('collapsed');
+          document.getElementById("sideBar").classList.toggle('collapsed');
+          if (document.getElementById('collapseBtn').style.transform == 'rotate(0deg)'){
+            document.getElementById('collapseBtn').style.transform = 'rotate(180deg)'
+          } else{
+            document.getElementById('collapseBtn').style.transform = 'rotate(0deg)'          
+          }
       }
     </script>
   </body>

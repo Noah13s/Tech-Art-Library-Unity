@@ -11,17 +11,25 @@ body {
   
 #sideBar {
     position: fixed;
-    top: 50vh;
     border-radius: 5px;
     left: 30px;
     width: 20vw;
-    height: 90vh;
     background: linear-gradient(180deg, #272527, rgba(37, 37, 39, .8) 52.08%, rgba(37, 37, 39, 0));
     color: white;
     padding: 20px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    transform: translateY(-50%);
     z-index: 10;
+    min-width: 300px;
+    min-height: 70px;
+    top: 3vh;
+    bottom: 3vh;
+    max-height: 100vh;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+#sideBar.collapsed {
+    max-height: 0;
 }
 
 .title {
@@ -29,14 +37,25 @@ body {
     font-size: 36px;
 }
 
+.subTitle {
+    color: grey;
+    font-size: 20px;
+}
+
 #panelHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    align-items: flex-start;
+}
+
+.verticalGroup{
+    display: flex;
+    flex-direction: column;
 }
 
 #panelContent {
-margin-top: 10px;
+    margin-top: 10px;
 }
 
 button {

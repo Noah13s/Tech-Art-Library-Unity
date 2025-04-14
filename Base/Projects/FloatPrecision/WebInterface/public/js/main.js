@@ -157,6 +157,21 @@ function createAxisLabelMesh(text, color, position) {
     return { element: labelElem, position: position };
 }
 
+// Function to update the sidebar with the selected object's user data
+function updateSidebarFromObject(selectedObject) {
+    const bodyData = selectedObject.userData;
+    const infoPanel = document.getElementById("sideBar");
+    infoPanel.getElementsByClassName("title")[0].textContent = bodyData.name;
+    infoPanel.getElementsByClassName("subTitle")[0].textContent = bodyData.type;
+    document.getElementById("panelContent").innerHTML = `
+      <p>Mass: ${bodyData.mass}</p>
+      <p>Radius: ${bodyData.radius}</p>
+      <p>Distance from Sun: ${bodyData.distanceFromSun}</p>
+      <img src="${bodyData.imageUrl}" alt="${bodyData.name}" />
+    `;
+}
+export { updateSidebarFromObject };
+
 // Create axis label objects
 const axisLabels = [
     createAxisLabelMesh('X', '#ff0000', new THREE.Vector3(1.2, 0, 0)),
@@ -214,6 +229,7 @@ window.addEventListener('click', () => {
             updateLabelContent(focusedObject);
             label.style.display = 'block';
             console.log(`Entering focus mode on: ${focusedObject.name}`);
+            updateSidebarFromObject(focusedObject);
         }
     }
 });
