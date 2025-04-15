@@ -1,9 +1,11 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UIControlSystem : MonoBehaviour
 {
     public NodeGridSystem nodeGridSystem;               // Reference to your NodeGridSystem
     public Vector2Int currentSelectedPosition = Vector2Int.zero; // Default selection at (0,0)
+    [SerializeField] private UnityEvent exitInteraction;
 
     void Start()
     {
@@ -36,6 +38,10 @@ public class UIControlSystem : MonoBehaviour
             GameObject currentNode = nodeGridSystem.GetNodeAtPosition(currentSelectedPosition);
             UIControlElement currentElement = currentNode.GetComponent<UIControlElement>();
             currentElement.Interact();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            exitInteraction?.Invoke();
         }
 
 

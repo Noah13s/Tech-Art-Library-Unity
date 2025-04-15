@@ -7,7 +7,7 @@ public class UIControlElement : MonoBehaviour
     [SerializeField] private UnityEvent onSelectEnter;
     [SerializeField] private UnityEvent onSelectExit;
     [SerializeField] private UnityEvent onInteraction;
-    
+
     public void SelectEnter()
     {
         selected = true;
@@ -23,4 +23,6 @@ public class UIControlElement : MonoBehaviour
     {
         onInteraction?.Invoke();
     }
+
+
 }
