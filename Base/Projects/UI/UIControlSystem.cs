@@ -3,6 +3,8 @@ using UnityEngine.Events;
 
 public class UIControlSystem : MonoBehaviour
 {
+    public bool resetSelection = false;
+    public bool resetSelectionPosition = false;
     public NodeGridSystem nodeGridSystem;               // Reference to your NodeGridSystem
     public Vector2Int currentSelectedPosition = Vector2Int.zero; // Default selection at (0,0)
     [SerializeField] private UnityEvent exitInteraction;
@@ -18,6 +20,11 @@ public class UIControlSystem : MonoBehaviour
             nodeGridSystem.SetNodeAtPosition(Vector2Int.zero, gameObject); // or assign a dedicated GameObject
 
         // Immediately select the default node
+        SelectNode(currentSelectedPosition);
+    }
+
+    private void OnEnable()
+    {
         SelectNode(currentSelectedPosition);
     }
 
@@ -42,6 +49,16 @@ public class UIControlSystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             exitInteraction?.Invoke();
+            if (resetSelection)
+            {
+                if (resetSelectionPosition) { currentSelectedPosition = Vector2Int.zero; }                
+                foreach (Vector2Int pos in nodeGridSystem.GetAllPositions())
+                {
+                    GameObject node = nodeGridSystem.GetNodeAtPosition(pos);
+                    node.GetComponent<UIControlElement>().SelectExit();
+                }
+            }
+
         }
 
 
