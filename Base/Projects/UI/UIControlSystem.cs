@@ -45,16 +45,6 @@ public class UIControlSystem : MonoBehaviour
 #if !ENABLE_INPUT_SYSTEM
         LegacyInputHandler();
 #endif
-
-        if (direction != Vector2Int.zero)
-        {
-            Vector2Int newPos = currentSelectedPosition + direction;
-            GameObject newNode = nodeGridSystem.GetNodeAtPosition(newPos);
-            if (newNode != null)
-            {
-                SelectNode(newPos);
-            }
-        }
     }
 
     private void LegacyInputHandler()
@@ -68,6 +58,17 @@ public class UIControlSystem : MonoBehaviour
             direction = new Vector2Int(-1, 0);
         else if (Input.GetKeyDown(KeyCode.RightArrow))
             direction = new Vector2Int(1, 0);
+
+        // Apply requested direction
+        if (direction != Vector2Int.zero)
+        {
+            Vector2Int newPos = currentSelectedPosition + direction;
+            GameObject newNode = nodeGridSystem.GetNodeAtPosition(newPos);
+            if (newNode != null)
+            {
+                SelectNode(newPos);
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
@@ -88,6 +89,7 @@ public class UIControlSystem : MonoBehaviour
                 }
             }
         }
+
     }
 #if ENABLE_INPUT_SYSTEM
     private void NewInputInit()
@@ -118,7 +120,16 @@ public class UIControlSystem : MonoBehaviour
     {
         direction = Vector2Int.zero;
         direction = Vector2Int.RoundToInt(obj.ReadValue<Vector2>());
-        Debug.Log(direction);
+        // Apply requested direction
+        if (direction != Vector2Int.zero)
+        {
+            Vector2Int newPos = currentSelectedPosition + direction;
+            GameObject newNode = nodeGridSystem.GetNodeAtPosition(newPos);
+            if (newNode != null)
+            {
+                SelectNode(newPos);
+            }
+        }
     }
     private void Enter(InputAction.CallbackContext obj)
     {
