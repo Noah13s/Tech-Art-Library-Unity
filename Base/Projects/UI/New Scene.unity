@@ -492,10 +492,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf95c011a2d444b468fb5873b8a23794, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resetSelection: 0
-  resetSelectionPosition: 0
   nodeGridSystem: {fileID: 623986283}
   currentSelectedPosition: {x: 0, y: 0}
+  LbRbNavigation: 0
+  resetSelection: 0
+  resetSelectionPosition: 0
   exitInteraction:
     m_PersistentCalls:
       m_Calls: []
@@ -1820,10 +1821,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf95c011a2d444b468fb5873b8a23794, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resetSelection: 1
-  resetSelectionPosition: 1
   nodeGridSystem: {fileID: 1083862900}
   currentSelectedPosition: {x: 0, y: 0}
+  LbRbNavigation: 0
+  resetSelection: 1
+  resetSelectionPosition: 1
   exitInteraction:
     m_PersistentCalls:
       m_Calls: []
@@ -1884,10 +1886,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf95c011a2d444b468fb5873b8a23794, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resetSelection: 1
-  resetSelectionPosition: 0
   nodeGridSystem: {fileID: 1253587651}
   currentSelectedPosition: {x: 0, y: 0}
+  LbRbNavigation: 0
+  resetSelection: 1
+  resetSelectionPosition: 0
   exitInteraction:
     m_PersistentCalls:
       m_Calls:
@@ -2535,10 +2538,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf95c011a2d444b468fb5873b8a23794, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resetSelection: 1
-  resetSelectionPosition: 0
   nodeGridSystem: {fileID: 1532485043}
   currentSelectedPosition: {x: 0, y: 0}
+  LbRbNavigation: 0
+  resetSelection: 1
+  resetSelectionPosition: 0
   exitInteraction:
     m_PersistentCalls:
       m_Calls:

@@ -4,7 +4,9 @@
     "references": [
         "Assembly",
         "Unity.RenderPipelines.Core.Runtime",
-        "Unity.RenderPipelines.Universal.Runtime"
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Players-Assembly-Definition",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

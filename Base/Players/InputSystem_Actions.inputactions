@@ -12,7 +12,7 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Look",
@@ -947,6 +947,138 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                }
+            ]
+        },
+        {
+            "name": "UIControls",
+            "id": "1d32541a-80e4-42ab-9050-f14acae9fa18",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "26666ef3-b1d0-4531-9161-a9154441a7c4",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "TabSwitch",
+                    "type": "Value",
+                    "id": "2059ba8c-ca7d-47c5-9216-7315456b0c1f",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Enter",
+                    "type": "Button",
+                    "id": "91e235c8-8eb1-4e66-981a-e38007cb9c34",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Exit",
+                    "type": "Button",
+                    "id": "cddf15c4-c544-4b95-ad6f-26777c9f8909",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "2D Vector",
+                    "id": "a16b3213-2617-4bd9-8e3c-5f3548fe55f8",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "ee95aa84-7dc5-4322-967c-01b4d79a992a",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "78199fd0-4834-425f-9569-3726c4ae5b51",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "537c16e3-fef0-4e7a-950b-35b03f32b55d",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "5e358562-a95d-4d96-8039-63e22294c5d1",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "eaa7fd2f-03ec-4663-af5a-2720404590ad",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TabSwitch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0e60b3bf-b127-4ed6-a92f-3cf47a062e9b",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Enter",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04c855da-eb23-4837-9d54-d71a75db9c75",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Exit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

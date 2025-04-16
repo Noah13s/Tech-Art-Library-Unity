@@ -34,7 +34,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
-                    ""initialStateCheck"": false
+                    ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""Look"",
@@ -971,6 +971,138 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""UIControls"",
+            ""id"": ""1d32541a-80e4-42ab-9050-f14acae9fa18"",
+            ""actions"": [
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""26666ef3-b1d0-4531-9161-a9154441a7c4"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""TabSwitch"",
+                    ""type"": ""Value"",
+                    ""id"": ""2059ba8c-ca7d-47c5-9216-7315456b0c1f"",
+                    ""expectedControlType"": ""Integer"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Enter"",
+                    ""type"": ""Button"",
+                    ""id"": ""91e235c8-8eb1-4e66-981a-e38007cb9c34"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Exit"",
+                    ""type"": ""Button"",
+                    ""id"": ""cddf15c4-c544-4b95-ad6f-26777c9f8909"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""a16b3213-2617-4bd9-8e3c-5f3548fe55f8"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""ee95aa84-7dc5-4322-967c-01b4d79a992a"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""78199fd0-4834-425f-9569-3726c4ae5b51"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""537c16e3-fef0-4e7a-950b-35b03f32b55d"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""5e358562-a95d-4d96-8039-63e22294c5d1"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""eaa7fd2f-03ec-4663-af5a-2720404590ad"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""TabSwitch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0e60b3bf-b127-4ed6-a92f-3cf47a062e9b"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Enter"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""04c855da-eb23-4837-9d54-d71a75db9c75"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Exit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1038,6 +1170,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_TopDown_Player_Interact = m_TopDown_Player.FindAction("Interact", throwIfNotFound: true);
         m_TopDown_Player_MouseDrag = m_TopDown_Player.FindAction("MouseDrag", throwIfNotFound: true);
         m_TopDown_Player_Move = m_TopDown_Player.FindAction("Move", throwIfNotFound: true);
+        // UIControls
+        m_UIControls = asset.FindActionMap("UIControls", throwIfNotFound: true);
+        m_UIControls_Move = m_UIControls.FindAction("Move", throwIfNotFound: true);
+        m_UIControls_TabSwitch = m_UIControls.FindAction("TabSwitch", throwIfNotFound: true);
+        m_UIControls_Enter = m_UIControls.FindAction("Enter", throwIfNotFound: true);
+        m_UIControls_Exit = m_UIControls.FindAction("Exit", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -1048,6 +1186,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         UnityEngine.Debug.Assert(!m_Helicopter_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Helicopter_Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Car_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Car_Player.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_TopDown_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.TopDown_Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_UIControls.enabled, "This will cause a leak and performance issues, InputSystem_Actions.UIControls.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -1557,6 +1696,76 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         }
     }
     public TopDown_PlayerActions @TopDown_Player => new TopDown_PlayerActions(this);
+
+    // UIControls
+    private readonly InputActionMap m_UIControls;
+    private List<IUIControlsActions> m_UIControlsActionsCallbackInterfaces = new List<IUIControlsActions>();
+    private readonly InputAction m_UIControls_Move;
+    private readonly InputAction m_UIControls_TabSwitch;
+    private readonly InputAction m_UIControls_Enter;
+    private readonly InputAction m_UIControls_Exit;
+    public struct UIControlsActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+        public UIControlsActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Move => m_Wrapper.m_UIControls_Move;
+        public InputAction @TabSwitch => m_Wrapper.m_UIControls_TabSwitch;
+        public InputAction @Enter => m_Wrapper.m_UIControls_Enter;
+        public InputAction @Exit => m_Wrapper.m_UIControls_Exit;
+        public InputActionMap Get() { return m_Wrapper.m_UIControls; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIControlsActions set) { return set.Get(); }
+        public void AddCallbacks(IUIControlsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UIControlsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UIControlsActionsCallbackInterfaces.Add(instance);
+            @Move.started += instance.OnMove;
+            @Move.performed += instance.OnMove;
+            @Move.canceled += instance.OnMove;
+            @TabSwitch.started += instance.OnTabSwitch;
+            @TabSwitch.performed += instance.OnTabSwitch;
+            @TabSwitch.canceled += instance.OnTabSwitch;
+            @Enter.started += instance.OnEnter;
+            @Enter.performed += instance.OnEnter;
+            @Enter.canceled += instance.OnEnter;
+            @Exit.started += instance.OnExit;
+            @Exit.performed += instance.OnExit;
+            @Exit.canceled += instance.OnExit;
+        }
+
+        private void UnregisterCallbacks(IUIControlsActions instance)
+        {
+            @Move.started -= instance.OnMove;
+            @Move.performed -= instance.OnMove;
+            @Move.canceled -= instance.OnMove;
+            @TabSwitch.started -= instance.OnTabSwitch;
+            @TabSwitch.performed -= instance.OnTabSwitch;
+            @TabSwitch.canceled -= instance.OnTabSwitch;
+            @Enter.started -= instance.OnEnter;
+            @Enter.performed -= instance.OnEnter;
+            @Enter.canceled -= instance.OnEnter;
+            @Exit.started -= instance.OnExit;
+            @Exit.performed -= instance.OnExit;
+            @Exit.canceled -= instance.OnExit;
+        }
+
+        public void RemoveCallbacks(IUIControlsActions instance)
+        {
+            if (m_Wrapper.m_UIControlsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUIControlsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UIControlsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UIControlsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UIControlsActions @UIControls => new UIControlsActions(this);
     private int m_AzertyKeyboardSchemeIndex = -1;
     public InputControlScheme AzertyKeyboardScheme
     {
@@ -1620,5 +1829,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         void OnInteract(InputAction.CallbackContext context);
         void OnMouseDrag(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+    }
+    public interface IUIControlsActions
+    {
+        void OnMove(InputAction.CallbackContext context);
+        void OnTabSwitch(InputAction.CallbackContext context);
+        void OnEnter(InputAction.CallbackContext context);
+        void OnExit(InputAction.CallbackContext context);
     }
 }
