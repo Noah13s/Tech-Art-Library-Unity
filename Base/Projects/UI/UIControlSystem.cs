@@ -33,6 +33,12 @@ public class UIControlSystem : MonoBehaviour
         // Ensure that the default node exists in NodeGridSystem
         if (!nodeGridSystem.HasNodeAtPosition(Vector2Int.zero))
             nodeGridSystem.SetNodeAtPosition(Vector2Int.zero, gameObject); // or assign a dedicated GameObject
+
+        foreach (var node in nodeGridSystem.nodeEntries)
+        {
+            UIControlElement currentElement = node.nodeObject.GetComponent<UIControlElement>();
+            currentElement.controlsystem = this;
+        }
     }
 
     private void OnEnable()
@@ -88,7 +94,7 @@ public class UIControlSystem : MonoBehaviour
                 foreach (Vector2Int pos in nodeGridSystem.GetAllPositions())
                 {
                     GameObject node = nodeGridSystem.GetNodeAtPosition(pos);
-                    node.GetComponent<UIControlElement>().SelectExit();
+                    node.GetComponent<UIControlElement>().ControllerSelectExit();
                 }
             }
         }
@@ -179,13 +185,13 @@ public class UIControlSystem : MonoBehaviour
             foreach (Vector2Int pos in nodeGridSystem.GetAllPositions())
             {
                 GameObject node = nodeGridSystem.GetNodeAtPosition(pos);
-                node.GetComponent<UIControlElement>().SelectExit();
+                node.GetComponent<UIControlElement>().ControllerSelectExit();
             }
         }
     }
 #endif
 
-    private void SelectNode(Vector2Int newPos)
+    public void SelectNode(Vector2Int newPos)
     {
         // Call SelectExit on the currently selected node if it has UIControlElement attached
         GameObject currentNode = nodeGridSystem.GetNodeAtPosition(currentSelectedPosition);
@@ -194,7 +200,7 @@ public class UIControlSystem : MonoBehaviour
             UIControlElement currentElement = currentNode.GetComponent<UIControlElement>();
             if (currentElement != null)
             {
-                currentElement.SelectExit();
+                currentElement.ControllerSelectExit();
             }
         }
 
@@ -208,7 +214,7 @@ public class UIControlSystem : MonoBehaviour
             UIControlElement newElement = newNode.GetComponent<UIControlElement>();
             if (newElement != null)
             {
-                newElement.SelectEnter();
+                newElement.ControllerSelectEnter();
             }
         }
     }

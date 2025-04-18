@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UIElements;
 
 public class NodeGridSystem : MonoBehaviour
 {
@@ -24,6 +25,19 @@ public class NodeGridSystem : MonoBehaviour
     {
         NodeEntry entry = nodeEntries.FirstOrDefault(e => e.position == position);
         return entry?.nodeObject;
+    }
+
+    public Vector2Int GetPositionOfNode(GameObject nodeobject)
+    {
+        NodeEntry entry = nodeEntries.FirstOrDefault(e => e.nodeObject == nodeobject);
+        if (entry != null) 
+        {
+            return entry.position;
+        }
+        else
+        {
+            return Vector2Int.zero;
+        }
     }
 
     public bool HasNodeAtPosition(Vector2Int position)

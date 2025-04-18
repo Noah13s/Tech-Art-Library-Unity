@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -5,20 +6,25 @@ using UnityEngine.EventSystems;
 public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     public bool selected = false;
-    [SerializeField] private UnityEvent onSelectEnter;
-    [SerializeField] private UnityEvent onSelectExit;
+    [Header("Events")]
+    [SerializeField] private UnityEvent onControllerSelectEnter;
+    [SerializeField] private UnityEvent onControllerSelectExit;
     [SerializeField] private UnityEvent onInteractionEnter;
     [SerializeField] private UnityEvent onInteractionExit;
+    [SerializeField] private UnityEvent onMouseSelectEnter;
+    [SerializeField] private UnityEvent onMouseSelectExit;
 
-    public void SelectEnter()
+    [NonSerialized] public UIControlSystem controlsystem;
+
+    public void ControllerSelectEnter()
     {
         selected = true;
-        onSelectEnter?.Invoke();
+        onControllerSelectEnter?.Invoke();
     }
-    public void SelectExit()
+    public void ControllerSelectExit()
     {
         selected = false; 
-        onSelectExit?.Invoke();
+        onControllerSelectExit?.Invoke();
     }
 
     public void InteractEnter()
@@ -30,14 +36,26 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
         onInteractionExit?.Invoke();
     }
 
+    public void MouseSelectEnter()
+    {
+        selected = true;
+        onMouseSelectEnter?.Invoke();
+    }
+    public void MouseSelectExit()
+    {
+        selected = false;
+        onMouseSelectExit?.Invoke();
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
-        SelectEnter();
+        MouseSelectEnter();
+        if (controlsystem != null) { controlsystem.SelectNode(controlsystem.nodeGridSystem.GetPositionOfNode(this.gameObject)); }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        SelectExit();
+        MouseSelectExit();
     }
 
     public void OnPointerDown(PointerEventData eventData)
