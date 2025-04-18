@@ -1,12 +1,14 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
-public class UIControlElement : MonoBehaviour
+public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     public bool selected = false;
     [SerializeField] private UnityEvent onSelectEnter;
     [SerializeField] private UnityEvent onSelectExit;
-    [SerializeField] private UnityEvent onInteraction;
+    [SerializeField] private UnityEvent onInteractionEnter;
+    [SerializeField] private UnityEvent onInteractionExit;
 
     public void SelectEnter()
     {
@@ -19,10 +21,31 @@ public class UIControlElement : MonoBehaviour
         onSelectExit?.Invoke();
     }
 
-    public void Interact()
+    public void InteractEnter()
     {
-        onInteraction?.Invoke();
+        onInteractionEnter?.Invoke();
+    }
+    public void InteractExit()
+    {
+        onInteractionExit?.Invoke();
     }
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        SelectEnter();
+    }
 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        SelectExit();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        InteractEnter();
+    }
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        InteractExit();
+    }
 }

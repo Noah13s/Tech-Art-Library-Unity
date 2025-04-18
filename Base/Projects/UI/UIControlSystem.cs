@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Class for UI navigation for both unity input systems using <see cref="NodeGridSystem"/> for the navigation setup.
+/// </summary>
 public class UIControlSystem : MonoBehaviour
 {
     [Header("Setup")]
@@ -74,7 +77,7 @@ public class UIControlSystem : MonoBehaviour
         {
             GameObject currentNode = nodeGridSystem.GetNodeAtPosition(currentSelectedPosition);
             UIControlElement currentElement = currentNode.GetComponent<UIControlElement>();
-            currentElement.Interact();
+            currentElement.InteractEnter();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -92,30 +95,42 @@ public class UIControlSystem : MonoBehaviour
 
     }
 #if ENABLE_INPUT_SYSTEM
+    /// <summary>
+    /// New input system function for initializing the control reference and control events on enable.<br></br>
+    /// The new input system uses events while the legacy system uses <see cref="Update()"/>.
+    /// </summary>
     private void NewInputInit()
     {
         // Initialize the input actions for the new Input System
         if (controls == null)
         {
             controls = new();
-            controls.Enable();
             move = controls.UIControls.Move;
             enter = controls.UIControls.Enter;
             exit = controls.UIControls.Exit;
             tabChange = controls.UIControls.TabSwitch;
         }
+        controls.Enable();
 
         move.performed += Move;
-        enter.performed += Enter;
+        enter.started += EnterPressed;
+        enter.canceled += EnterReleased;
         exit.performed += Exit;
     }
 
     private void OnDisable()
     {
         move.performed -= Move;
-        enter.performed -= Enter;
+        enter.started -= EnterPressed;
+        enter.canceled -= EnterReleased;
         exit.performed -= Exit;
+        controls.Disable();
     }
+    /// <summary>
+    /// New input system function called by the "move" InputAction.<br></br>
+    /// This function moves the selection depending on the input int.
+    /// </summary>
+    /// <param name="obj"></param>
     private void Move(InputAction.CallbackContext obj)
     {
         direction = Vector2Int.zero;
@@ -131,12 +146,30 @@ public class UIControlSystem : MonoBehaviour
             }
         }
     }
-    private void Enter(InputAction.CallbackContext obj)
+    /// <summary>
+    /// New input system function for when the interact button is pressed.
+    /// </summary>
+    /// <param name="obj"></param>
+    private void EnterPressed(InputAction.CallbackContext obj)
     {
         GameObject currentNode = nodeGridSystem.GetNodeAtPosition(currentSelectedPosition);
         UIControlElement currentElement = currentNode.GetComponent<UIControlElement>();
-        currentElement.Interact();
+        currentElement.InteractEnter();
     }
+    /// <summary>
+    /// New input system function for when the interact button is released.
+    /// </summary>
+    /// <param name="obj"></param>
+    private void EnterReleased(InputAction.CallbackContext obj)
+    {
+        GameObject currentNode = nodeGridSystem.GetNodeAtPosition(currentSelectedPosition);
+        UIControlElement currentElement = currentNode.GetComponent<UIControlElement>();
+        currentElement.InteractExit();
+    }
+    /// <summary>
+    /// New input system function for when the exit button is pressed.
+    /// </summary>
+    /// <param name="obj"></param>
     private void Exit(InputAction.CallbackContext obj)
     {
         exitInteraction?.Invoke();
