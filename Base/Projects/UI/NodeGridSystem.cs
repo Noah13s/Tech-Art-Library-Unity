@@ -189,13 +189,17 @@ public class NodeGridSystemEditor : Editor
 
         // Compute total width and height needed with some padding.
         float totalWidth = (horizontalExtent * 2) * (nodeSize + spacing) + nodeSize + spacing * 2;
-        float totalHeight = (verticalExtent * 2) * (nodeSize + spacing) + nodeSize + spacing * 2;
-
-        // Get a control rect with computed height.
+        // how many cells above and below origin
+        float widthPerCell = nodeSize + spacing;
+        float gridHeight = (topExtent + bottomExtent) * widthPerCell + nodeSize;
+        float totalHeight = gridHeight + spacing * 2;
+        // reserve a rect of that exact height
         Rect gridArea = EditorGUILayout.GetControlRect(false, totalHeight);
+        // compute the Y of the origin node’s center:  
+        //   from the top of gridArea + top padding + topExtent cells down + half a node
+        float originCenterY = gridArea.y + spacing + topExtent * widthPerCell + nodeSize * 0.5f;
+        Vector2 defaultCenter = new Vector2(gridArea.center.x, originCenterY);
 
-        // Use gridArea.center as the default node center.
-        Vector2 defaultCenter = gridArea.center;
         Dictionary<Vector2Int, Rect> nodeRects = new Dictionary<Vector2Int, Rect>();
 
         // Position each node relative to (0,0) at the center.
