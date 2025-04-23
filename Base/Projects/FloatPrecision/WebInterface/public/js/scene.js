@@ -19,7 +19,7 @@ function createObject(name, geometry, material, position, userData) {
 }
 
 // --- Object Creation ---
-textureLoader.load('/public/textures/2k_sun.jpg', (sunTexture) => {
+textureLoader.load('/textures/2k_sun.jpg', (sunTexture) => {
     const sunMaterial = new THREE.MeshStandardMaterial({
         map: sunTexture,
         emissive: 0xffff00,
@@ -35,7 +35,7 @@ textureLoader.load('/public/textures/2k_sun.jpg', (sunTexture) => {
     });
     updateSidebarFromObject(sun);// Default start object
 });
-textureLoader.load('/public/textures/2k_earth_daymap.jpg', (earthTexture) => {
+textureLoader.load('/textures/2k_earth_daymap.jpg', (earthTexture) => {
     const earthMaterial = new THREE.MeshStandardMaterial({
         map: earthTexture,
         emissive: 0x0000ff,
