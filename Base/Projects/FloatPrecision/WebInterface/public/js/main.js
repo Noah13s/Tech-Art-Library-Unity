@@ -39,6 +39,7 @@ composer.addPass(bloomPass);
 
 // --- Focus Mode Variables ---
 let focusedObject = null;
+export { focusedObject };
 let isTransitioning = false;
 const transitionDuration = 1500; // Transition time in milliseconds
 
