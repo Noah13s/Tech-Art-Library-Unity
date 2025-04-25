@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import { scene, updateSidebarFromObject } from './main.js';
+import { scene, updateSidebarFromObject, objectsWithLabels } from './main.js';
+import { createLabelForObject } from './labels.js';
 
 const textureLoader = new THREE.TextureLoader();
+const labelContainer = document.getElementById('label-container'); // Ensure this exists in your HTML
 
 var sun;
 var earth;
@@ -33,8 +35,10 @@ textureLoader.load('/textures/2k_sun.jpg', (sunTexture) => {
         radius: "696,340 km",
         distanceFromEarth: "149.6 million km",
     });
-    updateSidebarFromObject(sun);// Default start object
+    createLabelForObject(sun, labelContainer, objectsWithLabels); // Add label
+    updateSidebarFromObject(sun); // Default start object
 });
+
 textureLoader.load('/textures/2k_earth_daymap.jpg', (earthTexture) => {
     const earthMaterial = new THREE.MeshStandardMaterial({
         map: earthTexture,
@@ -49,7 +53,9 @@ textureLoader.load('/textures/2k_earth_daymap.jpg', (earthTexture) => {
         radius: "6,371 km",
         distanceFromSun: "149.6 million km"
     });
+    createLabelForObject(earth, labelContainer, objectsWithLabels); // Add label
 });
+
 moon = createObject('Moon', new THREE.SphereGeometry(0.2, 32, 32), new THREE.MeshStandardMaterial({
     color: 0x888888,
     emissive: 0x888888,
@@ -62,4 +68,3 @@ player = createObject('Player', new THREE.SphereGeometry(0.3, 32, 32), new THREE
 }), [8, 2, 0]);
 
 export { player, moon, sun, earth };
-
