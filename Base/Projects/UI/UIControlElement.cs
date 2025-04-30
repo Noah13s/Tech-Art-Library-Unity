@@ -27,7 +27,7 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
         onControllerSelectExit?.Invoke();
     }
 
-    public void InteractEnter()
+    public virtual void InteractEnter()
     {
         onInteractionEnter?.Invoke();
     }
