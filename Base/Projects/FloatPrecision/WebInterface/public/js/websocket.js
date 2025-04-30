@@ -1,5 +1,5 @@
 import { player, moon, sun, earth } from './scene.js';
-import { focusedObject } from './main.js';
+import { focusedObject, isTransitioning, controls } from './main.js';
 
 const socket = new WebSocket('ws://localhost:3000');
 const scaleFactor = 1 / 1e9;

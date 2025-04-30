@@ -200,6 +200,8 @@ animate();
 export { updateSidebarFromObject };
 export { focusedObject };
 export { objectsWithLabels };
+export { isTransitioning };
+export { controls };
 
 // --- Add Reset Camera Button ---
 const resetButton = document.createElement('button');
