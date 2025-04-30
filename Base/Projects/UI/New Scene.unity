@@ -1548,6 +1548,7 @@ MonoBehaviour:
   onMouseSelectExit:
     m_PersistentCalls:
       m_Calls: []
+  needFocusToNavigate: 0
 --- !u!1 &821189753
 GameObject:
   m_ObjectHideFlags: 0

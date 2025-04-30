@@ -16,12 +16,12 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [NonSerialized] public UIControlSystem controlsystem;
 
-    public void ControllerSelectEnter()
+    public virtual void ControllerSelectEnter()
     {
         selected = true;
         onControllerSelectEnter?.Invoke();
     }
-    public void ControllerSelectExit()
+    public virtual void ControllerSelectExit()
     {
         selected = false; 
         onControllerSelectExit?.Invoke();
@@ -31,38 +31,38 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         onInteractionEnter?.Invoke();
     }
-    public void InteractExit()
+    public virtual void InteractExit()
     {
         onInteractionExit?.Invoke();
     }
 
-    public void MouseSelectEnter()
+    public virtual void MouseSelectEnter()
     {
         selected = true;
         onMouseSelectEnter?.Invoke();
     }
-    public void MouseSelectExit()
+    public virtual void MouseSelectExit()
     {
         selected = false;
         onMouseSelectExit?.Invoke();
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public virtual void OnPointerEnter(PointerEventData eventData)
     {
         MouseSelectEnter();
         if (controlsystem != null) { controlsystem.SelectNode(controlsystem.nodeGridSystem.GetPositionOfNode(this.gameObject)); }
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public virtual void OnPointerExit(PointerEventData eventData)
     {
         MouseSelectExit();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public virtual void OnPointerDown(PointerEventData eventData)
     {
         InteractEnter();
     }
-    public void OnPointerUp(PointerEventData eventData)
+    public virtual void OnPointerUp(PointerEventData eventData)
     {
         InteractExit();
     }

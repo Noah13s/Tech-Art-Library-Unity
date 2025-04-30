@@ -5,7 +5,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Slider))]
 public class UISliderElement : UIControlElement
 {
+    [Tooltip("If true, the slider can be focused this will lock navigation to the slider when entered. If false, the slider cannot be entered and is navigable via selection only.")]
+    [SerializeField] private bool needFocusToNavigate = true;
+
     private Slider slider;
+    private bool focused;
 
 #if ENABLE_INPUT_SYSTEM
     private InputSystem_Actions controls;
@@ -50,6 +54,7 @@ public class UISliderElement : UIControlElement
     /// <param name="obj"></param>
     private void Move(InputAction.CallbackContext obj)
     {
+        if (needFocusToNavigate && !focused) { return; }
         if (selected) { slider.value = Mathf.Clamp(slider.value + obj.ReadValue<Vector2>().x, slider.minValue, slider.maxValue); }        
     }
     private void Exit(InputAction.CallbackContext obj)
@@ -65,12 +70,21 @@ public class UISliderElement : UIControlElement
     public override void InteractEnter()
     {
         base.InteractEnter();
-
+        if (!needFocusToNavigate) { return; }    
         controlsystem.enabled = false;
+        focused = true;
+    }
+
+    public override void MouseSelectExit()
+    {
+        base.MouseSelectExit();
+        if (!needFocusToNavigate) { return; }
+        ExitSlider();
     }
 
     private void ExitSlider()
     {
         controlsystem.enabled = true;
+        focused = false;
     }
 }
