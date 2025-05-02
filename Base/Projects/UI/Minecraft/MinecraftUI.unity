@@ -3313,6 +3313,7 @@ GameObject:
   - component: {fileID: 1384479744}
   - component: {fileID: 1384479745}
   - component: {fileID: 1384479746}
+  - component: {fileID: 1384479747}
   m_Layer: 5
   m_Name: FOV
   m_TagString: Untagged
@@ -3389,10 +3390,22 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 9
   m_WholeNumbers: 1
-  m_Value: 8
+  m_Value: 4
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1384479747}
+        m_TargetAssemblyTypeName: Carrousel, Projects
+        m_MethodName: SetIndex
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1384479746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3503,6 +3516,30 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1384479747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384479743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a263e5fdee7eca047bc4979ae4e82dda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  index: 8
+  stringArray:
+  - "FOV: 30\xB0\t"
+  - "FOV: 40\xB0\t"
+  - "FOV: 50\xB0\t"
+  - "FOV: 60\xB0\t"
+  - 'FOV: Normal'
+  - "FOV: 80\xB0\t"
+  - "FOV: 90\xB0\t"
+  - "FOV: 100\xB0\t"
+  - "FOV: Quake Pro\t"
+  text: {fileID: 1776144093}
 --- !u!1 &1472535161
 GameObject:
   m_ObjectHideFlags: 0
@@ -4429,7 +4466,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 32
   m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
