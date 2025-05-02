@@ -69,12 +69,14 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public virtual void OnPointerEnter(PointerEventData eventData)
     {
+        if (controlsystem.enabled == false) { return; } // Prevents mouse selection when the system is disabled.
         MouseSelectEnter();
         if (controlsystem != null) { controlsystem.SelectNode(controlsystem.nodeGridSystem.GetPositionOfNode(this.gameObject)); }
     }
 
     public virtual void OnPointerExit(PointerEventData eventData)
     {
+        if (controlsystem.enabled == false) { return; } // Prevents mouse selection when the system is disabled.
         MouseSelectExit();
     }
 

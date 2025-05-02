@@ -92,7 +92,7 @@ public class UISliderElement : UIControlElement
     {
         base.MouseSelectExit();
         if (!needFocusToNavigate) { return; }
-        ExitSlider();
+        //ExitSlider();
     }
 
     private void ExitSlider()
