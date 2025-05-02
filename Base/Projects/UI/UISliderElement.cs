@@ -1,12 +1,16 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Slider))]
 public class UISliderElement : UIControlElement
 {
+    [Header("Slider Settings")]
     [Tooltip("If true, the slider can be focused this will lock navigation to the slider when entered. If false, the slider cannot be entered and is navigable via selection only.")]
     [SerializeField] private bool needFocusToNavigate = true;
+    [SerializeField] private UnityEvent onFocusEnter;
+    [SerializeField] private UnityEvent onFocusExit;
 
     private Slider slider;
     private bool focused;
@@ -73,6 +77,7 @@ public class UISliderElement : UIControlElement
         if (!needFocusToNavigate) { return; }    
         controlsystem.enabled = false;
         focused = true;
+        onFocusEnter?.Invoke();
     }
 
     public override void MouseSelectExit()
@@ -86,5 +91,6 @@ public class UISliderElement : UIControlElement
     {
         controlsystem.enabled = true;
         focused = false;
+        onFocusExit?.Invoke();
     }
 }
