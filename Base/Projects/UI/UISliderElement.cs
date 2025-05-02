@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+
 [RequireComponent(typeof(Slider))]
 public class UISliderElement : UIControlElement
 {
@@ -78,6 +79,13 @@ public class UISliderElement : UIControlElement
         controlsystem.enabled = false;
         focused = true;
         onFocusEnter?.Invoke();
+    }
+
+    public override void InteractExit()
+    {
+        base.InteractExit();
+        if (!needFocusToNavigate) { return; }
+        ExitSlider();
     }
 
     public override void MouseSelectExit()
