@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 899e1f1109c517e4e9cbd1e4268f4813
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - impactVFX: {instanceID: 0}
+  - bulletPrefab: {fileID: 6397423374754405822, guid: b2b38fd473737154587c4b6107930ae2, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
