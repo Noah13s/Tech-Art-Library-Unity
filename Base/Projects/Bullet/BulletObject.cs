@@ -45,13 +45,6 @@ public class BulletObject : MonoBehaviour
 
             // Calculate maximum penetration depth based on bullet and material properties
             float maxPenetrationDepth = CalculateMaxPenetrationDepth(materialDensity);
-            /*
-            // If we've exceeded max penetration, stop the bullet
-            if (currentPenetrationDepth >= maxPenetrationDepth)
-            {
-                StopBullet();
-                return;
-            }*/
 
             // Slow down based on penetration depth percentage
             float penetrationRatio = currentPenetrationDepth / maxPenetrationDepth;
@@ -62,8 +55,10 @@ public class BulletObject : MonoBehaviour
             v *= Mathf.Clamp01(1f - (bulletData.ballisticCoefficient * penetrationDragMultiplier * slowdownFactor * Time.deltaTime));
             rb.velocity = v;
 
-            // Add slight random deflection to simulate internal material inconsistencies
-            rb.velocity += Vector3.Lerp(Vector3.zero, Random.insideUnitSphere * 0.1f, Time.deltaTime);
+            // Add progressively increasing random trajectory deviation during penetration
+            float deviationStrength = Mathf.Lerp(0.05f, 25f, penetrationRatio);
+            Vector3 randomDeviation = Random.insideUnitSphere * deviationStrength;
+            rb.velocity += Vector3.Lerp(Vector3.zero, randomDeviation, Time.deltaTime * penetrationRatio);
         }
     }
 
@@ -79,6 +74,32 @@ public class BulletObject : MonoBehaviour
 
             // Log entry for debugging
             Debug.Log($"Bullet entered: {other.name}");
+
+            if (bulletData.fragmentation)
+            {
+                // Handle fragmentation logic here
+                Debug.Log("Bullet fragmented!");
+
+                // Number of fragments to create
+                int fragmentCount = 5;
+
+                for (int i = 0; i < fragmentCount; i++)
+                {
+                    // Instantiate a new fragment
+                    GameObject fragment = Instantiate(bulletData.bulletPrefab, transform.position, Quaternion.identity);
+
+                    // Apply random direction and reduced speed to the fragment
+                    Rigidbody fragmentRb = fragment.GetComponent<Rigidbody>();
+                    if (fragmentRb != null)
+                    {
+                        Vector3 randomDirection = Random.insideUnitSphere.normalized;
+                        fragmentRb.velocity = randomDirection * (bulletData.speed * 0.5f); // Half the original speed
+                    }
+                }
+
+                // Destroy the original bullet after fragmentation
+                Destroy(gameObject);
+            }
         }
     }
 

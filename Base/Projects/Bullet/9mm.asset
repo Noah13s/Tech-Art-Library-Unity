@@ -18,3 +18,4 @@ MonoBehaviour:
   impactVFX: {fileID: 0}
   bulletPrefab: {fileID: 6397423374754405822, guid: b2b38fd473737154587c4b6107930ae2, type: 3}
   mass: 9.5
+  fragmentation: 1

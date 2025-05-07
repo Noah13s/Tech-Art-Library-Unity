@@ -12,4 +12,5 @@ public class BulletData : ScriptableObject
     public GameObject impactVFX;
     public GameObject bulletPrefab;
     public float mass = 9f;
+    public bool fragmentation = false;
 }
