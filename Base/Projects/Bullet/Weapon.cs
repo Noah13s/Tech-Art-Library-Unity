@@ -5,16 +5,48 @@ public class Weapon : MonoBehaviour
 {
     public Magazine magazine;
     public Transform bulletSpawnPoint; // Where bullets spawn from
+    public BulletData[] compatibleAmmo; // Array of compatible ammo types
 
 
     public void Fire()
     {
+        // Check if the magazine has ammo
+        if (magazine == null || magazine.currentAmmo <= 0)
+        {
+            Debug.LogWarning("Cannot fire: Magazine is empty or not assigned.");
+            return;
+        }
+
+        // Validate if the current bullet type in the magazine is compatible
+        bool isCompatible = false;
+        foreach (BulletData ammo in compatibleAmmo)
+        {
+            if (ammo == magazine.bulletData)
+            {
+                isCompatible = true;
+                break;
+            }
+        }
+
+        if (!isCompatible)
+        {
+            Debug.LogWarning("Cannot fire: Current bullet type in the magazine is not compatible with this weapon.");
+            return;
+        }
+
+        // Fire the magazine (reduce ammo count)
         magazine.Fire();
 
         // Instantiate the bullet prefab at the spawn point
+        if (magazine.bulletData.bulletPrefab == null)
+        {
+            Debug.LogError("Cannot fire: Bullet prefab is not assigned in the BulletData.");
+            return;
+        }
+
         GameObject bulletGO = Instantiate(magazine.bulletData.bulletPrefab, bulletSpawnPoint.position, bulletSpawnPoint.rotation);
 
-        // Get the BulletObject component and assign bullet data
+        // Assign bullet data to the instantiated bullet object
         BulletObject bullet = bulletGO.GetComponent<BulletObject>();
         if (bullet != null)
         {

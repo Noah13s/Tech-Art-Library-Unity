@@ -11,4 +11,5 @@ public class BulletData : ScriptableObject
     public float lifetime = 5f;
     public GameObject impactVFX;
     public GameObject bulletPrefab;
+    public float mass = 9f;
 }
