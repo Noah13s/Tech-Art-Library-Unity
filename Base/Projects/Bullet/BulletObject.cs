@@ -64,7 +64,7 @@ public class BulletObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // Don't re-enter tracking if already inside an object
+        // Ne pas ré-entrer si déjà à l'intérieur d'un objet
         if (!insideObject)
         {
             insideObject = true;
@@ -72,32 +72,55 @@ public class BulletObject : MonoBehaviour
             entryPoint = transform.position;
             currentPenetrationDepth = 0f;
 
-            // Log entry for debugging
             Debug.Log($"Bullet entered: {other.name}");
+
+            // Récupère la densité du matériau
+            float materialDensity = GetMaterialDensity(currentPenetratedObject);
+
+            // Récupère l'épaisseur du mur (exemple : via la taille du collider)
+            float wallThickness = 0f;
+            if (other is BoxCollider box)
+                wallThickness = box.size.z * box.transform.lossyScale.z;
+            else if (other is CapsuleCollider capsule)
+                wallThickness = capsule.height * capsule.transform.lossyScale.z;
+            else if (other is SphereCollider sphere)
+                wallThickness = sphere.radius * 2f * sphere.transform.lossyScale.z;
+            else
+                wallThickness = 1f; // Valeur par défaut
+
+            // Calcule la pénétration maximale
+            float maxPenetrationDepth = CalculateMaxPenetrationDepth(materialDensity);
+
+            // Si le mur est trop épais, la balle s'arrête à la surface
+            if (wallThickness >= maxPenetrationDepth)
+            {
+                StopBullet();
+                Debug.Log("Bullet stopped at the surface due to wall thickness.");
+                return;
+            }
 
             if (bulletData.fragmentation)
             {
-                // Handle fragmentation logic here
                 Debug.Log("Bullet fragmented!");
 
-                // Number of fragments to create
                 int fragmentCount = 5;
+                float angleVariation = 20f;
 
                 for (int i = 0; i < fragmentCount; i++)
                 {
-                    // Instantiate a new fragment
                     GameObject fragment = Instantiate(bulletData.bulletPrefab, transform.position, Quaternion.identity);
 
-                    // Apply random direction and reduced speed to the fragment
                     Rigidbody fragmentRb = fragment.GetComponent<Rigidbody>();
                     if (fragmentRb != null)
                     {
-                        Vector3 randomDirection = Random.insideUnitSphere.normalized;
-                        fragmentRb.velocity = randomDirection * (bulletData.speed * 0.5f); // Half the original speed
+                        Vector3 baseDirection = rb.velocity.normalized;
+                        Quaternion randomRot = Quaternion.AngleAxis(Random.Range(-angleVariation, angleVariation), Random.onUnitSphere);
+                        Vector3 fragmentDirection = randomRot * baseDirection;
+
+                        fragmentRb.velocity = fragmentDirection * (bulletData.speed * 0.5f);
                     }
                 }
 
-                // Destroy the original bullet after fragmentation
                 Destroy(gameObject);
             }
         }
@@ -146,11 +169,9 @@ public class BulletObject : MonoBehaviour
 
     private float CalculateMaxPenetrationDepth(float materialDensity)
     {
-        // Calculate max penetration based on bullet data and material density
-        // Formula can be tuned based on desired simulation accuracy
-
-        float bulletEnergy = bulletData.speed * (bulletData.mass/1000);
-        float penetration = bulletEnergy / (materialDensity * 10f);
+        // Exemple très simplifié inspiré de la balistique terminale
+        float bulletEnergy = 0.5f * (bulletData.mass / 1000f) * bulletData.speed * bulletData.speed; // en Joules
+        float penetration = bulletEnergy / (materialDensity * 100f); // Ajustez le facteur selon vos tests
 
         // Respect minimum thickness to allow small objects to actually stop bullets
         return Mathf.Max(penetration, 0.05f);
