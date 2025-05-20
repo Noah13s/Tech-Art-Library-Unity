@@ -3,12 +3,12 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Class for UI navigation for both unity input systems using <see cref="NodeGridSystem"/> for the navigation setup.
+/// Class for UI navigation for both unity input systems using <see cref="NodeTreeSystem"/> for the navigation setup.
 /// </summary>
 public class UIControlSystem : MonoBehaviour
 {
     [Header("Setup")]
-    public NodeGridSystem nodeGridSystem;               // Reference to your NodeGridSystem
+    public NodeTreeSystem nodeGridSystem;               // Reference to your NodeGridSystem
     public Vector2Int currentSelectedPosition = Vector2Int.zero; // Default selection at (0,0)
     [Header("Parameters")]
     public bool LbRbNavigation = false;
@@ -28,7 +28,7 @@ public class UIControlSystem : MonoBehaviour
     {
         // Auto-assign the NodeGridSystem if not set
         if (nodeGridSystem == null)
-            nodeGridSystem = FindObjectOfType<NodeGridSystem>();
+            nodeGridSystem = FindObjectOfType<NodeTreeSystem>();
 
         // Ensure that the default node exists in NodeGridSystem
         if (!nodeGridSystem.HasNodeAtPosition(Vector2Int.zero))

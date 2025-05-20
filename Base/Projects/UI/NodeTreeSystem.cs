@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
 
-public class NodeGridSystem : MonoBehaviour
+public class NodeTreeSystem : MonoBehaviour
 {
     [System.Serializable]
     public class NodeEntry
@@ -30,7 +30,7 @@ public class NodeGridSystem : MonoBehaviour
     public Vector2Int GetPositionOfNode(GameObject nodeobject)
     {
         NodeEntry entry = nodeEntries.FirstOrDefault(e => e.nodeObject == nodeobject);
-        if (entry != null) 
+        if (entry != null)
         {
             return entry.position;
         }
@@ -83,7 +83,7 @@ public class NodeGridSystem : MonoBehaviour
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(NodeGridSystem))]
+[CustomEditor(typeof(NodeTreeSystem))]
 public class NodeGridSystemEditor : Editor
 {
     private const float nodeSize = 60f;
@@ -91,7 +91,7 @@ public class NodeGridSystemEditor : Editor
     private const float buttonSize = 20f;
 
     // Directions for connections: Up, Right, Down, Left
-    private Vector2Int[] directions = new Vector2Int[]
+    static public Vector2Int[] directions = new Vector2Int[]
     {
         new Vector2Int(0, 1),
         new Vector2Int(1, 0),
@@ -103,9 +103,17 @@ public class NodeGridSystemEditor : Editor
     {
         serializedObject.Update();
 
-        NodeGridSystem nodeSystem = (NodeGridSystem)target;
+        NodeTreeSystem nodeSystem = (NodeTreeSystem)target;
 
         EditorGUILayout.LabelField("Node Grid System", EditorStyles.boldLabel);
+        EditorGUILayout.Space();
+
+        // Add button to open in popup window
+        if (GUILayout.Button("Open Node Grid in Popup Window", GUILayout.Height(30)))
+        {
+            NodeGridPopupWindow.ShowWindow(nodeSystem);
+        }
+
         EditorGUILayout.Space();
 
         // Ensure the default node (0,0) always exists.
@@ -125,7 +133,7 @@ public class NodeGridSystemEditor : Editor
     }
 
     // Checks connectivity using BFS from the default node (0,0) after removing posToRemove.
-    private bool IsConnectedAfterRemoval(NodeGridSystem nodeSystem, Vector2Int posToRemove)
+    static public bool IsConnectedAfterRemoval(NodeTreeSystem nodeSystem, Vector2Int posToRemove)
     {
         List<Vector2Int> allPositions = nodeSystem.GetAllPositions();
         // Remove the node we plan to remove.
@@ -156,7 +164,7 @@ public class NodeGridSystemEditor : Editor
     }
 
     // Determines if a node can be safely removed.
-    private bool CanRemoveNodeSafely(NodeGridSystem nodeSystem, Vector2Int posToRemove)
+    private bool CanRemoveNodeSafely(NodeTreeSystem nodeSystem, Vector2Int posToRemove)
     {
         // Do not allow removal of the default node.
         if (posToRemove == Vector2Int.zero)
@@ -166,7 +174,7 @@ public class NodeGridSystemEditor : Editor
         return IsConnectedAfterRemoval(nodeSystem, posToRemove);
     }
 
-    private void DrawNodeGrid(NodeGridSystem nodeSystem)
+    public static void DrawNodeGrid(NodeTreeSystem nodeSystem, bool isWindow = false, Vector2 scrollPosition = default)
     {
         List<Vector2Int> positions = nodeSystem.GetAllPositions();
         if (positions.Count == 0)
@@ -188,17 +196,38 @@ public class NodeGridSystemEditor : Editor
         float verticalExtent = Mathf.Max(topExtent, bottomExtent);
 
         // Compute total width and height needed with some padding.
-        float totalWidth = (horizontalExtent * 2) * (nodeSize + spacing) + nodeSize + spacing * 2;
-        // how many cells above and below origin
         float widthPerCell = nodeSize + spacing;
+        float totalWidth = (horizontalExtent * 2) * widthPerCell + nodeSize + spacing * 2;
         float gridHeight = (topExtent + bottomExtent) * widthPerCell + nodeSize;
         float totalHeight = gridHeight + spacing * 2;
-        // reserve a rect of that exact height
-        Rect gridArea = EditorGUILayout.GetControlRect(false, totalHeight);
-        // compute the Y of the origin node’s center:  
-        //   from the top of gridArea + top padding + topExtent cells down + half a node
-        float originCenterY = gridArea.y + spacing + topExtent * widthPerCell + nodeSize * 0.5f;
-        Vector2 defaultCenter = new Vector2(gridArea.center.x, originCenterY);
+
+        Rect gridArea;
+        Vector2 defaultCenter;
+
+        if (isWindow)
+        {
+            // For the window, use a fixed size that depends on the grid dimensions
+            // and make it scrollable if needed
+            float windowWidth = Mathf.Min(totalWidth, EditorGUIUtility.currentViewWidth - 20);
+            float windowHeight = Mathf.Min(totalHeight, 600); // Limit height to 600 for very large grids
+
+            gridArea = new Rect(0, 0, totalWidth, totalHeight);
+
+            // The center position needs to account for scroll position
+            float originCenterY = gridArea.y + spacing + topExtent * widthPerCell + nodeSize * 0.5f;
+            defaultCenter = new Vector2(gridArea.center.x, originCenterY);
+
+            // Adjust for scroll position
+            defaultCenter.x -= scrollPosition.x;
+            defaultCenter.y -= scrollPosition.y;
+        }
+        else
+        {
+            // For the inspector, use the standard approach
+            gridArea = EditorGUILayout.GetControlRect(false, totalHeight);
+            float originCenterY = gridArea.y + spacing + topExtent * widthPerCell + nodeSize * 0.5f;
+            defaultCenter = new Vector2(gridArea.center.x, originCenterY);
+        }
 
         Dictionary<Vector2Int, Rect> nodeRects = new Dictionary<Vector2Int, Rect>();
 
@@ -264,7 +293,7 @@ public class NodeGridSystemEditor : Editor
                 {
                     Undo.RecordObject(nodeSystem, "Add Node");
                     nodeSystem.SetNodeAtPosition(adjacentPos, null);
-                    EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(nodeSystem);
                     Event.current.Use();
                     return;
                 }
@@ -291,23 +320,94 @@ public class NodeGridSystemEditor : Editor
             {
                 Undo.RecordObject(nodeSystem, "Change Node Reference");
                 nodeSystem.SetNodeAtPosition(pos, newNodeObj);
-                EditorUtility.SetDirty(target);
+                EditorUtility.SetDirty(nodeSystem);
             }
 
             // Only allow deletion if safe (and not the default node)
-            if (CanRemoveNodeSafely(nodeSystem, pos))
+            if (pos != Vector2Int.zero && IsConnectedAfterRemoval(nodeSystem, pos))
             {
                 Rect removeButtonRect = new Rect(nodeRect.x + nodeRect.width - buttonSize, nodeRect.y, buttonSize, buttonSize);
                 if (GUI.Button(removeButtonRect, "-"))
                 {
                     Undo.RecordObject(nodeSystem, "Remove Node");
                     nodeSystem.RemoveNodeAtPosition(pos);
-                    EditorUtility.SetDirty(target);
+                    EditorUtility.SetDirty(nodeSystem);
                     Event.current.Use();
                     return;
                 }
             }
         }
+    }
+
+    private void DrawNodeGrid(NodeTreeSystem nodeSystem)
+    {
+        DrawNodeGrid(nodeSystem, false);
+    }
+}
+
+// Create new editor window for the node grid
+public class NodeGridPopupWindow : EditorWindow
+{
+    private NodeTreeSystem nodeSystem;
+    private Vector2 scrollPosition;
+    private Vector2Int[] directions = new Vector2Int[]
+    {
+        new Vector2Int(0, 1),
+        new Vector2Int(1, 0),
+        new Vector2Int(0, -1),
+        new Vector2Int(-1, 0)
+    };
+
+    public static void ShowWindow(NodeTreeSystem nodeSystem)
+    {
+        NodeGridPopupWindow window = GetWindow<NodeGridPopupWindow>("Node Grid Viewer");
+        window.nodeSystem = nodeSystem;
+        window.minSize = new Vector2(400, 300);
+        window.Show();
+    }
+
+    private void OnGUI()
+    {
+        if (nodeSystem == null)
+        {
+            EditorGUILayout.HelpBox("No Node Grid System selected.", MessageType.Warning);
+            return;
+        }
+
+        // Display the node system name
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+        EditorGUILayout.LabelField($"Editing: {nodeSystem.name}", EditorStyles.boldLabel);
+        EditorGUILayout.EndHorizontal();
+
+        // Create scroll view
+        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+
+        // Calculate suitable box size based on node count
+        List<Vector2Int> positions = nodeSystem.GetAllPositions();
+        int minX = positions.Min(p => p.x);
+        int maxX = positions.Max(p => p.x);
+        int minY = positions.Min(p => p.y);
+        int maxY = positions.Max(p => p.y);
+
+        float nodeSize = 60f;
+        float spacing = 20f;
+        float widthPerCell = nodeSize + spacing;
+
+        float width = (maxX - minX + 2) * widthPerCell;
+        float height = (maxY - minY + 2) * widthPerCell;
+
+        // Minimum size so we always have space
+        width = Mathf.Max(width, 600);
+        height = Mathf.Max(height, 600);
+
+        GUILayout.Box("", GUILayout.Width(width), GUILayout.Height(height));
+
+        // Draw the node grid
+        NodeGridSystemEditor.DrawNodeGrid(nodeSystem, true, scrollPosition);
+
+        EditorGUILayout.EndScrollView();
+
+        Repaint();
     }
 }
 #endif
