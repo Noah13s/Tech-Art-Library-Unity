@@ -24,7 +24,7 @@ public class BulletObject : MonoBehaviour
         lifetimeTimer = 0f;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         // Lifetime & stop check
         lifetimeTimer += Time.deltaTime;
@@ -71,6 +71,13 @@ public class BulletObject : MonoBehaviour
             currentPenetratedObject = other.transform;
             entryPoint = transform.position;
             currentPenetrationDepth = 0f;
+
+            // Handle immediate stops for very dense materials
+            if (ShouldStopImmediately(other))
+            {
+                StopBullet();
+                return;
+            }
 
             Debug.Log($"Bullet entered: {other.name}");
 
@@ -140,18 +147,6 @@ public class BulletObject : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Handle immediate stops for very dense materials
-        if (ShouldStopImmediately(collision.collider))
-        {
-            StopBullet();
-            return;
-        }
-
-        Debug.Log($"Bullet hit: {collision.collider.name}");
-    }
-
     private float GetMaterialDensity(Transform obj)
     {
         // Get material density based on tag or material name
@@ -181,7 +176,6 @@ public class BulletObject : MonoBehaviour
     {
         // Check for materials that should stop bullets immediately
         // Like extremely dense metals, etc.
-
         if (collider.CompareTag("Impenetrable") ||
             collider.name.ToLower().Contains("steel_thick") ||
             collider.name.ToLower().Contains("armored"))
@@ -196,7 +190,6 @@ public class BulletObject : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = Vector3.zero;
-            rb.isKinematic = true; // Stop physics simulation
         }
 
         // Optional: Create impact effect here

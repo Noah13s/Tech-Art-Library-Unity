@@ -303,7 +303,7 @@ Transform:
   m_GameObject: {fileID: 654588835}
   serializedVersion: 2
   m_LocalRotation: {x: -0.28439388, y: -0, z: -0, w: 0.9587076}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -128.2, z: -197}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 923463317}
   m_Layer: 0
   m_Name: Cube (3)
-  m_TagString: Metal
+  m_TagString: Concrete
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
