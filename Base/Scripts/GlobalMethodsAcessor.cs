@@ -63,44 +63,42 @@ public class GlobalMethodsAccessor : MonoBehaviour
         if (targetScript == null)
         {
             publicMethods = Array.Empty<Method>();
-            Debug.LogWarning("No target script assigned.");
+            Debug.LogWarning("No target script assigned.", this);
             return;
         }
 
         Type type = targetScript.GetType();
         MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-        publicMethods = new Method[methods.Length];
 
-        for (int i = 0; i < methods.Length; i++)
+        // Filter to only include parameterless methods
+        var parameterlessMethods = Array.FindAll(methods, m => m.GetParameters().Length == 0);
+        publicMethods = new Method[parameterlessMethods.Length];
+
+        for (int i = 0; i < parameterlessMethods.Length; i++)
         {
-            MethodInfo methodInfo = methods[i];
+            MethodInfo methodInfo = parameterlessMethods[i];
             Method m = new Method { methodName = methodInfo.Name };
 
             Type returnType = methodInfo.ReturnType;
             if (returnType == typeof(void))
             {
                 m.eventType = MethodEventType.Void;
-                m.InvokeVoid();
             }
             else if (returnType == typeof(string))
             {
                 m.eventType = MethodEventType.String;
-                m.InvokeWithString(string.Empty);
             }
             else if (returnType == typeof(int))
             {
                 m.eventType = MethodEventType.Int;
-                m.InvokeWithInt(0);
             }
             else if (returnType == typeof(float))
             {
                 m.eventType = MethodEventType.Float;
-                m.InvokeWithFloat(0f);
             }
             else if (returnType == typeof(bool))
             {
                 m.eventType = MethodEventType.Bool;
-                m.InvokeWithBool(false);
             }
             else
             {
@@ -111,7 +109,7 @@ public class GlobalMethodsAccessor : MonoBehaviour
             publicMethods[i] = m;
         }
 
-        Debug.Log($"Found {publicMethods.Length} public methods in {type.Name}");
+        Debug.Log($"Found {publicMethods.Length} parameterless public methods in {type.Name}");
     }
 
     // Method to invoke the appropriate event based on the method's return type
@@ -193,7 +191,7 @@ public class GlobalMethodsAccessorEditor : Editor
                 var method = accessor.publicMethods[i];
                 EditorGUILayout.BeginVertical(GUI.skin.box);
 
-                EditorGUILayout.LabelField($"Method: {method.methodName}");
+                EditorGUILayout.LabelField($"Method: {method.methodName} Index: {i}");
 
                 // Display only the appropriate event type
                 string propName = method.eventType switch
