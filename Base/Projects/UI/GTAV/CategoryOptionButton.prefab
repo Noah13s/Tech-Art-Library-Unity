@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3522442051311480910}
   - component: {fileID: 4301609241031929707}
   - component: {fileID: 8588081798682698639}
+  - component: {fileID: 7356281926981175795}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -34,8 +35,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5.199997, y: 0}
-  m_SizeDelta: {x: -10.400005, y: 0}
+  m_AnchoredPosition: {x: 5.249999, y: 0}
+  m_SizeDelta: {x: -10.500001, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4301609241031929707
 CanvasRenderer:
@@ -134,6 +135,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7356281926981175795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6096934730249034662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 701134750ca07ad4bb5e91409b050500, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 8588081798682698639}
 --- !u!1 &6208281479592363025
 GameObject:
   m_ObjectHideFlags: 0
@@ -145,8 +159,10 @@ GameObject:
   - component: {fileID: 1739389429290948373}
   - component: {fileID: 8445327408971942899}
   - component: {fileID: 8892499517063081269}
+  - component: {fileID: 1492201473843107782}
+  - component: {fileID: 2287955186384136980}
   m_Layer: 5
-  m_Name: OptionButton
+  m_Name: CategoryOptionButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -210,3 +226,97 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1492201473843107782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208281479592363025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7f61a3c01a5e04081636f9a6fc651c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unhighlightColor: {r: 0, g: 0, b: 0, a: 0.8509804}
+  highlightColor: {r: 1, g: 1, b: 1, a: 1}
+  background: {fileID: 8892499517063081269}
+--- !u!114 &2287955186384136980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208281479592363025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aa0f95ca5d75a34991eb07293146af2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selected: 0
+  onControllerSelectEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1492201473843107782}
+        m_TargetAssemblyTypeName: BackgroundHighlight, Projects
+        m_MethodName: Highlight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7356281926981175795}
+        m_TargetAssemblyTypeName: TmpHighlightCat, Projects
+        m_MethodName: Highlight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onControllerSelectExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1492201473843107782}
+        m_TargetAssemblyTypeName: BackgroundHighlight, Projects
+        m_MethodName: Unhighlight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 7356281926981175795}
+        m_TargetAssemblyTypeName: TmpHighlightCat, Projects
+        m_MethodName: Unhighlight
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onInteractionEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractionExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onMouseSelectEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onMouseSelectExit:
+    m_PersistentCalls:
+      m_Calls: []
