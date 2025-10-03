@@ -560,6 +560,12 @@ MonoBehaviour:
   onMouseSelectExit:
     m_PersistentCalls:
       m_Calls: []
+  onMoveRight:
+    m_PersistentCalls:
+      m_Calls: []
+  onMoveLeft:
+    m_PersistentCalls:
+      m_Calls: []
   needFocusToNavigate: 1
   onFocusEnter:
     m_PersistentCalls:
