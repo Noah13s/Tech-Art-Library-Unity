@@ -51,7 +51,7 @@ public class Carrousel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Index out of range");
+            Debug.LogError("Index out of range", this);
         }
     }
 
@@ -65,7 +65,7 @@ public class Carrousel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Index out of range");
+            Debug.LogError("Index out of range", this);
         }
     }
     public int GetIndex()
@@ -84,7 +84,7 @@ public class Carrousel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("TextMeshProUGUI is not set");
+            Debug.LogError("TextMeshProUGUI is not set", this);
         }
     }
 }
