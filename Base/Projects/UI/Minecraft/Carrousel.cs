@@ -13,7 +13,7 @@ public class Carrousel : MonoBehaviour
     {
         if (stringArray == null || stringArray.Length == 0)
         {
-            Debug.LogError("String array is not set or empty");
+            Debug.LogError("String array is not set or empty", this);
             return;
         }
         index = 0; // Initialize index to the first element

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MenuDisplayController : MonoBehaviour
@@ -8,12 +6,22 @@ public class MenuDisplayController : MonoBehaviour
 
     public void DisplayMenu(int menuIndex)
     {
+        if (menuDisplay == null || menuDisplay.Length == 0)
+        {
+            Debug.LogWarning("MenuDisplay array is empty or not assigned.", this);
+            return;
+        }
+
         for (int i = 0; i < menuDisplay.Length; i++)
         {
-            if (i == menuIndex)
-                menuDisplay[i].SetActive(true);
-            else
-                menuDisplay[i].SetActive(false);
+            GameObject menu = menuDisplay[i];
+            if (menu == null)
+            {
+                Debug.LogWarning($"Menu at index {i} is not assigned.", this);
+                continue;
+            }
+
+            menu.SetActive(i == menuIndex);
         }
     }
 }
