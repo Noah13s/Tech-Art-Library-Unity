@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7f61a3c01a5e04081636f9a6fc651c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unhighlightColor: {r: 1, g: 1, b: 1, a: 0}
+  unhighlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightColor: {r: 0, g: 0, b: 0, a: 1}
   background: {fileID: 4808656516912432886}
 --- !u!1 &4031938190659996839
@@ -524,7 +524,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2209074905833143369}
+      - m_Target: {fileID: 5723112381416570899}
         m_TargetAssemblyTypeName: BackgroundHighlight, Projects
         m_MethodName: Unhighlight
         m_Mode: 1
@@ -747,7 +747,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7f61a3c01a5e04081636f9a6fc651c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unhighlightColor: {r: 1, g: 1, b: 1, a: 0}
+  unhighlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightColor: {r: 0, g: 0, b: 0, a: 1}
   background: {fileID: 6630395925603988343}
 --- !u!1 &6980183447645847533

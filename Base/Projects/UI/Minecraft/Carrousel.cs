@@ -16,7 +16,11 @@ public class Carrousel : MonoBehaviour
             Debug.LogError("String array is not set or empty", this);
             return;
         }
-        index = 0; // Initialize index to the first element
+        if (index == -1)
+        {
+            index = 0;
+        }
+        SetIndex(index);
     }
 
     public void Next()
