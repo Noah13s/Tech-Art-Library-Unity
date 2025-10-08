@@ -84,10 +84,14 @@ public class UIControlElement : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public virtual void OnPointerDown(PointerEventData eventData)
     {
+        if (controlsystem == null) { return; }
+        if (controlsystem.enabled == false) { return; } // Prevents mouse selection when the system is disabled.
         InteractEnter();
     }
     public virtual void OnPointerUp(PointerEventData eventData)
     {
+        if (controlsystem == null) { return; }
+        if (controlsystem.enabled == false) { return; } // Prevents mouse selection when the system is disabled.
         InteractExit();
     }
 }

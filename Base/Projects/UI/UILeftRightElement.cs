@@ -109,4 +109,22 @@ public class UILeftRightElement : UIControlElement
         focused = false;
         onFocusExit?.Invoke();
     }
+
+    public void ManualMove(int x)
+    {
+        if (needFocusToNavigate && !focused) { return; }
+        if (selected)
+        {
+            if (x > 0)
+            {
+                carrousel.Next();
+                onMoveRight.Invoke();
+            }
+            else if (x < 0)
+            {
+                carrousel.Previous();
+                onMoveLeft.Invoke();
+            }
+        }
+    }
 }
