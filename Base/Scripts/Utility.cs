@@ -1,9 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-using static UnityEditor.Profiling.RawFrameDataView;
 
-public class Utility
+public class Utility: MonoBehaviour
 {
     [SerializeField] private UnityEvent<float> fps;
 
@@ -19,10 +18,27 @@ public class Utility
             fps.Invoke(Mathf.Round(smoothedFPS)); // Round to whole number
         }
     }
+
+    public static void QuitApplication()
+    {
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif    
+    }
 }
 
 namespace TechArtUtility
 {
+    public static class Utility
+    {
+        public static void QuitApplication()
+        {
+
+        }
+    }
+
     public static class DebugUtility
     {
     #if UNITY_EDITOR
