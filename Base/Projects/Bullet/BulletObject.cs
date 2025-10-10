@@ -12,6 +12,7 @@ public class BulletObject : MonoBehaviour
     private float currentPenetrationDepth = 0f;   // track how far we've penetrated
     private Transform currentPenetratedObject;    // track which object we're inside
     private Vector3 entryPoint;                   // track where we entered the object
+    private bool isFragment=false;
 
     private void Start()
     {
@@ -72,13 +73,6 @@ public class BulletObject : MonoBehaviour
             entryPoint = transform.position;
             currentPenetrationDepth = 0f;
 
-            // Handle immediate stops for very dense materials
-            if (ShouldStopImmediately(other))
-            {
-                StopBullet();
-                return;
-            }
-
             Debug.Log($"Bullet entered: {other.name}");
 
             // Récupère la densité du matériau
@@ -94,24 +88,26 @@ public class BulletObject : MonoBehaviour
                 wallThickness = sphere.radius * 2f * sphere.transform.lossyScale.z;
             else
                 wallThickness = 1f; // Valeur par défaut
-
             // Calcule la pénétration maximale
             float maxPenetrationDepth = CalculateMaxPenetrationDepth(materialDensity);
 
-            // Si le mur est trop épais, la balle s'arrête à la surface
-            if (wallThickness >= maxPenetrationDepth)
+            // Si le mur est trop épais, la balle s'arrête à la surface 10m max
+            if (wallThickness >= 10f)
             {
                 StopBullet();
                 Debug.Log("Bullet stopped at the surface due to wall thickness.");
                 return;
             }
 
-            if (bulletData.fragmentation)
+            if (bulletData.fragmentation && isFragment != true)
             {
                 Debug.Log("Bullet fragmented!");
 
+                // --- inside your fragmentation block ---
                 int fragmentCount = 5;
-                float angleVariation = 20f;
+                float angleVariation = 20f; // degrees cone half-angle
+
+                float foreignObjectMass = other.GetComponent<BulletMaterial>().mass;
 
                 for (int i = 0; i < fragmentCount; i++)
                 {
@@ -120,17 +116,61 @@ public class BulletObject : MonoBehaviour
                     Rigidbody fragmentRb = fragment.GetComponent<Rigidbody>();
                     if (fragmentRb != null)
                     {
-                        Vector3 baseDirection = rb.velocity.normalized;
-                        Quaternion randomRot = Quaternion.AngleAxis(Random.Range(-angleVariation, angleVariation), Random.onUnitSphere);
-                        Vector3 fragmentDirection = randomRot * baseDirection;
+                        BulletObject bulletScript = fragment.GetComponent<BulletObject>();
+                        if (bulletScript != null)
+                        {
+                            bulletScript.bulletData = bulletData;
+                            bulletScript.isFragment = true;
+                        }
 
-                        fragmentRb.velocity = fragmentDirection * (bulletData.speed * 0.5f);
+                        Vector3 baseDirection = rb.velocity.normalized;
+                        Vector3 fragmentDirection = RandomDirectionInCone(baseDirection, angleVariation);
+
+                        float penetrationRatio = Mathf.Clamp01(wallThickness / foreignObjectMass);
+                        float energyLostPercent = Mathf.Clamp01(penetrationRatio) * 100f;
+                        Debug.Log($"Energy lost in penetration through {other.name}: {energyLostPercent:F1}%");
+
+
+                        // Optional: small random speed variance
+                        float minSpeedFactor = 0.2f;  // fraction of original speed if fully stopped
+                        float maxSpeedFactor = 0.7f;  // fraction of original speed when just exiting
+
+                        float speedFactor = Mathf.Lerp(maxSpeedFactor, minSpeedFactor, penetrationRatio);
+                        fragmentRb.velocity = fragmentDirection * (bulletData.speed * speedFactor);
+
+                        // Orient the fragment to face travel direction (if desired)
+                        fragment.transform.rotation = Quaternion.LookRotation(fragmentDirection);
                     }
                 }
-
                 Destroy(gameObject);
             }
         }
+    }
+
+    private Vector3 RandomDirectionInCone(Vector3 baseDir, float maxAngleDeg)
+    {
+        // Ensure baseDir is normalized
+        baseDir = baseDir.normalized;
+
+        float maxAngleRad = maxAngleDeg * Mathf.Deg2Rad;
+
+        // Sample uniformly in the cone: pick cos(theta) uniformly between cos(maxAngle) and 1
+        float cosTheta = Mathf.Cos(maxAngleRad);
+        float u = Random.value;
+        float cos = Mathf.Lerp(cosTheta, 1f, u);
+        float sin = Mathf.Sqrt(1f - cos * cos);
+        float phi = Random.value * Mathf.PI * 2f;
+
+        // Build orthonormal basis (baseDir, orth1, orth2)
+        Vector3 orth1 = Vector3.Cross(baseDir, Vector3.up);
+        if (orth1.sqrMagnitude < 1e-6f) // baseDir is parallel to up
+            orth1 = Vector3.Cross(baseDir, Vector3.right);
+        orth1.Normalize();
+        Vector3 orth2 = Vector3.Cross(baseDir, orth1);
+
+        // Direction in that basis
+        Vector3 dir = baseDir * cos + orth1 * (Mathf.Cos(phi) * sin) + orth2 * (Mathf.Sin(phi) * sin);
+        return dir.normalized;
     }
 
     private void OnTriggerExit(Collider other)
@@ -151,14 +191,6 @@ public class BulletObject : MonoBehaviour
     {
         // Get material density based on tag or material name
         // You can expand this to use a material database or scriptable objects
-
-        if (obj.CompareTag("Concrete") || obj.name.ToLower().Contains("concrete"))
-            return 15f; // High density for concrete
-        else if (obj.CompareTag("Metal") || obj.name.ToLower().Contains("metal"))
-            return 20f; // Very high for metal
-        else if (obj.CompareTag("Wood") || obj.name.ToLower().Contains("wood"))
-            return 5f;  // Medium for wood
-        else
             return 3f;  // Default for generic materials
     }
 
@@ -170,18 +202,6 @@ public class BulletObject : MonoBehaviour
 
         // Respect minimum thickness to allow small objects to actually stop bullets
         return Mathf.Max(penetration, 0.05f);
-    }
-
-    private bool ShouldStopImmediately(Collider collider)
-    {
-        // Check for materials that should stop bullets immediately
-        // Like extremely dense metals, etc.
-        if (collider.CompareTag("Impenetrable") ||
-            collider.name.ToLower().Contains("steel_thick") ||
-            collider.name.ToLower().Contains("armored"))
-            return true;
-
-        return false;
     }
 
     private void StopBullet()

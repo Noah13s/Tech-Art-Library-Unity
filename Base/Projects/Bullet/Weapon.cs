@@ -72,7 +72,6 @@ public class WeaponEditor : Editor
         {
             // Code to execute when button is clicked
             Weapon weapon = (Weapon)target;
-            Debug.Log("Custom action triggered for " + weapon.name);
 
             // Example: Call a method from your Weapon script
             weapon.Fire();
