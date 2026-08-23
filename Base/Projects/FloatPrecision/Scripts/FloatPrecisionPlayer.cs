@@ -1,54 +1,6 @@
-﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
-
-/// <summary>
-/// Vector 3 based on doubles instead of floats for handling very large values.
-/// </summary>
-[System.Serializable]
-public struct DoubleVector3
-{
-    public double x, y, z;
-    public DoubleVector3(double x, double y, double z)
-    {
-        this.x = x; this.y = y; this.z = z;
-    }
-    public static DoubleVector3 operator +(DoubleVector3 a, DoubleVector3 b) =>
-        new DoubleVector3(a.x + b.x, a.y + b.y, a.z + b.z);
-    public static DoubleVector3 operator -(DoubleVector3 a, DoubleVector3 b) =>
-        new DoubleVector3(a.x - b.x, a.y - b.y, a.z - b.z);
-    public static DoubleVector3 operator *(DoubleVector3 a, double d) =>
-        new DoubleVector3(a.x * d, a.y * d, a.z * d);
-    public double Magnitude() => Math.Sqrt(x * x + y * y + z * z);
-    public DoubleVector3 Negate() => new DoubleVector3(-x, -y, -z);
-    public DoubleVector3 Normalized()
-    {
-        double mag = Magnitude();
-        return mag > 0 ? new DoubleVector3(x / mag, y / mag, z / mag) : new DoubleVector3(0, 0, 0);
-    }
-    public static explicit operator Vector3(DoubleVector3 d) =>
-        new Vector3((float)d.x, (float)d.y, (float)d.z);
-
-    public DoubleVector3 Cross(DoubleVector3 other) =>
-    new DoubleVector3(
-        y * other.z - z * other.y,
-        z * other.x - x * other.z,
-        x * other.y - y * other.x
-    );
-
-    public static DoubleVector3 Lerp(DoubleVector3 a, DoubleVector3 b, double t)
-    {
-        t = Math.Clamp(t, 0.0, 1.0);
-        return new DoubleVector3(
-            a.x + (b.x - a.x) * t,
-            a.y + (b.y - a.y) * t,
-            a.z + (b.z - a.z) * t
-        );
-    }
-
-    public double Dot(DoubleVector3 other) =>
-        x * other.x + y * other.y + z * other.z;
-}
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Simple world space static spaceship player that moves via a <seealso cref="DoubleVector3"/> playerPosition parameter.
@@ -72,43 +24,47 @@ public class FloatPrecisionPlayer : MonoBehaviour
 
     void Update()
     {
-
         HandleVelocity();
-        if (Input.GetKey(KeyCode.W)) { transform.Rotate(sensitivity, 0, 0, Space.Self); }
-        if (Input.GetKey(KeyCode.S)) { transform.Rotate(-sensitivity, 0, 0, Space.Self); }
-        if (Input.GetKey(KeyCode.D)) { transform.Rotate(0, sensitivity, 0, Space.Self); }
-        if (Input.GetKey(KeyCode.A)) { transform.Rotate(0, -sensitivity, 0, Space.Self); }
-        if (Input.GetKey(KeyCode.E)) { transform.Rotate(0, 0, -sensitivity, Space.Self); }
-        if (Input.GetKey(KeyCode.Q)) { transform.Rotate(0, 0, sensitivity, Space.Self); }
 
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null)
         {
-            // Convert transform.forward to DoubleVector3 and update position in double space.
-            DoubleVector3 forward = new (transform.forward.x, transform.forward.y, transform.forward.z);
-            if (velocityActive)
+            if (keyboard.wKey.isPressed) { transform.Rotate(sensitivity, 0, 0, Space.Self); }
+            if (keyboard.sKey.isPressed) { transform.Rotate(-sensitivity, 0, 0, Space.Self); }
+            if (keyboard.dKey.isPressed) { transform.Rotate(0, sensitivity, 0, Space.Self); }
+            if (keyboard.aKey.isPressed) { transform.Rotate(0, -sensitivity, 0, Space.Self); }
+            if (keyboard.eKey.isPressed) { transform.Rotate(0, 0, -sensitivity, Space.Self); }
+            if (keyboard.qKey.isPressed) { transform.Rotate(0, 0, sensitivity, Space.Self); }
+
+            if (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed)
             {
-                velocity += forward * (moveSpeed * Time.deltaTime);
+                MoveAlongForward(1.0);
             }
-            else
+
+            if (keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed)
             {
-                playerPosition += forward * (moveSpeed * Time.deltaTime);
-            }
-        }
-        if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-        {
-            // Convert transform.forward to DoubleVector3 and update position in double space.
-            DoubleVector3 forward = new(transform.forward.x, transform.forward.y, transform.forward.z);
-            if (velocityActive)
-            {
-                velocity += forward.Negate() * (moveSpeed * Time.deltaTime);
-            } else
-            {
-                playerPosition += forward.Negate() * (moveSpeed * Time.deltaTime);
+                MoveAlongForward(-1.0);
             }
         }
 
         playerPositionEvent?.Invoke($"X:{playerPosition.x}\nY:{playerPosition.y}\nZ:{playerPosition.z}");
-        playerSpeed?.Invoke(moveSpeed);
+        playerSpeed?.Invoke(velocityActive ? velocity.Magnitude() : moveSpeed);
+    }
+
+    private void MoveAlongForward(double direction)
+    {
+        // Convert transform.forward to DoubleVector3 and update position in double space.
+        DoubleVector3 forward = new(transform.forward.x, transform.forward.y, transform.forward.z);
+        DoubleVector3 movement = forward * (direction * moveSpeed * Time.deltaTime);
+
+        if (velocityActive)
+        {
+            velocity += movement;
+        }
+        else
+        {
+            playerPosition += movement;
+        }
     }
 
     /// <summary>
@@ -142,7 +98,9 @@ public class FloatPrecisionPlayer : MonoBehaviour
     {
         if (!velocityActive) { return; }
 
-        AddPosition(velocity);
+        // Velocity is stored in meters per second. Integrating without deltaTime made
+        // motion frame-rate dependent and greatly exaggerated residual ground speed.
+        AddPosition(velocity * Time.deltaTime);
     }
 
     public void AddVelocity(DoubleVector3 _velocity)
@@ -153,6 +111,11 @@ public class FloatPrecisionPlayer : MonoBehaviour
     public DoubleVector3 GetVelocity()
     {
         return velocity;
+    }
+
+    public void SetVelocity(DoubleVector3 newVelocity)
+    {
+        velocity = newVelocity;
     }
 
     public DoubleVector3 GetPosition()

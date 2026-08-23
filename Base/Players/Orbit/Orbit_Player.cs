@@ -126,6 +126,14 @@ public class OrbitCamera : MonoBehaviour
 #endif
             distance = Mathf.Clamp(distance, 1f, Mathf.Infinity); // Clamp distance
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (lockCamera || target == null)
+        {
+            return;
+        }
 
         // Calculate the rotation and position
         // Compute the base rotation based on absoluteUp

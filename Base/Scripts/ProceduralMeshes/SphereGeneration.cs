@@ -1,5 +1,7 @@
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class SphereGeneration : MonoBehaviour
@@ -9,10 +11,30 @@ public class SphereGeneration : MonoBehaviour
     public int nbRings = 16;
     public int nbSegments = 16;
 
+#if UNITY_EDITOR
+    private bool generationQueued;
+
     private void OnValidate()
     {
-        GenerateSphere();
+        if (generationQueued)
+        {
+            return;
+        }
+
+        generationQueued = true;
+        EditorApplication.delayCall += GenerateAfterValidation;
     }
+
+    private void GenerateAfterValidation()
+    {
+        generationQueued = false;
+
+        if (this != null)
+        {
+            GenerateSphere();
+        }
+    }
+#endif
 
     void GenerateSphere()
     {
@@ -33,7 +55,7 @@ public class SphereGeneration : MonoBehaviour
             {
                 float theta = 2f * Mathf.PI * (float)segment / nbSegments;
 
-                // Rotate 180° on Y-axis (negate X and Z)
+                // Rotate 180Â° on Y-axis (negate X and Z)
                 float x = -radius * Mathf.Sin(phi) * Mathf.Cos(theta);
                 float y = radius * Mathf.Cos(phi);
                 float z = -radius * Mathf.Sin(phi) * Mathf.Sin(theta);

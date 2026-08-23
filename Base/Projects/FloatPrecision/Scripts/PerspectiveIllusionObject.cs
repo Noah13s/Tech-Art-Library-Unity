@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// Script that handles the unity transform of a gameobject to represent
@@ -25,54 +26,103 @@ public class PerspectiveIllusionObject : MonoBehaviour
     // Transition range (in world units) below maxDistanceFromPlayer over which we blend to true mode.
     public float transitionRange = 100f;
 
+    [Header("Rendering")]
+    [Tooltip("Real-time shadows from perspective-compressed celestial meshes are not physically valid and can cover the entire local ground patch.")]
+    public bool castRealtimeShadows = false;
+
+    private void OnEnable()
+    {
+        if (castRealtimeShadows)
+        {
+            return;
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        foreach (Renderer objectRenderer in renderers)
+        {
+            objectRenderer.shadowCastingMode = ShadowCastingMode.Off;
+        }
+    }
+
     void Update()
     {
-        // Calculate the true relative position from the player to the planet's simulation center.
-        DoubleVector3 relativePosition = simulationPosition - player.playerPosition;
-        double actualDistance = relativePosition.Magnitude();
+        if (player == null)
+        {
+            return;
+        }
 
-        // True radius (planet's radius based on simulationScale, which represents the full diameter)
-        double objectRadius = simulationScale * 0.5;
+        CalculateRenderState(
+            out DoubleVector3 renderedPosition,
+            out double renderedScale,
+            out double actualDistance,
+            out surfaceDistance);
 
-        // Surface distance is defined as distance from the planet's surface (can be negative).
-        surfaceDistance = actualDistance - objectRadius;
         altitude?.Invoke((long)surfaceDistance);
         centerDistance?.Invoke((long)actualDistance);
 
-        // --- Compute far mode (illusion) values ---
-        // In far mode, we want the object's center to be exactly maxDistanceFromPlayer from the player.
-        double fixedDistance = maxDistanceFromPlayer; // use maxDistanceFromPlayer directly
-        // Far mode position: along the same direction, clamped to fixedDistance.
-        DoubleVector3 farPosition = relativePosition.Normalized() * fixedDistance;
-        // Far mode scale: we want the apparent size (scale/distance) to remain constant.
-        float farScale = (float)(simulationScale * (fixedDistance / actualDistance));
+        transform.position = (Vector3)renderedPosition;
+        transform.localScale = Vector3.one * (float)renderedScale;
+    }
 
-        // --- Near mode values (true mode) ---
-        DoubleVector3 nearPosition = relativePosition;
-        float nearScale = (float)simulationScale;
-
-        // --- Determine blending factor ---
-        // When surfaceDistance >= maxDistanceFromPlayer, use full far mode (t = 0).
-        // When surfaceDistance <= maxDistanceFromPlayer - transitionRange, use full near mode (t = 1).
-        float t;
-        if (surfaceDistance >= maxDistanceFromPlayer)
+    /// <summary>
+    /// Calculates the player-relative position and scale used to render this object.
+    /// Consumers such as close-up surface patches should use this state so they remain
+    /// aligned with the perspective illusion in both far and near modes.
+    /// </summary>
+    public void CalculateRenderState(
+        out DoubleVector3 renderedPosition,
+        out double renderedScale,
+        out double actualDistance,
+        out double distanceFromSurface)
+    {
+        if (player == null)
         {
-            t = 0f;
+            renderedPosition = new DoubleVector3(0, 0, 0);
+            renderedScale = 0.0;
+            actualDistance = 0.0;
+            distanceFromSurface = double.PositiveInfinity;
+            return;
         }
-        else if (surfaceDistance <= maxDistanceFromPlayer - transitionRange)
+
+        DoubleVector3 relativePosition = simulationPosition - player.playerPosition;
+        actualDistance = relativePosition.Magnitude();
+        double objectRadius = simulationScale * 0.5;
+        distanceFromSurface = actualDistance - objectRadius;
+
+        if (actualDistance <= double.Epsilon)
         {
-            t = 1f;
+            renderedPosition = relativePosition;
+            renderedScale = simulationScale;
+            return;
+        }
+
+        double fixedDistance = Math.Max(0.0, maxDistanceFromPlayer);
+        DoubleVector3 farPosition = relativePosition.Normalized() * fixedDistance;
+        double farScale = simulationScale * (fixedDistance / actualDistance);
+
+        double blendRange = Math.Max(0.0, transitionRange);
+        double t;
+        if (distanceFromSurface >= fixedDistance)
+        {
+            t = 0.0;
+        }
+        else if (blendRange <= double.Epsilon || distanceFromSurface <= fixedDistance - blendRange)
+        {
+            t = 1.0;
         }
         else
         {
-            t = Mathf.InverseLerp(maxDistanceFromPlayer, maxDistanceFromPlayer - transitionRange, (float)surfaceDistance);
+            t = (fixedDistance - distanceFromSurface) / blendRange;
         }
 
-        // --- Blend position and scale ---
-        DoubleVector3 finalPosition = DoubleVector3.Lerp(farPosition, nearPosition, t);
-        float finalScale = Mathf.Lerp(farScale, nearScale, t);
+        renderedPosition = DoubleVector3.Lerp(farPosition, relativePosition, t);
+        renderedScale = farScale + (simulationScale - farScale) * t;
+    }
 
-        transform.position = (Vector3)finalPosition;
-        transform.localScale = Vector3.one * finalScale;
+    private void OnValidate()
+    {
+        simulationScale = Math.Max(0.0, simulationScale);
+        maxDistanceFromPlayer = Mathf.Max(0f, maxDistanceFromPlayer);
+        transitionRange = Mathf.Max(0f, transitionRange);
     }
 }

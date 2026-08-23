@@ -3,7 +3,7 @@
 
 // Include this in a shader to use secondary camera depth
 
-#include "Common.hlsl"
+#include "../../Shaders/Includes/Common.hlsl"
 
 // Camera depth
 TEXTURE2D(_CameraDepthTexture);
@@ -91,5 +91,4 @@ float CompositeDepthScaled(float2 uv, float viewLength, out bool isEndOfDepth)
 }
 
 #endif
-
 
