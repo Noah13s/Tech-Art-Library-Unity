@@ -22,11 +22,15 @@ public class FloatPrecisionPlayer : MonoBehaviour
     [SerializeField] private UnityEvent<string> playerPositionEvent;
     [SerializeField] private UnityEvent<double> playerSpeed;
 
+    public bool VelocityActive => velocityActive;
+    public double MovementSpeed => moveSpeed;
+    public bool FlightInputEnabled { get; set; } = true;
+
     void Update()
     {
         HandleVelocity();
 
-        Keyboard keyboard = Keyboard.current;
+        Keyboard keyboard = FlightInputEnabled ? Keyboard.current : null;
         if (keyboard != null)
         {
             if (keyboard.wKey.isPressed) { transform.Rotate(sensitivity, 0, 0, Space.Self); }

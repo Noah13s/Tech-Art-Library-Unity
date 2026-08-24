@@ -118,20 +118,16 @@ public class AtmosphereProfile : ScriptableObject
 			throw new Exception("Compute Shader not provided");
 		}
 
-		if (opticalDepthTexture == null || !opticalDepthTexture.IsCreated()) 
-		{
-			CreateRenderTexture(ref opticalDepthTexture, (int)LUTSize, (int)LUTSize, FilterMode.Bilinear, RenderTextureFormat.ARGBHalf);	
+		CreateRenderTexture(ref opticalDepthTexture, (int)LUTSize, (int)LUTSize, FilterMode.Bilinear, RenderTextureFormat.ARGBHalf);
 
-			shader.SetTexture(0, "_Result", opticalDepthTexture);
+		shader.SetTexture(0, "_Result", opticalDepthTexture);
+		SetComputeProperties(shader, planetRadius, atmosphereRadius);
 
-			SetComputeProperties(shader, planetRadius, atmosphereRadius);
+		shader.GetKernelThreadGroupSizes(0, out uint x, out uint y, out _);
 
-			shader.GetKernelThreadGroupSizes(0, out uint x, out uint y, out _);
-
-			int numGroupsX = Mathf.CeilToInt((int)LUTSize / (float)x);
-			int numGroupsY = Mathf.CeilToInt((int)LUTSize / (float)y);
-			shader.Dispatch(0, numGroupsX, numGroupsY, 1);
-		}
+		int numGroupsX = Mathf.CeilToInt((int)LUTSize / (float)x);
+		int numGroupsY = Mathf.CeilToInt((int)LUTSize / (float)y);
+		shader.Dispatch(0, numGroupsX, numGroupsY, 1);
 	}
 
 

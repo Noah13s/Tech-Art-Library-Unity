@@ -121,12 +121,12 @@ public class AtmosphereRenderPass : ScriptableRenderPass
 
         if (cameraData.postProcessEnabled) 
         {
-            RenderEffects(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, prefabMode);
+            RenderEffects(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, camera, prefabMode);
         }
 #else
         if (cameraData.postProcessEnabled) 
         {
-            RenderEffects(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, false);
+            RenderEffects(cmd, renderingData.cameraData.renderer.cameraColorTargetHandle, camera, false);
         }
 #endif
 
@@ -136,7 +136,7 @@ public class AtmosphereRenderPass : ScriptableRenderPass
     }
 
 
-    private void RenderEffects(CommandBuffer cmd, RenderTargetIdentifier colorSource, bool inPrefabMode) 
+    private void RenderEffects(CommandBuffer cmd, RenderTargetIdentifier colorSource, Camera camera, bool inPrefabMode)
     {
         BlitUtility.BeginBlitLoop(cmd, colorSource);
 
@@ -151,6 +151,7 @@ public class AtmosphereRenderPass : ScriptableRenderPass
             }
 #endif
             Material blitMat = visibleEffects[i].effect.GetMaterial(atmosphereShader);
+            visibleEffects[i].effect.PrepareForCamera(camera);
             BlitUtility.BlitNext(blitMat, "_Source");
         }
 

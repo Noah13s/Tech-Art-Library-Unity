@@ -48,8 +48,8 @@ public class OrbitCamera : MonoBehaviour
         // Enable the input controls
 #if ENABLE_INPUT_SYSTEM
         controls.Enable();
-        controls.Orbit_Player.LeftButton.performed += OnButtonPressed;
-        controls.Orbit_Player.LeftButton.canceled += OnButtonReleased;
+        controls.Orbit_Player.RightButton.performed += OnButtonPressed;
+        controls.Orbit_Player.RightButton.canceled += OnButtonReleased;
 #endif
     }
 
@@ -58,8 +58,8 @@ public class OrbitCamera : MonoBehaviour
         // Disable the input controls
 #if ENABLE_INPUT_SYSTEM
         controls.Disable();
-        controls.Orbit_Player.LeftButton.performed -= OnButtonPressed;
-        controls.Orbit_Player.LeftButton.canceled -= OnButtonReleased;
+        controls.Orbit_Player.RightButton.performed -= OnButtonPressed;
+        controls.Orbit_Player.RightButton.canceled -= OnButtonReleased;
 #endif
     }
 
@@ -87,7 +87,7 @@ public class OrbitCamera : MonoBehaviour
         if (rightClickMove)
         {
 #if ENABLE_INPUT_SYSTEM
-            if (controls.Orbit_Player.LeftButton.IsPressed() && IsCursorOverGameWindow())
+            if (controls.Orbit_Player.RightButton.IsPressed() && IsCursorOverGameWindow())
             {
                 // Rotate the camera based on mouse input            
                 currentRotationX += controls.Orbit_Player.Delta.ReadValue<Vector2>().x * sensitivityX;

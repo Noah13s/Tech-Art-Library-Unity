@@ -21,8 +21,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Mat_Earth
-  m_Shader: {fileID: -6465566751694194690, guid: 7ea5cf5f8dbd3084ea12efe9cf2e450c, type: 3}
-  m_Parent: {fileID: 2100000, guid: 727c10f64e1a42c49bd4063b47b854cc, type: 2}
+  m_Shader: {fileID: 4800000, guid: 4a82f5d36b314f36b7990b8edcfa59c4, type: 3}
+  m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -41,6 +41,14 @@ Material:
         m_Texture: {fileID: 2800000, guid: e7ec3c0f33fc12248a507b21dafb42ec, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _EmissionTexture:
+        m_Texture: {fileID: 2800000, guid: 37fcc58df6e99b344a4e99acd9d0a330, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetalMap:
+        m_Texture: {fileID: 2800000, guid: 33bc790ad4dc1cb49b93bc0789da6b5b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalTexture:
         m_Texture: {fileID: 2800000, guid: fcc0561e8a60867499fbf436ec5576a2, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -53,14 +61,23 @@ Material:
     m_Floats:
     - _BUILTIN_CullMode: 2
     - _ColorTint: 0
+    - _EmissionStrength: 1
     - _Intensity: 1
     - _Metalness: 0
+    - _NightFadeEnd: 0.05
+    - _NightFadeStart: -0.12
+    - _NormalStrength: 1
     - _Rougness: 0
+    - _SpecularStrength: 0.35
     - _UseDiffuseMap: 1
+    - _UseEmissionMap: 1
+    - _UseMetalMap: 0
     - _UseNormalMap: 1
     - _UseRoughnessMap: 1
+    - _WorkflowMode: 1
     m_Colors:
-    - _Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlobalTiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &9032776174500464493

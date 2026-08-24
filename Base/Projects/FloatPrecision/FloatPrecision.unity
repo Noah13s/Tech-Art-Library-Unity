@@ -167,8 +167,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 56d588086c0c2f948b194738d3375434, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_Name:
+  m_EditorClassIdentifier:
   simulationPosition:
     x: 0
     y: 0
@@ -1037,7 +1037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0714872af4141a3479706526c59bf278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 7509.32189798
+  mass: 6.4171e+23
 --- !u!114 &691628598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1124,6 +1124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 694544966}
   - component: {fileID: 694544967}
+  - component: {fileID: 2147000001}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1200,6 +1201,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2147000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694544965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6f7e1a2b3c449e88d6f0a1b2c3d4e5f, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  player: {fileID: 694544967}
+  flightCamera: {fileID: 1313644643}
+  systemRadius: 48
+  trajectorySteps: 320
+  trajectoryRefreshInterval: 0.25
+  backgroundColor: {r: 0.008, g: 0.012, b: 0.025, a: 1}
 --- !u!1 &712076223
 GameObject:
   m_ObjectHideFlags: 0
@@ -2009,6 +2028,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   planet: {fileID: 1185176547}
   atmosphereEffect: {fileID: 1025097942}
+  stableRadiusFraction: 0.95
 --- !u!1 &1185176541
 GameObject:
   m_ObjectHideFlags: 0
@@ -2145,7 +2165,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  transitionRange: 100
+  transitionRange: 75000
 --- !u!114 &1185176550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4676,7 +4696,7 @@ MonoBehaviour:
     x: 149982270700
     y: 0
     z: 0
-  simulationScale: 12742000
+  simulationScale: 3474800
   maxDistanceFromPlayer: 80000
   player: {fileID: 694544967}
   altitude:
@@ -4698,7 +4718,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0714872af4141a3479706526c59bf278, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 7509.32189798
+  mass: 7.342e+22
 --- !u!1 &1971876541
 GameObject:
   m_ObjectHideFlags: 0

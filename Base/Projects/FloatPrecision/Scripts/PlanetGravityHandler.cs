@@ -11,15 +11,26 @@ public class PlanetGravityHandler : MonoBehaviour
     private PerspectiveIllusionObject planet;
     private FloatPrecisionPlayer player;
 
+    public double Mass => mass;
+    public double GravitationalParameter => GravitationalConstant * mass;
+    public PerspectiveIllusionObject Planet
+    {
+        get
+        {
+            EnsureReferences();
+            return planet;
+        }
+    }
+
     private void Awake()
     {
-        planet = GetComponent<PerspectiveIllusionObject>();
-        player = planet.player;
+        EnsureReferences();
     }
 
     private void FixedUpdate()
     {
-        if (player == null)
+        EnsureReferences();
+        if (player == null || !player.VelocityActive)
             return;
 
         player.AddVelocity(CalculateGravityForceAtPosition(player.playerPosition) * Time.fixedDeltaTime);
@@ -27,6 +38,7 @@ public class PlanetGravityHandler : MonoBehaviour
 
     public double CalculateGravityAtPosition(DoubleVector3 position)
     {
+        EnsureReferences();
         if (planet == null)
             return 0;
 
@@ -40,6 +52,7 @@ public class PlanetGravityHandler : MonoBehaviour
 
     public DoubleVector3 CalculateGravityForceAtPosition(DoubleVector3 position)
     {
+        EnsureReferences();
         if (planet == null)
             return DoubleVector3.Zero;
 
@@ -49,5 +62,14 @@ public class PlanetGravityHandler : MonoBehaviour
             return DoubleVector3.Zero;
 
         return direction.Normalized() * (GravitationalConstant * mass / distanceSquared);
+    }
+
+    private void EnsureReferences()
+    {
+        planet ??= GetComponent<PerspectiveIllusionObject>();
+        if (player == null && planet != null)
+        {
+            player = planet.player;
+        }
     }
 }

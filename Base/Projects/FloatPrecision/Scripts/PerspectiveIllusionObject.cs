@@ -23,7 +23,7 @@ public class PerspectiveIllusionObject : MonoBehaviour
     [SerializeField] private UnityEvent<Int64> altitude;
     [SerializeField] private UnityEvent<Int64> centerDistance;
 
-    // Transition range (in world units) below maxDistanceFromPlayer over which we blend to true mode.
+    [Tooltip("Surface-distance range used to blend from the compressed far representation to true local scale. Use a broad range so the handoff is imperceptible.")]
     public float transitionRange = 100f;
 
     [Header("Rendering")]
@@ -100,7 +100,10 @@ public class PerspectiveIllusionObject : MonoBehaviour
         DoubleVector3 farPosition = relativePosition.Normalized() * fixedDistance;
         double farScale = simulationScale * (fixedDistance / actualDistance);
 
-        double blendRange = Math.Max(0.0, transitionRange);
+        // Position and scale must use exactly the same blend factor. Their ratio then
+        // remains constant, so the object's apparent angular size cannot change during
+        // the handoff. SmoothStep also gives the transition zero velocity at both ends.
+        double blendRange = Math.Min(fixedDistance, Math.Max(0.0, transitionRange));
         double t;
         if (distanceFromSurface >= fixedDistance)
         {
@@ -115,6 +118,8 @@ public class PerspectiveIllusionObject : MonoBehaviour
             t = (fixedDistance - distanceFromSurface) / blendRange;
         }
 
+        t = t * t * (3.0 - 2.0 * t);
+
         renderedPosition = DoubleVector3.Lerp(farPosition, relativePosition, t);
         renderedScale = farScale + (simulationScale - farScale) * t;
     }
@@ -123,6 +128,6 @@ public class PerspectiveIllusionObject : MonoBehaviour
     {
         simulationScale = Math.Max(0.0, simulationScale);
         maxDistanceFromPlayer = Mathf.Max(0f, maxDistanceFromPlayer);
-        transitionRange = Mathf.Max(0f, transitionRange);
+        transitionRange = Mathf.Clamp(transitionRange, 0f, maxDistanceFromPlayer);
     }
 }

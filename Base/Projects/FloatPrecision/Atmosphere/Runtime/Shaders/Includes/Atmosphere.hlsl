@@ -85,7 +85,10 @@ float3 OpticalDepthBaked(float3 rayOrigin, float3 rayDir)
 
 	float uvX = 1 - (dot(normal, rayDir) * 0.5 + 0.5);
 
-	return SAMPLE_TEXTURE2D(_BakedOpticalDepth, sampler_BakedOpticalDepth, float2(uvX, height01)).xyz;
+	// The LUT is baked with a unit planet radius. Optical path length scales
+	// linearly with radius while density remains a function of normalized height.
+	return SAMPLE_TEXTURE2D(_BakedOpticalDepth, sampler_BakedOpticalDepth, float2(uvX, height01)).xyz
+		* _PlanetRadius;
 }
 
 
@@ -195,4 +198,3 @@ float3 CalculateScattering(float3 start, float3 dir, float sceneDepth, float3 sc
 	// Apply final color
     return (rayleigh + mie + ambient) * _Intensity + sceneColor * opacity;
 }
-

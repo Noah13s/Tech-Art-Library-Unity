@@ -45,6 +45,8 @@ ENDHLSL
 
 			TEXTURE2D(_Source);
 			SAMPLER(sampler_Source);
+			float3 _AtmosphereCameraPosition;
+			float _AtmosphereSceneDepthScale;
 
 
 			v2f AtmosphereVertex(appdata v) 
@@ -66,8 +68,9 @@ ENDHLSL
 
 				bool isEndOfDepth;
 				float sceneDepth = CompositeDepthScaled(i.uv, viewLength, isEndOfDepth);
+				sceneDepth *= _AtmosphereSceneDepthScale;
 
-				float3 color = CalculateScattering(_WorldSpaceCameraPos.xyz, i.viewVector / viewLength, sceneDepth, originalCol.xyz);
+				float3 color = CalculateScattering(_AtmosphereCameraPosition, i.viewVector / viewLength, sceneDepth, originalCol.xyz);
 
 				return float4(color, originalCol.w);
 			}

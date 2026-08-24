@@ -36,6 +36,7 @@ The scene uses the Input System package. It does not require the legacy input AP
 | `Q` / `E` | Roll |
 | `Shift` | Move forward, or add forward velocity in velocity mode |
 | `Ctrl` | Move backward, or add reverse velocity in velocity mode |
+| Right mouse drag | Orbit/look around the player |
 | `Tab` | Open or close the navigation map |
 
 The **Atmosphere Speed**, **Space**, and **Spacex2** buttons change the movement or acceleration increment without modifying the double-precision position directly.
