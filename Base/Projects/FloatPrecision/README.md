@@ -12,6 +12,7 @@ The main scene is [`FloatPrecision.unity`](FloatPrecision.unity).
 - A generated, displaced surface patch for close flight and ground contact
 - Inverse-square gravity from multiple celestial bodies
 - Camera-relative atmospheric scattering and simulation-space sunlight
+- Perspective-aware volumetric clouds for Earth
 - A navigable 3D map with textured planets and the player's real mesh
 - Gravity-aware trajectory prediction with impact and prediction-limit markers
 - Time controls available in both the flight view and navigation map
@@ -81,6 +82,16 @@ Within the close-up range, [`SphereSurfacePatchGenerator`](Scripts/SphereSurface
 
 Atmospheric scattering uses a separate camera-relative proxy capped near the far planet's render scale. Scene depth and camera positions are converted into that proxy together, keeping the atmosphere aligned while avoiding million-unit shader calculations.
 
+## Volumetric clouds
+
+Earth uses an adapted version of [UnityVolumetricCloudsURP](https://github.com/jiaozi158/UnityVolumetricCloudsURP). The renderer, shader, noise textures, and original MIT notice are stored in `VolumetricClouds` so the project has no external runtime download.
+
+[`PlanetVolumetricCloudsController`](Scripts/PlanetVolumetricCloudsController.cs) creates the global cloud volume and exposes the initial Earth tuning on the Earth object. Altitude and wind remain physical metre-based values. At runtime, the controller supplies the cloud renderer with Earth's current perspective-proxy center, radius, and metres-to-render-units scale. Cloud shell thickness, noise frequency, wind displacement, ray steps, and optical density are converted together so the layer remains consistent across distance bands.
+
+The renderer combines detailed local volumetric noise with a unique procedural weather field generated once for the entire planet. Domain-warped multi-scale noise, latitude flow, and procedural vortices create fronts and spiral systems without repeating the small 3D detail texture across the globe. `Planet-Wide Weather` controls determine coverage, contrast, seed, map resolution, and close-range influence. Between 75 km and 750 km altitude, small volumetric erosion features smoothly give way to the planetary field; above 750 km no tiled shape or erosion source remains in the render.
+
+The initial profile uses a 1.5–7 km layer, broad low-frequency formations, 35 km/h wind, 48 primary steps, and four light steps. Close flight uses 65%-resolution bilateral rendering; the renderer smoothly increases to full resolution from orbit to avoid aliasing the compressed cloud shell. Cloud-cookie ground shadows are disabled for this first pass because the upstream renderer replaces the main directional-light cookie; they should be enabled only after integrating them with the existing local shadow solution.
+
 ## Gravity and lighting
 
 Each [`PlanetGravityHandler`](Scripts/PlanetGravityHandler.cs) contributes inverse-square acceleration from its body's configured mass while velocity mode is enabled. The player's velocity is stored in metres per second and integrated over time.
@@ -97,10 +108,12 @@ Each [`PlanetGravityHandler`](Scripts/PlanetGravityHandler.cs) contributes inver
 | [`Scripts/SphereSurfacePatchGenerator.cs`](Scripts/SphereSurfacePatchGenerator.cs) | Close-up displaced terrain and ground contact |
 | [`Scripts/PlanetGravityHandler.cs`](Scripts/PlanetGravityHandler.cs) | Celestial mass and gravitational acceleration |
 | [`Scripts/AtmosphereHandler.cs`](Scripts/AtmosphereHandler.cs) | Atmosphere alignment and scale synchronization |
+| [`Scripts/PlanetVolumetricCloudsController.cs`](Scripts/PlanetVolumetricCloudsController.cs) | Earth cloud volume and perspective-scale synchronization |
 | [`Scripts/SimulationSunLightController.cs`](Scripts/SimulationSunLightController.cs) | Stable Sun-relative lighting |
 | [`Scripts/SimulationMapController.cs`](Scripts/SimulationMapController.cs) | Runtime map, trajectory predictor, object details, and time controls |
 | `Atmosphere/Runtime` | URP render feature, render pass, shaders, and depth support |
 | `Atmosphere/Profiles` | Atmosphere profile assets |
+| `VolumetricClouds` | Adapted URP cloud renderer, shaders, noise assets, and license |
 | `Planets` | Planet materials, textures, and visual assets |
 | `WebInterface` | Optional Node.js and WebSocket visualization |
 

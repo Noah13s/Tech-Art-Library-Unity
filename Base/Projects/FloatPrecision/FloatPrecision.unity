@@ -2043,6 +2043,7 @@ GameObject:
   - component: {fileID: 1185176547}
   - component: {fileID: 1185176550}
   - component: {fileID: 1185176551}
+  - component: {fileID: 1185176552}
   m_Layer: 0
   m_Name: Earth
   m_TagString: Untagged
@@ -2194,6 +2195,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mass: 5.972e+24
+--- !u!114 &1185176552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185176541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d62f9ef7ea1743d9a13a631477088f82, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  planet: {fileID: 1185176547}
+  cloudsEnabled: 1
+  bottomAltitude: 1500
+  altitudeRange: 5500
+  density: 0.3
+  preset: 1
+  shapeFactor: 0.55
+  shapeScale: 1.35
+  localShapeVariation: 0.68
+  planetaryCoverageScale: 1.45
+  planetaryCoverage: 0.58
+  planetaryCoverageContrast: 0.75
+  planetaryCoverageInfluence: 1
+  weatherMapOverride: {fileID: 0}
+  weatherMapWidth: 1024
+  weatherSeed: 15873
+  detailFadeStartAltitude: 35000
+  detailFadeEndAltitude: 240000
+  erosionFactor: 0.32
+  erosionScale: 55
+  microErosion: 0
+  windOrientation: 65
+  windSpeedKph: 35
+  ambientLight: 0.8
+  sunlight: 1.15
+  primarySteps: 48
+  lightSteps: 4
+  temporalAccumulation: 0.75
+  orbitalProxyOpacity: 0.75
+  orbitalCloudTint: {r: 1, g: 1, b: 1, a: 1}
+  orbitalAmbient: 0.12
 --- !u!1 &1185304996
 GameObject:
   m_ObjectHideFlags: 0

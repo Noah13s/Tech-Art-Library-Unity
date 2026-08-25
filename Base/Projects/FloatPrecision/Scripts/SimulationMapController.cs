@@ -343,6 +343,10 @@ public sealed class SimulationMapController : MonoBehaviour
         UniversalAdditionalCameraData cameraData = cameraObject.AddComponent<UniversalAdditionalCameraData>();
         cameraData.renderPostProcessing = false;
         cameraData.renderShadows = false;
+
+        VolumetricCloudsCameraOverride cloudOverride =
+            cameraObject.AddComponent<VolumetricCloudsCameraOverride>();
+        cloudOverride.renderClouds = false;
     }
 
     private void BuildInterface()
