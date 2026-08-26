@@ -21,10 +21,16 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
 
     [Header("Shape")]
     [SerializeField] private VolumetricClouds.CloudPresets preset = VolumetricClouds.CloudPresets.Cloudy;
-    [SerializeField, Range(0f, 1f)] private float shapeFactor = 0.55f;
+    [SerializeField, Range(0f, 1f)] private float shapeFactor = 0.72f;
     [SerializeField, Min(0.1f)] private float shapeScale = 1.35f;
     [Tooltip("Breaks the repeating local noise into cloud fields with different sizes and silhouettes.")]
-    [SerializeField, Range(0f, 1f)] private float localShapeVariation = 0.68f;
+    [SerializeField, Range(0f, 1f)] private float localShapeVariation = 0.82f;
+    [SerializeField, Range(0.1f, 4f)] private float macroShapeScale = 0.62f;
+    [SerializeField, Range(0.2f, 48f)] private float cumulusScale = 32f;
+    [SerializeField, Range(0f, 1f)] private float cumulusStrength = 0.82f;
+    [SerializeField, Range(0f, 1f)] private float verticalDevelopment = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float detailStrength = 0.62f;
+    [SerializeField, Range(0f, 1f)] private float edgeHardness = 0.96f;
 
     [Header("Planet-Wide Weather")]
     [SerializeField, Range(0.25f, 8f)] private float planetaryCoverageScale = 1.45f;
@@ -47,9 +53,14 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
     [Header("Lighting and Quality")]
     [SerializeField, Range(0f, 2f)] private float ambientLight = 0.8f;
     [SerializeField, Range(0f, 2f)] private float sunlight = 1.15f;
-    [SerializeField, Range(24, 256)] private int primarySteps = 48;
+    [SerializeField, Range(0.0005f, 0.02f)] private float extinctionCoefficient = 0.0045f;
+    [SerializeField, Range(0f, 2f)] private float silverLiningIntensity = 0.70f;
+    [SerializeField, Range(24, 256)] private int primarySteps = 128;
     [SerializeField, Range(1, 16)] private int lightSteps = 4;
-    [SerializeField, Range(0f, 1f)] private float temporalAccumulation = 0.75f;
+    [SerializeField, Range(25f, 500f)] private float baseStepSize = 90f;
+    [SerializeField, Range(0f, 0.05f)] private float adaptiveStepSizeFactor = 0.008f;
+    [SerializeField, Range(250f, 3000f)] private float maximumStepSize = 1200f;
+    [SerializeField, Range(0f, 1f)] private float temporalAccumulation = 0.86f;
 
     [Header("Orbital Cloud Proxy")]
     [Tooltip("Optical density of the satellite-scale cloud shell used after local volumetric detail fades out.")]
@@ -143,6 +154,12 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         clouds.shapeFactor.Override(shapeFactor);
         clouds.shapeScale.Override(shapeScale);
         clouds.localShapeVariation.Override(localShapeVariation);
+        clouds.macroShapeScale.Override(macroShapeScale);
+        clouds.cumulusScale.Override(cumulusScale);
+        clouds.cumulusStrength.Override(cumulusStrength);
+        clouds.verticalDevelopment.Override(verticalDevelopment);
+        clouds.detailStrength.Override(detailStrength);
+        clouds.edgeHardness.Override(edgeHardness);
         clouds.planetaryCoverageScale.Override(planetaryCoverageScale);
         clouds.planetaryCoverage.Override(planetaryCoverage);
         clouds.planetaryCoverageContrast.Override(planetaryCoverageContrast);
@@ -161,8 +178,13 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         clouds.globalSpeed.Override(windSpeedKph);
         clouds.ambientLightProbeDimmer.Override(ambientLight);
         clouds.sunLightDimmer.Override(sunlight);
+        clouds.extinctionCoefficient.Override(extinctionCoefficient);
+        clouds.silverLiningIntensity.Override(silverLiningIntensity);
         clouds.numPrimarySteps.Override(primarySteps);
         clouds.numLightSteps.Override(lightSteps);
+        clouds.baseStepSize.Override(baseStepSize);
+        clouds.adaptiveStepSizeFactor.Override(adaptiveStepSizeFactor);
+        clouds.maximumStepSize.Override(maximumStepSize);
         clouds.temporalAccumulationFactor.Override(temporalAccumulation);
         clouds.perceptualBlending.Override(1f);
 
@@ -606,6 +628,12 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         altitudeRange = Mathf.Max(100f, altitudeRange);
         shapeScale = Mathf.Max(0.1f, shapeScale);
         localShapeVariation = Mathf.Clamp01(localShapeVariation);
+        macroShapeScale = Mathf.Clamp(macroShapeScale, 0.1f, 4f);
+        cumulusScale = Mathf.Clamp(cumulusScale, 0.2f, 48f);
+        cumulusStrength = Mathf.Clamp01(cumulusStrength);
+        verticalDevelopment = Mathf.Clamp01(verticalDevelopment);
+        detailStrength = Mathf.Clamp01(detailStrength);
+        edgeHardness = Mathf.Clamp01(edgeHardness);
         planetaryCoverageScale = Mathf.Clamp(planetaryCoverageScale, 0.25f, 8f);
         weatherMapWidth = Mathf.Clamp(weatherMapWidth, 128, 1024);
         detailFadeStartAltitude = Mathf.Max(0f, detailFadeStartAltitude);
@@ -613,6 +641,11 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         erosionScale = Mathf.Max(1f, erosionScale);
         primarySteps = Mathf.Clamp(primarySteps, 24, 256);
         lightSteps = Mathf.Clamp(lightSteps, 1, 16);
+        baseStepSize = Mathf.Clamp(baseStepSize, 25f, 500f);
+        adaptiveStepSizeFactor = Mathf.Clamp(adaptiveStepSizeFactor, 0f, 0.05f);
+        maximumStepSize = Mathf.Clamp(maximumStepSize, 250f, 3000f);
+        extinctionCoefficient = Mathf.Clamp(extinctionCoefficient, 0.0005f, 0.02f);
+        silverLiningIntensity = Mathf.Clamp(silverLiningIntensity, 0f, 2f);
         orbitalProxyOpacity = Mathf.Clamp(orbitalProxyOpacity, 0.25f, 5f);
 
         if (Application.isPlaying)

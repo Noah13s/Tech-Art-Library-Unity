@@ -59,6 +59,24 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [Tooltip("Breaks the repeated local volume into larger cloud groups with varied sizes and silhouettes.")]
     public ClampedFloatParameter localShapeVariation = new(0.82f, 0.0f, 1.0f);
 
+    [Tooltip("Scale of non-periodic synoptic and cloud-bank shapes. Lower values create broader formations.")]
+    public ClampedFloatParameter macroShapeScale = new(0.55f, 0.1f, 4.0f);
+
+    [Tooltip("Scale of procedural cumulus billows inside the macro weather systems.")]
+    public ClampedFloatParameter cumulusScale = new(32.0f, 0.2f, 48.0f);
+
+    [Tooltip("Blends from layered cloud banks to vertically developed cumulus forms.")]
+    public ClampedFloatParameter cumulusStrength = new(0.72f, 0.0f, 1.0f);
+
+    [Tooltip("Controls the amount of tall convective cloud and anvil development.")]
+    public ClampedFloatParameter verticalDevelopment = new(0.68f, 0.0f, 1.0f);
+
+    [Tooltip("Strength of the close-range, texture-based edge erosion. The main silhouette remains procedural and non-periodic.")]
+    public ClampedFloatParameter detailStrength = new(0.52f, 0.0f, 1.0f);
+
+    [Tooltip("Sharpness of the transition from clear air to cloud. Values near one produce crisp cumulus edges without increasing opacity everywhere.")]
+    public ClampedFloatParameter edgeHardness = new(0.96f, 0.0f, 1.0f);
+
     [Header("Planetary Coverage")]
     [Tooltip("Controls the size of planet-wide weather systems. Lower values create larger cloud fronts.")]
     public ClampedFloatParameter planetaryCoverageScale = new(1.75f, 0.25f, 8.0f);
@@ -249,6 +267,12 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [AdditionalProperty, Tooltip("Controls the amount of multi-scattering inside the cloud.")]
     public ClampedFloatParameter multiScattering = new(0.5f, 0.0f, 1.0f);
 
+    [Tooltip("Physical extinction coefficient in inverse metres. This is converted to proxy space so opacity remains stable at every simulation scale.")]
+    public ClampedFloatParameter extinctionCoefficient = new(0.0045f, 0.0005f, 0.02f);
+
+    [Tooltip("Strength of forward scattering and the bright rim around sun-facing cloud edges.")]
+    public ClampedFloatParameter silverLiningIntensity = new(0.70f, 0.0f, 2.0f);
+
     /// <summary>
     /// When enabled, URP evaluates the Volumetric Clouds' shadows. To render the shadows, this property overrides the cookie in the main directional light.
     /// </summary>
@@ -322,6 +346,15 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     /// </summary>
     [Tooltip("Controls the number of steps when evaluating the clouds' transmittance. A higher value may lead to a lower noise level and longer view distance, but at a higher cost.")]
     public ClampedIntParameter numPrimarySteps = new(32, 24, 256);
+
+    [Tooltip("Physical near-camera ray step in metres. Small values preserve cauliflower silhouettes while flying through clouds.")]
+    public ClampedFloatParameter baseStepSize = new(90.0f, 25.0f, 500.0f);
+
+    [Tooltip("Adds this fraction of camera distance to the current ray step, allowing distant empty space to be crossed efficiently.")]
+    public ClampedFloatParameter adaptiveStepSizeFactor = new(0.008f, 0.0f, 0.05f);
+
+    [Tooltip("Maximum physical ray step in metres after adaptive growth.")]
+    public ClampedFloatParameter maximumStepSize = new(1200.0f, 250.0f, 3000.0f);
 
     /// <summary>
     /// Controls the number of steps when evaluating the clouds' lighting. A higher value will lead to smoother lighting and improved self-shadowing, but at a higher cost.

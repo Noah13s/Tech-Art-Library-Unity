@@ -20,8 +20,10 @@ public class AtmosphereRenderFeature : ScriptableRendererFeature
 
         atmospherePass = new AtmosphereRenderPass(atmosphereShader);
 
-        // Effect does not work with transparents since they do not write to the depth buffer. Sorry if you wanted to have a planet made of glass.
-        atmospherePass.renderPassEvent = RenderPassEvent.AfterRenderingSkybox;//RenderPassEvent.BeforeRenderingTransparents;
+        // Establish the atmospheric sky before volumetric clouds are composited.
+        // Partially transparent cloud pixels must blend with this radiance, not the
+        // camera clear color used to represent empty space.
+        atmospherePass.renderPassEvent = RenderPassEvent.AfterRenderingSkybox;
 
         atmospherePass.ConfigureInput(ScriptableRenderPassInput.Depth);
     }
@@ -91,5 +93,3 @@ public class AtmosphereRenderFeature : ScriptableRendererFeature
         return shader;
     }
 }
-
-

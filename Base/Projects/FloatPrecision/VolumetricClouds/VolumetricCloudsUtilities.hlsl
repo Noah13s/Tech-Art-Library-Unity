@@ -33,9 +33,9 @@ half3 EvaluateVolumetricCloudsAmbientProbe(half3 normalWS)
 // Number of steps before we start the large steps
 #define EMPTY_STEPS_BEFORE_LARGE_STEPS 8
 // Forward eccentricity
-#define FORWARD_ECCENTRICITY 0.7
-// Forward eccentricity
-#define BACKWARD_ECCENTRICITY 0.7
+#define FORWARD_ECCENTRICITY 0.76
+// A weaker backward lobe preserves dark cloud bases without producing a flat halo.
+#define BACKWARD_ECCENTRICITY 0.28
 // Distance until which the erosion texture is used
 #define MIN_EROSION_DISTANCE 3000.0
 #define MAX_EROSION_DISTANCE 100000.0
@@ -132,9 +132,22 @@ float ConvertCloudDepth(float3 position)
 
 float GenerateRandomFloat(float2 screenUV)
 {
-    float time = unity_DeltaTime.y * _Time.y + _Seed;
-    _Seed += 1.0;
-    return GenerateHashedRandomFloat(uint3(screenUV * _ScreenSize.xy, time));
+    float2 pixel = floor(screenUV * _ScreenSize.xy);
+
+    // Interleaved gradient noise has much lower low-frequency clumping than a
+    // per-pixel hash. That matters at cloud silhouettes: white-noise clusters
+    // read as holes and black speckles even after a small reconstruction
+    // filter, while IGN distributes the same number of ray samples evenly.
+    pixel += float2(_Seed * 17.0, _Seed * 29.0);
+    float spatialNoise = frac(52.9829189 * frac(dot(
+        pixel,
+        float2(0.06711056, 0.00583715))));
+
+    // A golden-ratio temporal sequence converges more evenly than unrelated
+    // white-noise frames and is independent of Time.timeScale. Cloud edges can
+    // therefore denoise while gameplay is paused instead of freezing one noisy
+    // ray offset indefinitely.
+    return frac(spatialNoise + _CloudFrameIndex * 0.61803398875);
 }
 
 // Returns the closest hit in X and the farthest hit in Y.
@@ -359,6 +372,8 @@ struct CloudCoverageData
     half maxCloudHeight;
     // Low-frequency, seamless shape used when the whole planet is visible.
     half planetaryShape;
+    // Weather-derived tendency to build tall cumulus and anvil structures.
+    half convection;
     // Per-sample blend from nearby 3D detail to the planet-wide weather field.
     half detailLod;
 };
@@ -377,7 +392,12 @@ half EvaluatePlanetDetailLod(float3 positionPS)
 
 // Samples the unique, procedurally generated global weather field once around
 // the planet. The texture wraps only at longitude and clamps at the poles.
-void EvaluatePlanetaryWeather(float3 positionPS, half detailLod, out half coverage, out half shape)
+void EvaluatePlanetaryWeather(
+    float3 positionPS,
+    half detailLod,
+    out half coverage,
+    out half shape,
+    out half convection)
 {
     // Global weather is advanced once through the longitudinal offset below.
     // Adding the local-noise wind displacement here as well made the planet-wide
@@ -387,11 +407,11 @@ void EvaluatePlanetaryWeather(float3 positionPS, half detailLod, out half covera
         atan2(planetDirection.z, planetDirection.x) * 0.159154943 + 0.5 + _PlanetaryWeatherOffset,
         asin(clamp(planetDirection.y, -1.0, 1.0)) * 0.318309886 + 0.5);
 
-    half2 weather = SAMPLE_TEXTURE2D_LOD(
+    half3 weather = SAMPLE_TEXTURE2D_LOD(
         _PlanetaryWeatherMap,
         sampler_PlanetaryWeatherMap,
         weatherUV,
-        detailLod * 0.15).rg;
+        detailLod * 0.15).rgb;
 
     // Preserve the satellite-like internal texture at orbital distance. Mip zero
     // is intentional: this map is only sampled once around the planet and the
@@ -406,6 +426,9 @@ void EvaluatePlanetaryWeather(float3 positionPS, half detailLod, out half covera
     half coverageSignal = lerp(weather.x, farCoverageSignal, detailLod);
     half farShape = weather.x * lerp(0.03, 1.0, internalStructure);
     shape = saturate(lerp(nearShape, farShape, detailLod));
+    convection = saturate(
+        smoothstep(0.48, 0.82, weather.z) * 0.70
+        + smoothstep(0.62, 0.90, weather.y) * 0.30);
 
     half threshold = 1.0 - _PlanetaryCoverage;
     half softness = lerp(0.20, 0.055, _PlanetaryCoverageContrast);
@@ -536,8 +559,14 @@ void GetCloudCoverageData(float3 positionPS, out CloudCoverageData data)
 //#if defined(CLOUDS_SIMPLE_PRESET)
     half planetaryCoverage;
     half planetaryShape;
+    half convection;
     half detailLod = EvaluatePlanetDetailLod(positionPS);
-    EvaluatePlanetaryWeather(positionPS, detailLod, planetaryCoverage, planetaryShape);
+    EvaluatePlanetaryWeather(
+        positionPS,
+        detailLod,
+        planetaryCoverage,
+        planetaryShape,
+        convection);
 
     half coverageInfluence = lerp(_PlanetaryCoverageInfluence, 1.0, detailLod);
     half4 cloudMapData = half4(lerp(0.9, planetaryCoverage, coverageInfluence), 0.0, 0.25, 1.0);
@@ -549,7 +578,169 @@ void GetCloudCoverageData(float3 positionPS, out CloudCoverageData data)
     data.cloudType = cloudMapData.z;
     data.maxCloudHeight = cloudMapData.w;
     data.planetaryShape = planetaryShape;
+    data.convection = convection;
     data.detailLod = detailLod;
+}
+
+// Texture-free value noise is used only for the silhouette-defining frequencies.
+// Unlike the imported 3D textures it does not repeat after one texture period, so
+// a flight across a cloud bank cannot reveal a tiled grid. The texture volumes are
+// retained later as inexpensive, high-frequency edge erosion.
+float HashCloudCell(float3 p)
+{
+    p = frac(p * 0.1031);
+    p += dot(p, p.yzx + 33.33);
+    return frac((p.x + p.y) * p.z);
+}
+
+float NonPeriodicNoise3D(float3 p)
+{
+    float3 cell = floor(p);
+    float3 local = frac(p);
+    local = local * local * (3.0 - 2.0 * local);
+
+    float n000 = HashCloudCell(cell + float3(0.0, 0.0, 0.0));
+    float n100 = HashCloudCell(cell + float3(1.0, 0.0, 0.0));
+    float n010 = HashCloudCell(cell + float3(0.0, 1.0, 0.0));
+    float n110 = HashCloudCell(cell + float3(1.0, 1.0, 0.0));
+    float n001 = HashCloudCell(cell + float3(0.0, 0.0, 1.0));
+    float n101 = HashCloudCell(cell + float3(1.0, 0.0, 1.0));
+    float n011 = HashCloudCell(cell + float3(0.0, 1.0, 1.0));
+    float n111 = HashCloudCell(cell + float3(1.0, 1.0, 1.0));
+
+    float n00 = lerp(n000, n100, local.x);
+    float n10 = lerp(n010, n110, local.x);
+    float n01 = lerp(n001, n101, local.x);
+    float n11 = lerp(n011, n111, local.x);
+    return lerp(lerp(n00, n10, local.y), lerp(n01, n11, local.y), local.z);
+}
+
+float3 RotateCloudCoordinates(float3 p)
+{
+    return float3(
+        dot(p, float3(0.00, 0.80, 0.60)),
+        dot(p, float3(-0.80, 0.36, -0.48)),
+        dot(p, float3(-0.60, -0.48, 0.64)));
+}
+
+half EvaluateProceduralCloudShape(
+    float3 baseCoordinates,
+    half height,
+    half convection,
+    bool cheapVersion)
+{
+    float3 macroCoordinates = baseCoordinates * _MacroShapeScale;
+    float macroA = NonPeriodicNoise3D(macroCoordinates * 0.43 + float3(7.1, 19.7, 3.4));
+    float macroB = NonPeriodicNoise3D(
+        RotateCloudCoordinates(macroCoordinates) * 0.91 + float3(31.8, 5.2, 17.6));
+    float macroShape = smoothstep(0.28, 0.78, macroA * 0.58 + macroB * 0.42);
+
+    float3 warp = (float3(macroA, macroB, macroA + macroB) - float3(0.5, 0.5, 1.0))
+        * (0.85 * _LocalShapeVariation);
+    float systemVariation = smoothstep(0.16, 0.84, macroA * 0.61 + macroB * 0.39);
+    float3 cumulusCoordinates = RotateCloudCoordinates(baseCoordinates)
+        * _CumulusScale + warp + float3(13.2, 47.1, 8.7);
+    // Irrationally related, rotated value-noise octaves define a non-periodic
+    // cloud envelope.  The extra high octave is subtractive: it cuts turbulent
+    // pockets into the envelope instead of adding another layer of round blobs.
+    float billowA = NonPeriodicNoise3D(cumulusCoordinates);
+    float billowLarge = NonPeriodicNoise3D(
+        RotateCloudCoordinates(cumulusCoordinates) * 0.57
+            + float3(23.4, 71.8, 5.9));
+    float billowBody = lerp(billowLarge, billowA, systemVariation);
+    float billows = billowBody;
+
+    if (!cheapVersion)
+    {
+        float billowB = NonPeriodicNoise3D(
+            RotateCloudCoordinates(cumulusCoordinates) * 1.93
+                + float3(53.7, 11.9, 29.4));
+        float billowC = NonPeriodicNoise3D(
+            RotateCloudCoordinates(cumulusCoordinates * 3.71 + float3(9.3, 61.4, 22.8)));
+        float billowD = NonPeriodicNoise3D(
+            RotateCloudCoordinates(cumulusCoordinates.yzx * 7.13 + float3(41.7, 3.8, 73.1)));
+        billows = saturate(
+            billowBody * 0.54
+            + billowB * 0.30
+            + billowC * 0.16
+            - (1.0 - billowD) * (0.15 * _DetailStrength));
+
+        // The reference-quality cloud set uses a ~2.3 km Worley base with high
+        // persistence. Keep that cellular character local to the procedural
+        // envelope and decorrelate two samples so the 3D texture can never become
+        // a planet-wide repeating silhouette.
+        float3 worleyCoordinatesA = RotateCloudCoordinates(cumulusCoordinates)
+            * 0.83 + float3(0.17, 0.53, 0.89);
+        float3 worleyCoordinatesB = RotateCloudCoordinates(cumulusCoordinates.yzx)
+            * 1.71 + float3(0.61, 0.29, 0.97);
+        half worleyA = SAMPLE_TEXTURE3D_LOD(
+            _Worley128RGBA,
+            s_trilinear_repeat_sampler,
+            worleyCoordinatesA,
+            0.45).r;
+        half worleyB = SAMPLE_TEXTURE3D_LOD(
+            _Worley128RGBA,
+            s_trilinear_repeat_sampler,
+            worleyCoordinatesB,
+            1.15).r;
+        half cellularDetail = saturate(worleyA * 0.62 + worleyB * 0.38);
+        half cellularErosion = saturate((0.64 - cellularDetail) * 2.2);
+        billows = saturate(
+            billows - cellularErosion * (0.24 * _DetailStrength));
+        billows = saturate(billows * 1.18);
+    }
+
+    // The reference implementation describes several cloud types with the same
+    // ~2.3 km base scale but different altitude envelopes. Reconstruct that
+    // principle procedurally: weather convection continuously selects stratus,
+    // cumulus and congestus rather than stretching every cloud through the full
+    // layer. This is what prevents the horizon from becoming a wall of spheres.
+    half developedConvection = saturate(convection * _VerticalDevelopment);
+    half localTypeSignal = smoothstep(0.24, 0.78, macroB * 0.58 + macroA * 0.42);
+    half cumulusType = saturate(
+        localTypeSignal * lerp(0.58, 0.26, developedConvection)
+        + developedConvection);
+    half congestusType = smoothstep(
+        0.62,
+        0.90,
+        developedConvection * 0.76 + localTypeSignal * 0.24);
+    half macroSupport = smoothstep(0.24, 0.78, macroShape);
+
+    half stratusProfile = smoothstep(0.015, 0.075, height)
+        * (1.0 - smoothstep(0.30, 0.46, height));
+    half cumulusTop = saturate(
+        lerp(0.40, 0.76, cumulusType)
+        * lerp(0.82, 1.12, systemVariation));
+    half cumulusProfile = smoothstep(0.018, 0.10, height)
+        * (1.0 - smoothstep(cumulusTop - 0.20, cumulusTop, height));
+    half congestusProfile = smoothstep(0.04, 0.16, height)
+        * (1.0 - smoothstep(0.78, 0.98, height));
+
+    half stratusNoise = billows * 0.62 + macroShape * 0.38;
+    half stratus = smoothstep(0.40, 0.64, stratusNoise)
+        * stratusProfile
+        * lerp(1.0, 0.28, cumulusType);
+
+    half cumulusNoise = billows * 0.76 + macroShape * 0.24;
+    half cumulus = smoothstep(0.44, 0.64, cumulusNoise)
+        * cumulusProfile
+        * lerp(0.24, 1.0, macroSupport)
+        * lerp(0.68, 1.0, cumulusType);
+
+    half towerCore = smoothstep(
+        0.57,
+        0.75,
+        billowA * 0.48 + billows * 0.30 + macroShape * 0.22)
+        * congestusProfile
+        * lerp(0.16, 1.0, macroSupport)
+        * congestusType;
+    half anvilProfile = smoothstep(0.67, 0.78, height)
+        * (1.0 - smoothstep(0.90, 1.0, height));
+    half anvil = smoothstep(0.46, 0.70, macroShape * 0.62 + billowA * 0.38)
+        * anvilProfile
+        * congestusType;
+
+    return saturate(stratus * 0.38 + cumulus + towerCore * 0.82 + anvil * 0.34);
 }
 
 // Density remapping function
@@ -610,69 +801,12 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
     // Evaluate the coordinates at which the noise will be sampled and apply wind displacement
     baseNoiseSamplingCoordinates += properties.height * float3(_WindDirection.x, _WindDirection.y, 0.0f) * _AltitudeDistortion;
 
-    // Add nearby volume detail without replacing the planet-wide weather system.
-    // The source texture is single-channel, so every octave deliberately samples
-    // .r at a decorrelated rotation/scale instead of treating RGB/A as octaves.
     half detailLod = cloudCoverageData.detailLod;
-    half localShape = 1.0;
-    if (detailLod < 0.999)
-    {
-        // A rotated, incommensurate sample changes the apparent cell size over
-        // large regions instead of repeating one uniform bank of puffs.
-        float3 largeCoordinates = float3(
-            dot(baseNoiseSamplingCoordinates, float3(0.00, 0.80, 0.60)),
-            dot(baseNoiseSamplingCoordinates, float3(-0.80, 0.36, -0.48)),
-            dot(baseNoiseSamplingCoordinates, float3(-0.60, -0.48, 0.64)));
-        largeCoordinates = largeCoordinates * 0.37 + float3(0.173, 0.417, 0.731);
-        half largeShape = SAMPLE_TEXTURE3D_LOD(
-            _Worley128RGBA,
-            s_trilinear_repeat_sampler,
-            largeCoordinates,
-            noiseMipOffset + 0.7 + detailLod * 2.0).r;
-
-        // Three independently transformed scalar samples form a true vector warp.
-        // This is intentionally not an RGB sample: the imported texture stores R.
-        float3 systemCoordinates = float3(
-            dot(baseNoiseSamplingCoordinates, float3(0.7071, 0.0000, 0.7071)),
-            dot(baseNoiseSamplingCoordinates, float3(0.4082, 0.8165, -0.4082)),
-            dot(baseNoiseSamplingCoordinates, float3(-0.5774, 0.5774, 0.5774)));
-        systemCoordinates = systemCoordinates * 0.113 + float3(0.619, 0.283, 0.947);
-        half warpX = SAMPLE_TEXTURE3D_LOD(
-            _Worley128RGBA,
-            s_trilinear_repeat_sampler,
-            systemCoordinates + float3(0.13, 0.47, 0.71),
-            noiseMipOffset + 1.35 + detailLod * 1.5).r;
-        half warpY = SAMPLE_TEXTURE3D_LOD(
-            _Worley128RGBA,
-            s_trilinear_repeat_sampler,
-            systemCoordinates.yzx * 1.071 + float3(0.61, 0.29, 0.93),
-            noiseMipOffset + 1.55 + detailLod * 1.5).r;
-        half warpZ = SAMPLE_TEXTURE3D_LOD(
-            _Worley128RGBA,
-            s_trilinear_repeat_sampler,
-            systemCoordinates.zxy * 0.937 + float3(0.37, 0.83, 0.19),
-            noiseMipOffset + 1.75 + detailLod * 1.5).r;
-
-        float3 warpSignal = float3(warpX, warpY, warpZ) - 0.72;
-        float3 warpedMediumCoordinates = baseNoiseSamplingCoordinates
-            + warpSignal * (0.42 * _LocalShapeVariation)
-            + (largeShape - 0.68) * float3(0.13, -0.09, 0.17);
-        half mediumShape = SAMPLE_TEXTURE3D_LOD(
-            _Worley128RGBA,
-            s_trilinear_repeat_sampler,
-            warpedMediumCoordinates,
-            noiseMipOffset + detailLod * 3.0).r;
-
-        half systemShape = dot(half3(warpX, warpY, warpZ), half3(0.43, 0.34, 0.23));
-        half sizeVariation = saturate(largeShape * 0.58 + systemShape * 0.42);
-        half groupedMediumShape = mediumShape * lerp(0.48, 1.36, sizeVariation);
-        half variedShape = saturate(
-            groupedMediumShape
-            + (largeShape - 0.68) * 0.32
-            + (systemShape - 0.68) * 0.20
-            + (warpX - warpY) * 0.16);
-        localShape = lerp(mediumShape, variedShape, _LocalShapeVariation);
-    }
+    half proceduralShape = EvaluateProceduralCloudShape(
+        baseNoiseSamplingCoordinates,
+        properties.height,
+        cloudCoverageData.convection,
+        cheapVersion);
 
     // Read from the LUT
 //#if defined(CLOUDS_SIMPLE_PRESET)
@@ -688,22 +822,42 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
     half microDetailFactor = _MicroErosionFactor * densityErosionAO.y * (1.0 - detailLod);
 #endif
 
-    // One macro density is shared from cloud deck to orbit. Local Worley only
-    // modulates it and fades to a neutral value with distance, so approaching a
-    // weather system never swaps it for an unrelated repeated pattern.
-    half weatherCloudDensity = pow(saturate(cloudCoverageData.planetaryShape), 1.15)
+    half weatherStrength = saturate(
+        cloudCoverageData.coverage
+        * lerp(0.68, 1.20, cloudCoverageData.planetaryShape));
+    // Keep clear air genuinely empty, then transition quickly to optically dense
+    // cloud. A low threshold made every high-coverage region a translucent fog
+    // sheet; this compact remap creates readable silhouettes and internal depth.
+    // The type blend and its subtractive Worley erosion lower the statistical
+    // mean versus the former additive blob model. Keep the final threshold in
+    // the useful part of that distribution so coherent banks survive while the
+    // newly introduced high-frequency voids still cut their silhouettes.
+    half shapeThreshold = lerp(0.68, 0.38, weatherStrength)
+        + (1.0 - shapeFactor) * 0.06;
+    half densityTransitionWidth = lerp(0.24, 0.035, _EdgeHardness);
+    half shapedDensity = smoothstep(
+        shapeThreshold,
+        min(0.995, shapeThreshold + densityTransitionWidth),
+        proceduralShape);
+    half volumetricDensity = shapedDensity
         * densityErosionAO.x
-        * pow(cloudCoverageData.coverage.x, 1.10);
-    half localShapeRemap = lerp(0.08, 1.45, smoothstep(0.48, 0.92, localShape));
-    half localDetailStrength = (1.0 - detailLod) * shapeFactor;
-    half localModulation = lerp(1.0, localShapeRemap, localDetailStrength);
-    half base_cloud = weatherCloudDensity * localModulation;
+        * lerp(0.72, 1.18, cloudCoverageData.planetaryShape);
+
+    // At long range the analytic weather field takes over continuously. Nearby
+    // density is never replaced by a repeated texture, so the same cloud bank is
+    // recognizable while approaching it from orbit.
+    half distantDensity = pow(saturate(cloudCoverageData.planetaryShape), 1.18)
+        * densityErosionAO.x
+        * pow(cloudCoverageData.coverage, 1.05);
+    half base_cloud = lerp(volumetricDensity, distantDensity, detailLod);
 
     // Weight the ambient occlusion's contribution
     properties.ambientOcclusion = densityErosionAO.z;
 
-    // Change the sigma based on the rain cloud data
-    properties.sigmaT = lerp(0.04, 0.12, cloudCoverageData.rainClouds);
+    // Extinction is supplied in inverse physical metres and converted to render
+    // units by C#. This removes opacity changes caused by perspective compression.
+    properties.sigmaT = _ExtinctionCoefficient
+        * lerp(0.82, 1.28, cloudCoverageData.convection);
 
     // The ambient occlusion value that is baked is less relevant if there is shaping or erosion, small hack to compensate that
     half ambientOcclusionBlend = saturate(1.0 - max(erosionFactor, shapeFactor) * 0.5);
@@ -712,16 +866,46 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
     // Apply the erosion for nicer details
     if (!cheapVersion && erosionFactor > 0.0001)
     {
-        float3 erosionCoords = AnimateErosionNoisePosition(positionPS) / NOISE_TEXTURE_NORMALIZATION_FACTOR * _ErosionScale;
-        half erosionNoise = 1.0 - SAMPLE_TEXTURE3D_LOD(_ErosionNoise, s_linear_repeat_sampler, erosionCoords, CLOUD_DETAIL_MIP_OFFSET + erosionMipOffset + detailLod * 4.0).x;
-        erosionNoise = lerp(0.0, erosionNoise, erosionFactor * 0.75 * cloudCoverageData.coverage.x);
+        float3 erosionCoords = AnimateErosionNoisePosition(positionPS)
+            / NOISE_TEXTURE_NORMALIZATION_FACTOR * _ErosionScale;
+        float3 erosionCoordsB = RotateCloudCoordinates(erosionCoords) * 0.873
+            + float3(0.173, 0.619, 0.947);
+        half erosionA = SAMPLE_TEXTURE3D_LOD(
+            _ErosionNoise,
+            s_linear_repeat_sampler,
+            erosionCoords,
+            CLOUD_DETAIL_MIP_OFFSET + erosionMipOffset + detailLod * 4.0).x;
+        half erosionB = SAMPLE_TEXTURE3D_LOD(
+            _ErosionNoise,
+            s_linear_repeat_sampler,
+            erosionCoordsB,
+            CLOUD_DETAIL_MIP_OFFSET + 0.65 + erosionMipOffset + detailLod * 4.0).x;
+        half erosionNoise = 1.0 - lerp(erosionA, erosionB, 0.43);
+        erosionNoise = lerp(
+            0.0,
+            erosionNoise,
+            erosionFactor * _DetailStrength * cloudCoverageData.coverage);
         properties.ambientOcclusion = saturate(properties.ambientOcclusion - sqrt(erosionNoise * _ErosionOcclusion));
         base_cloud = DensityRemap(base_cloud, erosionNoise, 1.0, 0.0, 1.0);
 
         #if defined(_CLOUDS_MICRO_EROSION)
-        float3 fineCoords = AnimateErosionNoisePosition(positionPS) / (NOISE_TEXTURE_NORMALIZATION_FACTOR) * _MicroErosionScale;
-        half fineNoise = 1.0 - SAMPLE_TEXTURE3D_LOD(_ErosionNoise, s_linear_repeat_sampler, fineCoords, CLOUD_DETAIL_MIP_OFFSET + erosionMipOffset).x;
-        fineNoise = lerp(0.0, fineNoise, microDetailFactor * 0.5 * cloudCoverageData.coverage.x);
+        float3 fineCoords = AnimateErosionNoisePosition(positionPS)
+            / NOISE_TEXTURE_NORMALIZATION_FACTOR * _MicroErosionScale;
+        half fineA = SAMPLE_TEXTURE3D_LOD(
+            _ErosionNoise,
+            s_linear_repeat_sampler,
+            fineCoords,
+            CLOUD_DETAIL_MIP_OFFSET + erosionMipOffset).x;
+        half fineB = SAMPLE_TEXTURE3D_LOD(
+            _ErosionNoise,
+            s_linear_repeat_sampler,
+            RotateCloudCoordinates(fineCoords) * 1.117 + float3(0.31, 0.79, 0.53),
+            CLOUD_DETAIL_MIP_OFFSET + 0.8 + erosionMipOffset).x;
+        half fineNoise = 1.0 - lerp(fineA, fineB, 0.38);
+        fineNoise = lerp(
+            0.0,
+            fineNoise,
+            microDetailFactor * 0.45 * _DetailStrength * cloudCoverageData.coverage);
         base_cloud = DensityRemap(base_cloud, fineNoise, 1.0, 0.0, 1.0);
         #endif
     }
@@ -926,12 +1110,12 @@ void EvaluateCloud(CloudProperties cloudProperties, half3 rayDirection,
     half2 phaseFunction = half2(0.0, 0.0);
     half forwardP = HenyeyGreensteinPhaseFunction(FORWARD_ECCENTRICITY * PositivePow(_MultiScattering, 0), cosAngle);
     half backwardsP = HenyeyGreensteinPhaseFunction(-BACKWARD_ECCENTRICITY * PositivePow(_MultiScattering, 0), cosAngle);
-    phaseFunction[0] = forwardP + backwardsP;
+    phaseFunction[0] = forwardP * 0.82 + backwardsP * 0.18;
 
 #if NUM_MULTI_SCATTERING_OCTAVES >= 2
     forwardP = HenyeyGreensteinPhaseFunction(FORWARD_ECCENTRICITY * PositivePow(_MultiScattering, 1), cosAngle);
     backwardsP = HenyeyGreensteinPhaseFunction(-BACKWARD_ECCENTRICITY * PositivePow(_MultiScattering, 1), cosAngle);
-    phaseFunction[1] = forwardP + backwardsP;
+    phaseFunction[1] = forwardP * 0.72 + backwardsP * 0.28;
 #endif
 
 #if NUM_MULTI_SCATTERING_OCTAVES >= 3
@@ -948,7 +1132,13 @@ void EvaluateCloud(CloudProperties cloudProperties, half3 rayDirection,
 
     // Compute luminance separately to factor out color multiplication at the end of the loop
     // Use 1 as placeholder to compute the 'transfer function'
-    half3 sunLuminance = 1.0 * sunTransmittance * powderEffect;
+    half forwardAlignment = saturate(cosAngle * 0.5 + 0.5);
+    half silverLining = pow(forwardAlignment, 10.0)
+        * _SilverLiningIntensity
+        * saturate(1.0 - cloudProperties.density * 1.8);
+    half3 sunLuminance = sunTransmittance
+        * powderEffect
+        * (1.0 + silverLining);
     half ambientLuminance = 1.0 * cloudProperties.ambientOcclusion;
 
     // "Energy-conserving analytical integration"

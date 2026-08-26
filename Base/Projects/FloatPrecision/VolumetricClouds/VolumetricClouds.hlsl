@@ -57,10 +57,6 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
             // - Far plane
             float totalDistance = min(rayMarchRange.end, cloudRay.maxRayLength) - rayMarchRange.start;
 
-            // Evaluate our integration step
-            float stepS = min(totalDistance / (float)_NumPrimarySteps, _MaxStepSize);
-            totalDistance = stepS * _NumPrimarySteps;
-
             // Compute the environment lighting that is going to be used for the cloud evaluation
             float3 rayMarchStartPS = ConvertToPS(cloudRay.originWS) + rayMarchRange.start * cloudRay.direction;
             float3 rayMarchEndPS = rayMarchStartPS + totalDistance * cloudRay.direction;
@@ -72,7 +68,8 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
             float meanDistanceDivider = 0.0;
 
             // Current position for the evaluation, apply blue noise to start position
-            float currentDistance = cloudRay.integrationNoise;
+            float baseStepS = min(_BaseStepSize, _MaxStepSize);
+            float currentDistance = cloudRay.integrationNoise * baseStepS;
             float3 currentPositionWS = cloudRay.originWS + (rayMarchRange.start + currentDistance) * cloudRay.direction;
 
             // Initialize the values for the optimized ray marching
@@ -82,6 +79,12 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
             // Do the ray march for every step that we can.
             while (currentIndex < (int)_NumPrimarySteps && currentDistance < totalDistance)
             {
+                // Preserve near-camera detail and grow the step only with distance.
+                // A single horizon-derived step exceeded a kilometre and turned
+                // small cloud cells into unstable, spherical slabs.
+                float stepS = min(
+                    _MaxStepSize,
+                    baseStepS + (rayMarchRange.start + currentDistance) * _AdaptiveStepSizeFactor);
                 // Compute the camera-distance based attenuation
                 float densityAttenuationValue = DensityFadeValue(rayMarchRange.start + currentDistance);
                 // Compute the mip offset for the erosion texture
@@ -128,9 +131,8 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
                         activeSampling = false;
 
                     // Do the next step
-                    float relativeStepSize = lerp(cloudRay.integrationNoise, 1.0, saturate(currentIndex));
-                    currentPositionWS += cloudRay.direction * stepS * relativeStepSize;
-                    currentDistance += stepS * relativeStepSize;
+                    currentPositionWS += cloudRay.direction * stepS;
+                    currentDistance += stepS;
 
                 }
                 else
@@ -182,13 +184,38 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
 
                 // Evaluate the environement lighting contribution
             #ifdef _CLOUDS_AMBIENT_PROBE
-                half3 ambientTermTop = SAMPLE_TEXTURECUBE_LOD(_VolumetricCloudsAmbientProbe, sampler_VolumetricCloudsAmbientProbe, half3(0.0, 1.0, 0.0), 4.0).rgb;
-                half3 ambientTermBottom = SAMPLE_TEXTURECUBE_LOD(_VolumetricCloudsAmbientProbe, sampler_VolumetricCloudsAmbientProbe, half3(0.0, -1.0, 0.0), 4.0).rgb;
+                half3 radialUp = normalize(currentPositionPS);
+                half3 ambientTermTop = SAMPLE_TEXTURECUBE_LOD(_VolumetricCloudsAmbientProbe, sampler_VolumetricCloudsAmbientProbe, radialUp, 4.0).rgb;
+                half3 ambientTermBottom = SAMPLE_TEXTURECUBE_LOD(_VolumetricCloudsAmbientProbe, sampler_VolumetricCloudsAmbientProbe, -radialUp, 4.0).rgb;
             #else
-                half3 ambientTermTop = EvaluateVolumetricCloudsAmbientProbe(half3(0.0, 1.0, 0.0));
-                half3 ambientTermBottom = EvaluateVolumetricCloudsAmbientProbe(half3(0.0, -1.0, 0.0));
+                half3 radialUp = normalize(currentPositionPS);
+                half3 ambientTermTop = EvaluateVolumetricCloudsAmbientProbe(radialUp);
+                half3 ambientTermBottom = EvaluateVolumetricCloudsAmbientProbe(-radialUp);
             #endif
-                half3 ambient = max(0, lerp(ambientTermBottom, ambientTermTop, relativeHeight) * _AmbientProbeDimmer);
+                half3 probeAmbient = max(
+                    0,
+                    lerp(ambientTermBottom, ambientTermTop, relativeHeight)
+                        * _AmbientProbeDimmer);
+
+                // FloatPrecision renders its atmosphere after opaque geometry as
+                // a fullscreen effect, so a dynamic reflection probe can contain
+                // only black space even on the daylight side of the planet. Keep
+                // valid probe lighting, but provide the missing low-frequency sky
+                // irradiance from the local sun elevation. This prevents dense
+                // near-ground clouds becoming black silhouettes without flattening
+                // their self-shadowing or eliminating the night-side transition.
+                half sunElevation = dot(radialUp, sun.direction);
+                half daylight = smoothstep(-0.16, 0.24, sunElevation);
+                half horizonLight = 1.0 - abs(saturate(sunElevation));
+                half3 skyFallback = lerp(
+                    half3(0.012, 0.020, 0.038),
+                    half3(0.30, 0.40, 0.54),
+                    daylight);
+                skyFallback += half3(0.11, 0.075, 0.035)
+                    * horizonLight
+                    * daylight;
+                skyFallback *= _AmbientProbeDimmer;
+                half3 ambient = max(probeAmbient, skyFallback);
 
                 volumetricRay.scattering = sunColor * volumetricRay.scattering;
                 volumetricRay.scattering += ambient * volumetricRay.ambient;

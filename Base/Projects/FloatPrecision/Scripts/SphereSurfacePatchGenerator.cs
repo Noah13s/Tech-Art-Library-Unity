@@ -208,6 +208,28 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         hasPreviousPlayerPosition = true;
     }
 
+    /// <summary>
+    /// Resets the swept-collision origin after an intentional simulation-space teleport.
+    /// Without this, diagnostic/editor placement can look like a single enormous
+    /// movement step through the planet and is correctly snapped back to the surface.
+    /// </summary>
+    public void ResetPlayerMotionHistory()
+    {
+        if (player == null && planet != null)
+        {
+            player = planet.player;
+        }
+
+        if (player == null)
+        {
+            hasPreviousPlayerPosition = false;
+            return;
+        }
+
+        previousPlayerPosition = player.playerPosition;
+        hasPreviousPlayerPosition = true;
+    }
+
     void GenerateSurfacePatch(
         DoubleVector3 relativeCenter,
         double planetRadius,
