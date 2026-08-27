@@ -358,7 +358,10 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         if (isVolumeActive)
             Shader.EnableKeyword(VOLUMETRIC_CLOUDS);
         else
+        {
             Shader.DisableKeyword(VOLUMETRIC_CLOUDS);
+            volumetricCloudsShadowsPass?.DisableCloudShadow();
+        }
 
         if (isVolumeActive && (renderingData.cameraData.cameraType == CameraType.Game || renderingData.cameraData.cameraType == CameraType.SceneView || isProbeCamera))
         {
@@ -382,6 +385,16 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             volumetricCloudsPass.outputDepth = depthTexture || outputDepth; // Implicitly enable clouds depth when we need to output to scene depth
             volumetricCloudsPass.outputToSceneDepth = depthTexture;
             volumetricCloudsPass.sunAttenuation = sunAttenuation;
+        #if URP_PBSKY
+            volumetricCloudsPass.visualEnvVolume = visualEnvironment;
+        #endif
+            // Prepare all planet-space, weather and wind uniforms before any render
+            // pass executes. The ground-shadow pass runs before opaque lighting, so
+            // preparing only inside the later cloud-composite pass made its density
+            // one frame stale (and completely invalid on the first frame).
+            volumetricCloudsPass.PrepareForCamera(
+                renderingData.lightData,
+                renderingData.cameraData.camera);
             Shader.SetGlobalFloat(
                 volumetricCloudsDepthAvailable,
                 volumetricCloudsPass.outputDepth ? 1.0f : 0.0f);
@@ -400,7 +413,8 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
             renderer.EnqueuePass(volumetricCloudsPass);
 
-            if (cloudsVolume.shadows.value)
+            if (cloudsVolume.shadows.value &&
+                volumetricCloudsShadowsPass.ShouldRender(renderingData.cameraData.camera))
             {
                 // Check if URP supports "Light Cookies"
                 UniversalRenderPipelineAsset asset = UniversalRenderPipeline.asset;
@@ -415,10 +429,15 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             #if UNITY_EDITOR || DEBUG
                 else
                 {
+                    volumetricCloudsShadowsPass.DisableCloudShadow();
                     // URP may have stripped light cookie varients (in build), so skip the shadow cookie rendering
                     if (!isCookiePrinted) { Debug.LogWarning("Volumetric Clouds URP: Light Cookies are disabled in the active URP asset. The volumetric clouds shadows will not be rendered."); isCookiePrinted = true; }
                 }
             #endif
+            }
+            else
+            {
+                volumetricCloudsShadowsPass.DisableCloudShadow();
             }
 
             // No need to render dynamic ambient probe for reflection probes.
@@ -984,6 +1003,19 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             return RenderSettings.sun;
         }
 
+        private int preparedFrame = -1;
+        private int preparedCameraId;
+
+        public void PrepareForCamera(LightData lightData, Camera camera)
+        {
+            if (camera == null)
+                return;
+
+            UpdateClouds(GetMainLight(lightData), camera);
+            preparedFrame = Time.frameCount;
+            preparedCameraId = camera.GetInstanceID();
+        }
+
     #if UNITY_6000_0_OR_NEWER
         [Obsolete]
     #endif
@@ -1074,7 +1106,9 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             LightData lightData = renderingData.lightData;
             Light mainLight = GetMainLight(lightData);
 
-            UpdateClouds(mainLight, renderingData.cameraData.camera);
+            Camera camera = renderingData.cameraData.camera;
+            if (preparedFrame != Time.frameCount || preparedCameraId != camera.GetInstanceID())
+                UpdateClouds(mainLight, camera);
 
             cloudsMaterial.SetTexture(cameraDepthTexture, null); // Use global texture
 
@@ -1716,13 +1750,12 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private RTHandle shadowTextureHandle;
         private RTHandle intermediateShadowTextureHandle;
 
-        private readonly Vector3[] frustumCorners = new Vector3[4];
-
         private Light targetLight;
 
         private static readonly int shadowCookieResolution = Shader.PropertyToID("_ShadowCookieResolution");
         private static readonly int shadowIntensity = Shader.PropertyToID("_ShadowIntensity");
         private static readonly int shadowOpacityFallback = Shader.PropertyToID("_ShadowOpacityFallback");
+        private static readonly int shadowSampleCount = Shader.PropertyToID("_CloudShadowSampleCount");
         private static readonly int cloudShadowSunOrigin = Shader.PropertyToID("_CloudShadowSunOrigin");
         private static readonly int cloudShadowSunRight = Shader.PropertyToID("_CloudShadowSunRight");
         private static readonly int cloudShadowSunUp = Shader.PropertyToID("_CloudShadowSunUp");
@@ -1747,6 +1780,152 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         public VolumetricCloudsShadowsPass(Material material)
         {
             cloudsMaterial = material;
+        }
+
+        private struct ShadowRegion
+        {
+            public Vector3 planetCenter;
+            public float unitsPerMeter;
+            public float altitudeFade;
+            public Vector3 origin;
+            public Vector3 axisX;
+            public Vector3 axisY;
+            public Vector2 size;
+            public Matrix4x4 cookieMatrix;
+        }
+
+        private float GetAltitudeFade(Camera camera)
+        {
+            if (camera == null || cloudsVolume == null)
+                return 0.0f;
+
+            float planetRadius = Mathf.Lerp(
+                1.0f,
+                0.025f,
+                cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
+            Vector3 planetCenter = new Vector3(0.0f, -planetRadius, 0.0f);
+            float unitsPerMeter = 1.0f;
+
+        #if URP_PBSKY
+            if (visualEnvVolume != null && visualEnvVolume.IsActive())
+            {
+                Vector4 centerRadius = visualEnvVolume.GetPlanetCenterRadius(camera.transform.position);
+                planetCenter = new Vector3(centerRadius.x, centerRadius.y, centerRadius.z);
+                planetRadius = centerRadius.w;
+            }
+        #endif
+
+            if (TryGetPlanetRenderState(
+                out Vector3 overrideCenter,
+                out float overrideRadius,
+                out float overrideUnitsPerMeter))
+            {
+                planetCenter = overrideCenter;
+                planetRadius = overrideRadius;
+                unitsPerMeter = overrideUnitsPerMeter;
+            }
+
+            float altitudeMetres = Mathf.Max(
+                0.0f,
+                (Vector3.Distance(camera.transform.position, planetCenter) - planetRadius) /
+                Mathf.Max(unitsPerMeter, 0.000000001f));
+            float fadeStart = Mathf.Max(0.0f, cloudsVolume.shadowFadeStartAltitude.value);
+            float fadeEnd = Mathf.Max(fadeStart + 1.0f, cloudsVolume.shadowFadeEndAltitude.value);
+            return 1.0f - Mathf.SmoothStep(0.0f, 1.0f,
+                Mathf.InverseLerp(fadeStart, fadeEnd, altitudeMetres));
+        }
+
+        public bool ShouldRender(Camera camera)
+        {
+            return camera != null && camera.cameraType != CameraType.Reflection &&
+                GetAltitudeFade(camera) > 0.001f;
+        }
+
+        private bool TryBuildShadowRegion(Camera camera, Light light, out ShadowRegion region)
+        {
+            region = default;
+            if (camera == null || light == null || cloudsVolume == null)
+                return false;
+
+            float altitudeFade = GetAltitudeFade(camera);
+            if (altitudeFade <= 0.001f)
+                return false;
+
+            float planetRadius = Mathf.Lerp(
+                1.0f,
+                0.025f,
+                cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
+            Vector3 planetCenter = new Vector3(0.0f, -planetRadius, 0.0f);
+            float unitsPerMeter = 1.0f;
+
+        #if URP_PBSKY
+            if (visualEnvVolume != null && visualEnvVolume.IsActive())
+            {
+                Vector4 centerRadius = visualEnvVolume.GetPlanetCenterRadius(camera.transform.position);
+                planetCenter = new Vector3(centerRadius.x, centerRadius.y, centerRadius.z);
+                planetRadius = centerRadius.w;
+            }
+        #endif
+
+            if (TryGetPlanetRenderState(
+                out Vector3 overrideCenter,
+                out float overrideRadius,
+                out float overrideUnitsPerMeter))
+            {
+                planetCenter = overrideCenter;
+                planetRadius = overrideRadius;
+                unitsPerMeter = overrideUnitsPerMeter;
+            }
+
+            int resolution = Mathf.Max(1, (int)cloudsVolume.shadowResolution.value);
+            float coverageSize = Mathf.Max(
+                1.0f,
+                cloudsVolume.shadowDistance.value * unitsPerMeter);
+            float texelSize = coverageSize / resolution;
+
+            Matrix4x4 worldToLight = light.transform.worldToLocalMatrix;
+            Matrix4x4 lightToWorld = light.transform.localToWorldMatrix;
+            Vector3 centerLS = worldToLight.MultiplyPoint(camera.transform.position);
+            // Snap in light space, where the cookie projection is stationary. This
+            // removes sub-texel swimming while the camera moves over the surface.
+            centerLS.x = Mathf.Round(centerLS.x / texelSize) * texelSize;
+            centerLS.y = Mathf.Round(centerLS.y / texelSize) * texelSize;
+            Vector3 snappedCenter = lightToWorld.MultiplyPoint(centerLS);
+
+            Vector3 axisX = lightToWorld.MultiplyVector(Vector3.right).normalized * coverageSize;
+            Vector3 axisY = lightToWorld.MultiplyVector(Vector3.up).normalized * coverageSize;
+            Vector3 origin = snappedCenter - axisX * 0.5f - axisY * 0.5f;
+
+            Matrix4x4 cookieLightToWorld = lightToWorld;
+            cookieLightToWorld.SetColumn(3, new Vector4(
+                snappedCenter.x,
+                snappedCenter.y,
+                snappedCenter.z,
+                1.0f));
+            Matrix4x4 cookieScale = Matrix4x4.Scale(new Vector3(
+                1.0f / coverageSize,
+                1.0f / coverageSize,
+                1.0f));
+
+            region.planetCenter = planetCenter;
+            region.unitsPerMeter = unitsPerMeter;
+            region.altitudeFade = altitudeFade;
+            region.origin = origin;
+            region.axisX = axisX;
+            region.axisY = axisY;
+            region.size = new Vector2(coverageSize, coverageSize);
+            region.cookieMatrix = s_DirLightProj * cookieScale * cookieLightToWorld.inverse;
+            return true;
+        }
+
+        public void DisableCloudShadow()
+        {
+            ResetShadowCookie();
+            Shader.SetGlobalTexture(mainLightTexture, Texture2D.whiteTexture);
+            Shader.SetGlobalMatrix(mainLightWorldToLight, Matrix4x4.identity);
+            Shader.SetGlobalFloat(
+                mainLightCookieTextureFormat,
+                (float)LightCookieShaderFormat.Red);
         }
 
         #region Non Render Graph Pass
@@ -1826,7 +2005,13 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             bool hasVolumetricCloudsShadows = targetLight != null && targetLight.isActiveAndEnabled && targetLight.intensity != 0.0f;
             if (!hasVolumetricCloudsShadows)
             {
-                ResetShadowCookie();
+                DisableCloudShadow();
+                return;
+            }
+
+            if (!TryBuildShadowRegion(camera, targetLight, out ShadowRegion region))
+            {
+                DisableCloudShadow();
                 return;
             }
 
@@ -1836,89 +2021,53 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 if (isStereoEnabled)
                     cmd.DisableShaderKeyword(STEREO_INSTANCING_ON);
 
-                Matrix4x4 wsToLSMat = targetLight.transform.worldToLocalMatrix;
-                Matrix4x4 lsToWSMat = targetLight.transform.localToWorldMatrix;
-
-                float3 cameraPos = camera.transform.position;
-
-                float perspectiveCorrectedShadowDistance = cloudsVolume.shadowDistance.value / cos(camera.fieldOfView * Mathf.Deg2Rad * 0.5f);
-
-                camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), camera.farClipPlane, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
-
-                // Generate the light space bounds of the camera frustum
-                Bounds lightSpaceBounds = new Bounds();
-                lightSpaceBounds.SetMinMax(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue), new Vector3(-float.MaxValue, -float.MaxValue, -float.MaxValue));
-                lightSpaceBounds.Encapsulate(wsToLSMat.MultiplyPoint(cameraPos));
-                for (int cornerIdx = 0; cornerIdx < 4; ++cornerIdx)
-                {
-                    Vector3 corner = frustumCorners[cornerIdx];
-                    float diag = corner.magnitude;
-                    corner = (corner / diag) * Mathf.Min(perspectiveCorrectedShadowDistance, diag);
-                    Vector3 posLightSpace = wsToLSMat.MultiplyPoint(new float3(corner) + cameraPos);
-                    lightSpaceBounds.Encapsulate(posLightSpace);
-
-                    posLightSpace = wsToLSMat.MultiplyPoint(new float3(-corner) + cameraPos);
-                    lightSpaceBounds.Encapsulate(posLightSpace);
-                }
-
-                // Compute the four corners we need
-                float3 c0 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(-lightSpaceBounds.extents.x, -lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-                float3 c1 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(lightSpaceBounds.extents.x, -lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-                float3 c2 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(-lightSpaceBounds.extents.x, lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-
-            #if URP_PBSKY
-                bool isVolumeActive = visualEnvVolume != null && visualEnvVolume.IsActive();
-
-                float4 planetCenterRad = visualEnvVolume.GetPlanetCenterRadius(camera.transform.position);
-                float actualEarthRad = isVolumeActive ? planetCenterRad.w : Mathf.Lerp(1.0f, 0.025f, cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
-                float3 planetCenterPos = isVolumeActive ? planetCenterRad.xyz : float3(0.0f, -actualEarthRad, 0.0f);
-            #else
-                float actualEarthRad = Mathf.Lerp(1.0f, 0.025f, cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
-                float3 planetCenterPos = float3(0.0f, -actualEarthRad, 0.0f);
-            #endif
-
-                float3 dirX = c1 - c0;
-                float3 dirY = c2 - c0;
-
-                // The shadow cookie size
-                float2 regionSize = float2(length(dirX), length(dirY));
+                Vector3 cameraPos = camera.transform.position;
 
                 int shadowResolution = (int)cloudsVolume.shadowResolution.value;
 
                 // Update material properties
                 cloudsMaterial.SetFloat(shadowCookieResolution, shadowResolution);
-                //cloudsMaterial.SetFloat(shadowPlaneOffset, cloudsVolume.shadowPlaneHeightOffset.value);
-                cloudsMaterial.SetFloat(shadowIntensity, cloudsVolume.shadowOpacity.value);
-                cloudsMaterial.SetFloat(shadowOpacityFallback, 1.0f - cloudsVolume.shadowOpacityFallback.value);
-                cloudsMaterial.SetVector(cloudShadowSunOrigin, float4(c0 - planetCenterPos, 1.0f));
-                cloudsMaterial.SetVector(cloudShadowSunRight, float4(dirX, 0.0f));
-                cloudsMaterial.SetVector(cloudShadowSunUp, float4(dirY, 0.0f));
-                cloudsMaterial.SetVector(cloudShadowSunForward, float4(-targetLight.transform.forward, 0.0f));
-                cloudsMaterial.SetVector(cameraPositionPS, float4(cameraPos - planetCenterPos, 0.0f));
-                cmd.SetGlobalVector(volumetricCloudsShadowOriginToggle, float4(c0, 0.0f));
-                cmd.SetGlobalVector(volumetricCloudsShadowScale, float4(regionSize, 0.0f, 0.0f)); // Used in physically based sky
+                cloudsMaterial.SetFloat(
+                    shadowIntensity,
+                    cloudsVolume.shadowOpacity.value * region.altitudeFade);
+                cloudsMaterial.SetFloat(shadowOpacityFallback, 1.0f);
+                cloudsMaterial.SetFloat(shadowSampleCount, cloudsVolume.shadowSampleCount.value);
+                cloudsMaterial.SetVector(cloudShadowSunOrigin,
+                    new Vector4(
+                        region.origin.x - region.planetCenter.x,
+                        region.origin.y - region.planetCenter.y,
+                        region.origin.z - region.planetCenter.z,
+                        1.0f));
+                cloudsMaterial.SetVector(cloudShadowSunRight, new Vector4(region.axisX.x, region.axisX.y, region.axisX.z, 0.0f));
+                cloudsMaterial.SetVector(cloudShadowSunUp, new Vector4(region.axisY.x, region.axisY.y, region.axisY.z, 0.0f));
+                // The shader negates this vector so the density ray travels from
+                // the receiver towards the Sun.
+                cloudsMaterial.SetVector(cloudShadowSunForward, new Vector4(
+                    targetLight.transform.forward.x,
+                    targetLight.transform.forward.y,
+                    targetLight.transform.forward.z,
+                    0.0f));
+                cloudsMaterial.SetVector(cameraPositionPS, new Vector4(
+                    cameraPos.x - region.planetCenter.x,
+                    cameraPos.y - region.planetCenter.y,
+                    cameraPos.z - region.planetCenter.z,
+                    0.0f));
+                cmd.SetGlobalVector(volumetricCloudsShadowOriginToggle, new Vector4(region.origin.x, region.origin.y, region.origin.z, 0.0f));
+                cmd.SetGlobalVector(volumetricCloudsShadowScale, new Vector4(region.size.x, region.size.y, 0.0f, 0.0f));
 
                 // Apply light cookie settings
                 targetLight.cookie = null;
                 UniversalAdditionalLightData additonal = targetLight.GetComponent<UniversalAdditionalLightData>();
-                additonal.lightCookieSize = Vector2.one;
-                additonal.lightCookieOffset = Vector2.zero;
-
-                Vector2 uvScale = 1 / regionSize;
-                float minHalfValue = Unity.Mathematics.half.MinValue;
-                if (Mathf.Abs(uvScale.x) < minHalfValue)
-                    uvScale.x = Mathf.Sign(uvScale.x) * minHalfValue;
-                if (Mathf.Abs(uvScale.y) < minHalfValue)
-                    uvScale.y = Mathf.Sign(uvScale.y) * minHalfValue;
-
-                Matrix4x4 cookieUVTransform = Matrix4x4.Scale(new Vector3(uvScale.x, uvScale.y, 1));
-                lsToWSMat.SetColumn(3, float4(cameraPos, 1));
-                Matrix4x4 cookieMatrix = s_DirLightProj * cookieUVTransform * lsToWSMat.inverse;
+                if (additonal != null)
+                {
+                    additonal.lightCookieSize = Vector2.one;
+                    additonal.lightCookieOffset = Vector2.zero;
+                }
 
                 float cookieFormat = (float)GetLightCookieShaderFormat(shadowTextureHandle.rt.graphicsFormat);
 
                 cmd.SetGlobalTexture(mainLightTexture, shadowTextureHandle);
-                cmd.SetGlobalMatrix(mainLightWorldToLight, cookieMatrix);
+                cmd.SetGlobalMatrix(mainLightWorldToLight, region.cookieMatrix);
                 cmd.SetGlobalFloat(mainLightCookieTextureFormat, cookieFormat);
                 cmd.EnableShaderKeyword(_LIGHT_COOKIES);
 
@@ -2018,11 +2167,16 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             bool hasVolumetricCloudsShadows = targetLight != null && targetLight.isActiveAndEnabled && targetLight.intensity != 0.0f;
             if (!hasVolumetricCloudsShadows)
             {
-                ResetShadowCookie();
+                DisableCloudShadow();
                 return;
             }
 
             var camera = cameraData.camera;
+            if (!TryBuildShadowRegion(camera, targetLight, out ShadowRegion region))
+            {
+                DisableCloudShadow();
+                return;
+            }
 
             // add an unsafe render pass to the render graph, specifying the name and the data type that will be passed to the ExecutePass function
             using (var builder = renderGraph.AddUnsafePass<PassData>(profilerTag, out var passData))
@@ -2030,52 +2184,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 // UniversalResourceData contains all the texture handles used by the renderer, including the active color and depth textures
                 // The active color and depth textures are the main color and depth buffers that the camera renders into
                 
-                Matrix4x4 wsToLSMat = targetLight.transform.worldToLocalMatrix;
-                Matrix4x4 lsToWSMat = targetLight.transform.localToWorldMatrix;
-
-                float3 cameraPos = camera.transform.position;
-
-                float perspectiveCorrectedShadowDistance = cloudsVolume.shadowDistance.value / cos(camera.fieldOfView * Mathf.Deg2Rad * 0.5f);
-
-                camera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), camera.farClipPlane, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
-
-                // Generate the light space bounds of the camera frustum
-                Bounds lightSpaceBounds = new Bounds();
-                lightSpaceBounds.SetMinMax(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue), new Vector3(-float.MaxValue, -float.MaxValue, -float.MaxValue));
-                lightSpaceBounds.Encapsulate(wsToLSMat.MultiplyPoint(cameraPos));
-                for (int cornerIdx = 0; cornerIdx < 4; ++cornerIdx)
-                {
-                    Vector3 corner = frustumCorners[cornerIdx];
-                    float diag = corner.magnitude;
-                    corner = (corner / diag) * Mathf.Min(perspectiveCorrectedShadowDistance, diag);
-                    Vector3 posLightSpace = wsToLSMat.MultiplyPoint(float3(corner) + cameraPos);
-                    lightSpaceBounds.Encapsulate(posLightSpace);
-
-                    posLightSpace = wsToLSMat.MultiplyPoint(float3(-corner) + cameraPos);
-                    lightSpaceBounds.Encapsulate(posLightSpace);
-                }
-                
-                // Compute the four corners we need
-                float3 c0 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(-lightSpaceBounds.extents.x, -lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-                float3 c1 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(lightSpaceBounds.extents.x, -lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-                float3 c2 = lsToWSMat.MultiplyPoint(lightSpaceBounds.center + new Vector3(-lightSpaceBounds.extents.x, lightSpaceBounds.extents.y, lightSpaceBounds.extents.z));
-
-            #if URP_PBSKY
-                bool isVolumeActive = visualEnvVolume != null && visualEnvVolume.IsActive();
-
-                float4 planetCenterRad = visualEnvVolume.GetPlanetCenterRadius(camera.transform.position);
-                float actualEarthRad = isVolumeActive ? planetCenterRad.w : Mathf.Lerp(1.0f, 0.025f, cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
-                float3 planetCenterPos = isVolumeActive ? planetCenterRad.xyz : float3(0.0f, -actualEarthRad, 0.0f);
-            #else
-                float actualEarthRad = Mathf.Lerp(1.0f, 0.025f, cloudsVolume.earthCurvature.value) * VolumetricCloudsPass.earthRad;
-                float3 planetCenterPos = float3(0.0f, -actualEarthRad, 0.0f);
-            #endif
-
-                float3 dirX = c1 - c0;
-                float3 dirY = c2 - c0;
-                 
-                // The shadow cookie size
-                float2 regionSize = float2(length(dirX), length(dirY));
+                Vector3 cameraPos = camera.transform.position;
 
                 // Should we support colored shadows?
                 GraphicsFormat cookieTextureFormat = GraphicsFormat.R16_UNorm; //option 2: R8_UNorm
@@ -2099,34 +2208,35 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 
                 // Update material properties
                 cloudsMaterial.SetFloat(shadowCookieResolution, shadowResolution);
-                //cloudsMaterial.SetFloat(shadowPlaneOffset, cloudsVolume.shadowPlaneHeightOffset.value);
-                cloudsMaterial.SetFloat(shadowIntensity, cloudsVolume.shadowOpacity.value);
-                cloudsMaterial.SetFloat(shadowOpacityFallback, 1.0f - cloudsVolume.shadowOpacityFallback.value);
-                cloudsMaterial.SetVector(cloudShadowSunOrigin, float4(c0 - planetCenterPos, 1.0f));
-                cloudsMaterial.SetVector(cloudShadowSunRight, float4(dirX, 0.0f));
-                cloudsMaterial.SetVector(cloudShadowSunUp, float4(dirY, 0.0f));
-                cloudsMaterial.SetVector(cloudShadowSunForward, float4(-targetLight.transform.forward, 0.0f));
-                cloudsMaterial.SetVector(cameraPositionPS, float4(cameraPos - planetCenterPos, 0.0f));
-                cloudsMaterial.SetVector(volumetricCloudsShadowOriginToggle, float4(c0, 0.0f));
+                cloudsMaterial.SetFloat(shadowIntensity, cloudsVolume.shadowOpacity.value * region.altitudeFade);
+                cloudsMaterial.SetFloat(shadowOpacityFallback, 1.0f);
+                cloudsMaterial.SetFloat(shadowSampleCount, cloudsVolume.shadowSampleCount.value);
+                cloudsMaterial.SetVector(cloudShadowSunOrigin, new Vector4(
+                    region.origin.x - region.planetCenter.x,
+                    region.origin.y - region.planetCenter.y,
+                    region.origin.z - region.planetCenter.z,
+                    1.0f));
+                cloudsMaterial.SetVector(cloudShadowSunRight, new Vector4(region.axisX.x, region.axisX.y, region.axisX.z, 0.0f));
+                cloudsMaterial.SetVector(cloudShadowSunUp, new Vector4(region.axisY.x, region.axisY.y, region.axisY.z, 0.0f));
+                cloudsMaterial.SetVector(cloudShadowSunForward, new Vector4(
+                    targetLight.transform.forward.x,
+                    targetLight.transform.forward.y,
+                    targetLight.transform.forward.z,
+                    0.0f));
+                cloudsMaterial.SetVector(cameraPositionPS, new Vector4(
+                    cameraPos.x - region.planetCenter.x,
+                    cameraPos.y - region.planetCenter.y,
+                    cameraPos.z - region.planetCenter.z,
+                    0.0f));
 
                 // Apply light cookie settings
                 targetLight.cookie = null;
                 UniversalAdditionalLightData additonal = targetLight.GetComponent<UniversalAdditionalLightData>();
-                additonal.lightCookieSize = Vector2.one;
-                additonal.lightCookieOffset = Vector2.zero;
-
-                // Apply shadow cookie
-                Vector2 uvScale = 1 / regionSize;
-                float minHalfValue = Unity.Mathematics.half.MinValue;
-                if (Mathf.Abs(uvScale.x) < minHalfValue)
-                    uvScale.x = Mathf.Sign(uvScale.x) * minHalfValue;
-                if (Mathf.Abs(uvScale.y) < minHalfValue)
-                    uvScale.y = Mathf.Sign(uvScale.y) * minHalfValue;
-
-                Matrix4x4 cookieUVTransform = Matrix4x4.Scale(new Vector3(uvScale.x, uvScale.y, 1));
-                //cookieUVTransform.SetColumn(3, new Vector4(uvScale.x, uvScale.y, 0, 1));
-                lsToWSMat.SetColumn(3, float4(cameraPos, 1));
-                Matrix4x4 cookieMatrix = s_DirLightProj * cookieUVTransform * lsToWSMat.inverse;
+                if (additonal != null)
+                {
+                    additonal.lightCookieSize = Vector2.one;
+                    additonal.lightCookieOffset = Vector2.zero;
+                }
 
                 float cookieFormat = (float)GetLightCookieShaderFormat(cookieTextureFormat);
 
@@ -2134,10 +2244,10 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 passData.cloudsMaterial = cloudsMaterial;
                 passData.shadowTexture = shadowTexture;
                 passData.intermediateShadowTexture = intermediateShadowTexture;
-                passData.mainLightWorldToLight = cookieMatrix;
+                passData.mainLightWorldToLight = region.cookieMatrix;
                 passData.mainLightCookieTextureFormat = cookieFormat;
-                passData.shadowOriginToggle = float4(c0, 0.0f);
-                passData.shadowScale = float4(regionSize, 0.0f, 0.0f);
+                passData.shadowOriginToggle = new Vector4(region.origin.x, region.origin.y, region.origin.z, 0.0f);
+                passData.shadowScale = new Vector4(region.size.x, region.size.y, 0.0f, 0.0f);
                 passData.isStereoEnabled = cameraData.camera.stereoEnabled;
 
                 // UnsafePasses don't setup the outputs using UseTextureFragment/UseTextureFragmentDepth, you should specify your writes with UseTexture instead

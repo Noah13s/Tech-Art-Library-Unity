@@ -26,6 +26,16 @@ public class FloatPrecisionPlayer : MonoBehaviour
     public double MovementSpeed => moveSpeed;
     public bool FlightInputEnabled { get; set; } = true;
 
+    private void Awake()
+    {
+        // The runtime HUD owns persistent navigation locations. Adding it here keeps
+        // older FloatPrecision scenes and prefabs compatible without scene migration.
+        if (GetComponent<FloatPrecisionHudController>() == null)
+        {
+            gameObject.AddComponent<FloatPrecisionHudController>();
+        }
+    }
+
     void Update()
     {
         HandleVelocity();

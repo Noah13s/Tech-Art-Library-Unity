@@ -62,6 +62,19 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
     [SerializeField, Range(250f, 3000f)] private float maximumStepSize = 1200f;
     [SerializeField, Range(0f, 1f)] private float temporalAccumulation = 0.86f;
 
+    [Header("Ground Cloud Shadows")]
+    [SerializeField] private bool groundShadows = true;
+    [SerializeField] private VolumetricClouds.CloudShadowResolution groundShadowResolution =
+        VolumetricClouds.CloudShadowResolution.Medium256;
+    [Tooltip("Width in metres of the camera-centred cloud-shadow coverage area.")]
+    [SerializeField, Min(1000f)] private float groundShadowDistance = 24000f;
+    [SerializeField, Range(0f, 1f)] private float groundShadowOpacity = 0.72f;
+    [SerializeField, Range(6, 32)] private int groundShadowSamples = 16;
+    [Tooltip("Cloud shadows are fully active below this altitude in metres.")]
+    [SerializeField, Min(0f)] private float groundShadowFadeStartAltitude = 25000f;
+    [Tooltip("Cloud shadows are completely disabled above this altitude in metres.")]
+    [SerializeField, Min(1000f)] private float groundShadowFadeEndAltitude = 60000f;
+
     [Header("Orbital Cloud Proxy")]
     [Tooltip("Optical density of the satellite-scale cloud shell used after local volumetric detail fades out.")]
     [SerializeField, Range(0.25f, 5f)] private float orbitalProxyOpacity = 0.75f;
@@ -188,9 +201,15 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         clouds.temporalAccumulationFactor.Override(temporalAccumulation);
         clouds.perceptualBlending.Override(1f);
 
-        // Cloud-cookie shadows are intentionally deferred until the visual layer is
-        // stable; they replace the main directional light cookie in the upstream code.
-        clouds.shadows.Override(false);
+        clouds.shadows.Override(groundShadows);
+        clouds.shadowResolution.Override(groundShadowResolution);
+        clouds.shadowDistance.Override(groundShadowDistance);
+        clouds.shadowOpacity.Override(groundShadowOpacity);
+        clouds.shadowOpacityFallback.Override(0f);
+        clouds.shadowSampleCount.Override(groundShadowSamples);
+        clouds.shadowFadeStartAltitude.Override(groundShadowFadeStartAltitude);
+        clouds.shadowFadeEndAltitude.Override(
+            Mathf.Max(groundShadowFadeStartAltitude + 1000f, groundShadowFadeEndAltitude));
     }
 
     private void CreateProceduralWeatherMap()
@@ -644,6 +663,12 @@ public sealed class PlanetVolumetricCloudsController : MonoBehaviour
         baseStepSize = Mathf.Clamp(baseStepSize, 25f, 500f);
         adaptiveStepSizeFactor = Mathf.Clamp(adaptiveStepSizeFactor, 0f, 0.05f);
         maximumStepSize = Mathf.Clamp(maximumStepSize, 250f, 3000f);
+        groundShadowDistance = Mathf.Max(1000f, groundShadowDistance);
+        groundShadowSamples = Mathf.Clamp(groundShadowSamples, 6, 32);
+        groundShadowFadeStartAltitude = Mathf.Max(0f, groundShadowFadeStartAltitude);
+        groundShadowFadeEndAltitude = Mathf.Max(
+            groundShadowFadeStartAltitude + 1000f,
+            groundShadowFadeEndAltitude);
         extinctionCoefficient = Mathf.Clamp(extinctionCoefficient, 0.0005f, 0.02f);
         silverLiningIntensity = Mathf.Clamp(silverLiningIntensity, 0f, 2f);
         orbitalProxyOpacity = Mathf.Clamp(orbitalProxyOpacity, 0.25f, 5f);

@@ -390,11 +390,39 @@ half EvaluatePlanetDetailLod(float3 positionPS)
     return max(_PlanetViewLod, distanceLod);
 }
 
+// Decode the planet-wide weather map once and use the exact same macro envelope
+// for both the ray-marched volume and the orbital shell. None of these signals
+// are view-LOD dependent: detail LOD is allowed to change internal 3D structure,
+// but must never move a weather-system boundary while the camera approaches it.
+void DecodePlanetaryWeather(
+    half3 weather,
+    out half coverage,
+    out half shape,
+    out half convection)
+{
+    half threshold = 1.0 - _PlanetaryCoverage;
+    half softness = lerp(0.20, 0.055, _PlanetaryCoverageContrast);
+    coverage = smoothstep(
+        threshold - softness,
+        threshold + softness,
+        weather.x);
+
+    half shapeMask = smoothstep(0.27, 0.72, weather.y);
+    half fineDetail = smoothstep(0.22, 0.80, weather.z);
+    shape = saturate(
+        pow(shapeMask, 1.15)
+        * lerp(0.32, 1.0, fineDetail)
+        * lerp(0.18, 1.0, weather.y));
+
+    convection = saturate(
+        smoothstep(0.48, 0.82, weather.z) * 0.70
+        + smoothstep(0.62, 0.90, weather.y) * 0.30);
+}
+
 // Samples the unique, procedurally generated global weather field once around
 // the planet. The texture wraps only at longitude and clamps at the poles.
 void EvaluatePlanetaryWeather(
     float3 positionPS,
-    half detailLod,
     out half coverage,
     out half shape,
     out half convection)
@@ -411,29 +439,9 @@ void EvaluatePlanetaryWeather(
         _PlanetaryWeatherMap,
         sampler_PlanetaryWeatherMap,
         weatherUV,
-        detailLod * 0.15).rgb;
+        0.0).rgb;
 
-    // Preserve the satellite-like internal texture at orbital distance. Mip zero
-    // is intentional: this map is only sampled once around the planet and the
-    // render target already provides the required pixel filtering.
-    // R is broad coverage potential; G is continuous internal density detail.
-    // Keeping this linear avoids the double contrast-remap that previously made
-    // the distant systems look like opaque painted cutouts.
-    half internalStructure = smoothstep(0.35, 0.72, weather.y);
-    half nearShape = weather.x * lerp(0.52, 1.0, weather.y);
-    half farCoverageSignal = saturate(
-        weather.x * lerp(0.40, 1.25, internalStructure));
-    half coverageSignal = lerp(weather.x, farCoverageSignal, detailLod);
-    half farShape = weather.x * lerp(0.03, 1.0, internalStructure);
-    shape = saturate(lerp(nearShape, farShape, detailLod));
-    convection = saturate(
-        smoothstep(0.48, 0.82, weather.z) * 0.70
-        + smoothstep(0.62, 0.90, weather.y) * 0.30);
-
-    half threshold = 1.0 - _PlanetaryCoverage;
-    half softness = lerp(0.20, 0.055, _PlanetaryCoverageContrast);
-    softness *= lerp(1.0, 0.75, detailLod);
-    coverage = smoothstep(threshold - softness, threshold + softness, coverageSignal);
+    DecodePlanetaryWeather(weather, coverage, shape, convection);
 }
 
 struct OrbitalCloudShellResult
@@ -490,25 +498,15 @@ OrbitalCloudShellResult EvaluateOrbitalCloudShell(CloudRay cloudRay)
         weatherUV,
         0.0).rgb;
 
-    half threshold = 1.0 - _PlanetaryCoverage;
-    half coverageSoftness = lerp(0.24, 0.10, _PlanetaryCoverageContrast);
-    half synopticMask = smoothstep(
-        threshold - coverageSoftness,
-        threshold + coverageSoftness,
-        weather.x);
-
-    // Treat the shape channel as the actual satellite-visible silhouette.  The
-    // broad red field only decides where weather systems may exist; it must not
-    // fill those systems into solid white continents.  A continuous shape mask
-    // retains thin cirrus edges while its power curve exposes the sharper fronts
-    // and differently sized cells stored in the procedural map.
-    half shapeMask = smoothstep(0.27, 0.72, weather.y);
-    half fineDetail = smoothstep(0.22, 0.80, weather.z);
-    half structuredShape = pow(shapeMask, 1.15)
-        * lerp(0.32, 1.0, fineDetail);
-    half density = synopticMask
-        * structuredShape
-        * lerp(0.18, 1.0, weather.y);
+    half synopticMask;
+    half structuredShape;
+    half convection;
+    DecodePlanetaryWeather(
+        weather,
+        synopticMask,
+        structuredShape,
+        convection);
+    half density = synopticMask * structuredShape;
     if (density <= CLOUD_DENSITY_TRESHOLD)
         return result;
 
@@ -563,7 +561,6 @@ void GetCloudCoverageData(float3 positionPS, out CloudCoverageData data)
     half detailLod = EvaluatePlanetDetailLod(positionPS);
     EvaluatePlanetaryWeather(
         positionPS,
-        detailLod,
         planetaryCoverage,
         planetaryShape,
         convection);
@@ -847,16 +844,24 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
         shapeThreshold,
         min(0.995, shapeThreshold + densityTransitionWidth),
         proceduralShape);
-    half volumetricDensity = shapedDensity
-        * densityErosionAO.x
-        * lerp(0.72, 1.18, cloudCoverageData.planetaryShape);
-
-    // At long range the analytic weather field takes over continuously. Nearby
-    // density is never replaced by a repeated texture, so the same cloud bank is
-    // recognizable while approaching it from orbit.
-    half distantDensity = pow(saturate(cloudCoverageData.planetaryShape), 1.18)
-        * densityErosionAO.x
+    // Both representations use the same invariant synoptic envelope. Local 3D
+    // noise only modulates density inside it; it can no longer create unrelated
+    // banks which disappear when the orbital shell fades in. Keeping a non-zero
+    // local floor also prevents valid macro coverage from becoming a hole solely
+    // because one low-frequency 3D sample happened to be below its threshold.
+    half synopticEnvelope = pow(
+        saturate(cloudCoverageData.planetaryShape),
+        1.18)
         * pow(cloudCoverageData.coverage, 1.05);
+    half distantDensity = synopticEnvelope * densityErosionAO.x;
+    half localStructure = lerp(0.38, 1.28, shapedDensity);
+    half volumetricDensity = distantDensity
+        * localStructure
+        * lerp(0.90, 1.10, cloudCoverageData.convection);
+
+    // Detail LOD now removes local structure without changing the shared macro
+    // support. At contrast/influence 1, approaching a cloud system refines it in
+    // place instead of changing its planet-wide coverage.
     half base_cloud = lerp(volumetricDensity, distantDensity, detailLod);
 
     // Weight the ambient occlusion's contribution

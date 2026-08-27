@@ -329,6 +329,18 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [AdditionalProperty]
     public ClampedFloatParameter shadowOpacityFallback = new ClampedFloatParameter(0.0f, 0.0f, 1.0f);
 
+    [Tooltip("Ground-cloud shadows are fully enabled below this physical altitude in metres.")]
+    [AdditionalProperty]
+    public MinFloatParameter shadowFadeStartAltitude = new MinFloatParameter(25000.0f, 0.0f);
+
+    [Tooltip("Ground-cloud shadows are disabled above this physical altitude in metres.")]
+    [AdditionalProperty]
+    public MinFloatParameter shadowFadeEndAltitude = new MinFloatParameter(60000.0f, 1000.0f);
+
+    [Tooltip("Number of density samples used for each cloud-shadow texel. This is independent of the camera primary-ray step count.")]
+    [AdditionalProperty]
+    public ClampedIntParameter shadowSampleCount = new ClampedIntParameter(16, 6, 32);
+
     /// <summary>
     /// Temporal accumulation increases the visual quality of clouds by decreasing the noise. A higher value will give you better quality but can create ghosting.
     /// </summary>

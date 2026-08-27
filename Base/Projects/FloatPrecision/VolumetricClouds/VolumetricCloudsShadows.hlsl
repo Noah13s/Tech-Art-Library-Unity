@@ -18,6 +18,7 @@ float3 _CloudShadowSunUp;
 half3 _CloudShadowSunForward;
 half _ShadowIntensity;
 half _ShadowOpacityFallback;
+half _CloudShadowSampleCount;
 float3 _CameraPositionPS;
 //half _ShadowPlaneOffset;
 
@@ -36,42 +37,38 @@ half3 TraceVolumetricCloudsShadows(Varyings input) : SV_Target
     float farthestDistance = FLT_MIN;
     bool validShadow = false;
 
-    // Intersect the outer sphere
-    float2 lowestAltitudeIntersections, highestAltitudeIntersections;
-    bool lowBoundOk = IntersectRaySphere(rayOriginPS, rayDirection, _LowestCloudAltitude, lowestAltitudeIntersections);
-    bool highBoundOk = IntersectRaySphere(rayOriginPS, rayDirection, _HighestCloudAltitude, highestAltitudeIntersections);
-
-    if (lowBoundOk && highBoundOk)
+    float startDistance;
+    float endDistance;
+    if (IntersectCloudVolume(
+        rayOriginPS,
+        rayDirection,
+        _LowestCloudAltitude,
+        _HighestCloudAltitude,
+        startDistance,
+        endDistance))
     {
-        // Compute the integration range
-        float startDistance = highestAltitudeIntersections.x;
-        float totalDistance = max(lowestAltitudeIntersections.x - highestAltitudeIntersections.x, highestAltitudeIntersections.x - lowestAltitudeIntersections.x);
-        rayOriginPS += startDistance * rayDirection;
+        float totalDistance = max(0.0, endDistance - startDistance);
+        int sampleCount = clamp((int)round(_CloudShadowSampleCount), 6, 32);
+        float stepSize = totalDistance * rcp(max((float)sampleCount, 1.0));
 
-        float stepSize = totalDistance / 16;
-
-        for (int i = 1; i < 16; ++i)
+        // Use stable midpoint integration. The cookie itself is snapped to its
+        // texel grid, so density samples remain stationary in world/light space
+        // instead of swimming with sub-pixel camera motion.
+        for (int i = 0; i < 32; ++i)
         {
-            // Compute the sphere intersection position
-            float dist = (stepSize * i);
+            if (i >= sampleCount)
+                break;
+
+            float dist = startDistance + stepSize * (i + 0.5);
             float3 positionPS = rayOriginPS + rayDirection * dist;
 
-            // Get the coverage at intersection point
-            CloudCoverageData cloudCoverageData;
-            GetCloudCoverageData(positionPS, cloudCoverageData);
-
-            // Compute the cloud density
             CloudProperties cloudProperties;
             EvaluateCloudProperties(positionPS, 0.0, 0.0, true, true, cloudProperties);
 
-            // Apply the camera fade it to match the clouds perceived by the camera
-            cloudProperties.density *= DensityFadeValue(length(positionPS - _CameraPositionPS.xyz));
-
             if (cloudProperties.density > CLOUD_DENSITY_TRESHOLD)
             {
-                // Apply the extinction
-                closestDistance = min(closestDistance, totalDistance - stepSize * (i + 1));
-                farthestDistance = max(farthestDistance, totalDistance - stepSize * i);
+                closestDistance = min(closestDistance, dist);
+                farthestDistance = max(farthestDistance, dist);
                 const half3 currentStepExtinction = exp(-_ScatteringTint.xyz * cloudProperties.density * cloudProperties.sigmaT * stepSize);
                 transmittance *= Luminance(currentStepExtinction);
                 validShadow = true;
@@ -83,6 +80,14 @@ half3 TraceVolumetricCloudsShadows(Varyings input) : SV_Target
     
     //half shadows = lerp(1.0 - _ShadowIntensity, 1.0, transmittance);
     half shadows = lerp(1.0 - _ShadowIntensity, 1.0, saturate(transmittance - 0.05));
+
+    // Feather the finite local cookie into neutral sunlight. This prevents a
+    // visible square when the camera approaches the coverage boundary.
+    float edgeDistance = min(
+        min(normalizedCoord.x, 1.0 - normalizedCoord.x),
+        min(normalizedCoord.y, 1.0 - normalizedCoord.y));
+    half edgeWeight = smoothstep(0.0, 0.075, edgeDistance);
+    shadows = lerp(1.0, shadows, edgeWeight);
 
     /*
     // Evaluate the shadow

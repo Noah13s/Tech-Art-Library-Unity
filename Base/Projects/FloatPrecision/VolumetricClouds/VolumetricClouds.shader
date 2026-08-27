@@ -15,6 +15,7 @@ Shader "Hidden/Sky/VolumetricClouds"
         [HideInInspector] _VolumetricCloudsAmbientProbe("Ambient Probe", CUBE) = "grey" {}
         [HideInInspector] _NumPrimarySteps("Ray Steps", Float) = 32.0
         [HideInInspector] _NumLightSteps("Light Steps", Float) = 1.0
+        [HideInInspector] _CloudShadowSampleCount("Cloud Shadow Samples", Float) = 16.0
         [HideInInspector] _BaseStepSize("Base Step Size", Float) = 90.0
         [HideInInspector] _AdaptiveStepSizeFactor("Adaptive Step Size Factor", Float) = 0.008
         [HideInInspector] _MaxStepSize("Maximum Step Size", Float) = 1200.0
