@@ -835,6 +835,14 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
     half shapeThreshold = lerp(0.68, 0.38, weatherStrength)
         + (1.0 - shapeFactor) * 0.06;
     half densityTransitionWidth = lerp(0.24, 0.035, _EdgeHardness);
+    // A four-tap shadow ray cannot resolve the same near-binary density edge as
+    // the primary ray. Sampling that edge directly makes each light probe toggle
+    // between clear and opaque, exposing the primary intervals as bright/dark
+    // layers. Widen only the shadow-density footprint to reconstruct the average
+    // optical coverage seen by a long light interval. Camera density remains
+    // crisp, while self-shadowing changes continuously at no additional samples.
+    if (lightSampling)
+        densityTransitionWidth = max(densityTransitionWidth, 0.34h);
     half shapedDensity = smoothstep(
         shapeThreshold,
         min(0.995, shapeThreshold + densityTransitionWidth),
@@ -927,7 +935,11 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
 }
 
 // Function that evaluates the transmittance to the sun at a given cloud position
-half3 EvaluateSunTransmittance(float3 positionPS, half3 sunDirection, PHASE_FUNCTION_STRUCTURE phaseFunction)
+half3 EvaluateSunTransmittance(
+    float3 positionPS,
+    half3 sunDirection,
+    PHASE_FUNCTION_STRUCTURE phaseFunction,
+    float lightJitter)
 {
     // Compute the Ray to the limits of the cloud volume in the direction of the light
     float totalLightDistance = 0.0;
@@ -949,9 +961,14 @@ half3 EvaluateSunTransmittance(float3 positionPS, half3 sunDirection, PHASE_FUNC
         // Collect total density along light ray.
         for (int j = 0; j < _NumLightSteps; j++)
         {
-            // Here we intentionally do not take the right step size for the first step
-            // as it helps with darkening the clouds a bit more than they should at low light samples
-            float dist = intervalSize * (0.25 + j);
+            // Stratify the inexpensive shadow estimate independently from the
+            // primary ray. The former fixed 0.25 offset produced coherent lighting
+            // contours at every primary sample plane. A temporally rotated sequence
+            // preserves the same cost but turns those contours into convergent noise.
+            float lightSequence = frac(
+                lightJitter + (j + 1) * 0.754877666);
+            float intervalJitter = lerp(0.15, 0.85, lightSequence);
+            float dist = intervalSize * (j + intervalJitter);
 
             // Evaluate the current sample point
             float3 currentSamplePointPS = positionPS + sunDirection * dist;
@@ -1097,6 +1114,10 @@ half3 EvaluateSunColor(float3 entryEvaluationPointPS, float3 exitEvaluationPoint
 // Evaluates the inscattering from this position
 void EvaluateCloud(CloudProperties cloudProperties, half3 rayDirection,
                 float3 currentPositionPS, float stepSize, float relativeRayDistance,
+                float lightJitter,
+                inout half3 reconstructedSunLuminance,
+                inout half reconstructedAmbientLuminance,
+                inout half lightingReconstructionValid,
                 inout VolumetricRayResult volumetricRay)
 {
     // Apply the extinction
@@ -1128,7 +1149,43 @@ void EvaluateCloud(CloudProperties cloudProperties, half3 rayDirection,
     half powderEffect = PowderEffect(cloudProperties.density, cosAngle, _PowderEffectIntensity);
 
     // Evaluate the sun visibility
-    half3 sunTransmittance = EvaluateSunTransmittance(currentPositionPS, sun.direction, phaseFunction);
+    half3 sunTransmittance = EvaluateSunTransmittance(
+        currentPositionPS,
+        sun.direction,
+        phaseFunction,
+        lightJitter);
+
+    // Four shadow samples are enough for a stochastic residual, but not for the
+    // complete low-frequency lighting field: their binary density hits project
+    // as contour layers. Use a stable local-column approximation as a control
+    // variate and retain the raymarched result for cloud-to-cloud variation.
+    // This preserves depth and temporal detail without exposing individual taps.
+    half3 analyticSunTransmittance = 0.0h;
+    // Do not feed the point-sampled density into the control variate: doing so
+    // simply reproduces the same primary strata at higher contrast. A smooth
+    // height-dependent mean occupancy supplies the stable low-frequency column;
+    // local density variation remains in the stochastic residual below.
+    half meanColumnOccupancy = lerp(
+        0.025h,
+        0.005h,
+        saturate((half)cloudProperties.height));
+    half localExtinction = cloudProperties.sigmaT * meanColumnOccupancy;
+    half radialSunAlignment = abs(dot(normalize(currentPositionPS), sun.direction));
+    float localColumnLength = lerp(2200.0, 280.0, saturate(cloudProperties.height))
+        * rcp(max((float)radialSunAlignment, 0.28));
+    half3 analyticExtinction = localExtinction
+        * localColumnLength
+        * _ScatteringTint.xyz;
+    for (int analyticOctave = 0; analyticOctave < NUM_MULTI_SCATTERING_OCTAVES; ++analyticOctave)
+    {
+        half analyticMsFactor = PositivePow(_MultiScattering, analyticOctave);
+        analyticSunTransmittance += exp(-analyticExtinction * analyticMsFactor)
+            * (phaseFunction[analyticOctave] * analyticMsFactor);
+    }
+    sunTransmittance = lerp(
+        analyticSunTransmittance,
+        sunTransmittance,
+        0.12h);
 
     // Compute luminance separately to factor out color multiplication at the end of the loop
     // Use 1 as placeholder to compute the 'transfer function'
@@ -1140,6 +1197,31 @@ void EvaluateCloud(CloudProperties cloudProperties, half3 rayDirection,
         * powderEffect
         * (1.0 + silverLining);
     half ambientLuminance = 1.0 * cloudProperties.ambientOcclusion;
+
+    // The four-tap shadow ray is a stochastic estimate at discrete primary
+    // positions. Integrating it as a constant over the full primary interval
+    // exposes every sample as a bright or dark slab. Reconstruct a continuous
+    // lighting field along the view ray with a physical, step-aware one-pole
+    // filter. Density and extinction remain untouched, so silhouettes stay
+    // sharp; only the noisy low-frequency lighting estimate is reconstructed.
+    if (lightingReconstructionValid > 0.5h)
+    {
+        half reconstructionResponse = (half)saturate(
+            stepSize * rcp(stepSize + 8.0 * max((float)_BaseStepSize, 0.001)));
+        reconstructionResponse = max(reconstructionResponse, 0.08h);
+        sunLuminance = lerp(
+            reconstructedSunLuminance,
+            sunLuminance,
+            reconstructionResponse);
+        ambientLuminance = lerp(
+            reconstructedAmbientLuminance,
+            ambientLuminance,
+            reconstructionResponse);
+    }
+
+    reconstructedSunLuminance = sunLuminance;
+    reconstructedAmbientLuminance = ambientLuminance;
+    lightingReconstructionValid = 1.0h;
 
     // "Energy-conserving analytical integration"
     // See slide 28 at http://www.frostbite.com/2015/08/physically-based-unified-volumetric-rendering-in-frostbite/

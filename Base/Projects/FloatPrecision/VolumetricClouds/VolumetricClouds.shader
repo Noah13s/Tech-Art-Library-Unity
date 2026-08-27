@@ -969,13 +969,18 @@ Shader "Hidden/Sky/VolumetricClouds"
                     && abs(previousCloudDepth - UNITY_RAW_FAR_CLIP_VALUE) > 1e-6;
 
                 half depthConfidence = 1.0h;
+                // Stochastic primary and shadow samples intentionally move the
+                // estimated cloud depth at a stationary silhouette. Preserve that
+                // history when the camera is still so the estimator converges;
+                // decay it rapidly once motion makes the mismatch ambiguous.
+                half staticCoverageConfidence = 0.90h * exp2(-motionPixels * 1.5h);
                 if (hasCloudDepth != hadCloudDepth)
                 {
                     // At a static stochastic boundary, alternating hit/miss
                     // samples are precisely what temporal accumulation must
                     // integrate. During camera motion the same mismatch is a
                     // true disocclusion and history must be discarded.
-                    depthConfidence = 0.35h * exp2(-motionPixels * 1.5h);
+                    depthConfidence = staticCoverageConfidence;
                 }
                 else if (hasCloudDepth)
                 {
@@ -984,8 +989,7 @@ Shader "Hidden/Sky/VolumetricClouds"
                     float relativeDepthError = abs(currentLinearDepth - previousLinearDepth)
                         / max(min(currentLinearDepth, previousLinearDepth), 1.0);
                     half depthAgreement = exp2(-relativeDepthError * relativeDepthError * 2048.0);
-                    half staticCoverageFloor = 0.35h * exp2(-motionPixels * 1.5h);
-                    depthConfidence = max(depthAgreement, staticCoverageFloor);
+                    depthConfidence = max(depthAgreement, staticCoverageConfidence);
                 }
 
                 // Opacity-aware 3x3 moments. Sky and dense cloud samples do not
@@ -1053,8 +1057,15 @@ Shader "Hidden/Sky/VolumetricClouds"
                 half opacityMismatch = abs(historyCloud.a - currentCloud.a);
                 half edgeRange = maximumTransmittance - minimumTransmittance;
                 // Reject history aggressively on disocclusion/opacity changes,
-                // but retain useful accumulation for stable thin features.
-                half opacityConfidence = exp2(-opacityMismatch * opacityMismatch * 48.0h);
+                // but let stationary stochastic coverage converge. The former
+                // fixed strength rejected the very samples introduced to hide
+                // raymarch slicing, leaving deterministic-looking bands behind.
+                half opacityRejectionStrength = lerp(
+                    12.0h,
+                    48.0h,
+                    saturate(motionPixels * 0.5h));
+                half opacityConfidence = exp2(
+                    -opacityMismatch * opacityMismatch * opacityRejectionStrength);
                 half motionConfidence = exp2(-motionPixels * 0.035h);
                 half movingEdge = saturate(edgeRange * 3.0h) * saturate(motionPixels * 0.5h);
                 half edgeConfidence = lerp(1.0h, 0.12h, movingEdge);

@@ -67,51 +67,178 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
             // Normalization value of the depth
             float meanDistanceDivider = 0.0;
 
-            // Current position for the evaluation, apply blue noise to start position
+            // Subdivide the complete cloud traversal into a predictable set of
+            // physical intervals. The primary-step setting is a budget, while the
+            // requested physical step determines how many of those samples are
+            // actually useful. If the budget cannot satisfy the requested step we
+            // still cover the full traversal instead of silently clipping clouds.
             float baseStepS = min(_BaseStepSize, _MaxStepSize);
-            float currentDistance = cloudRay.integrationNoise * baseStepS;
-            float3 currentPositionWS = cloudRay.originWS + (rayMarchRange.start + currentDistance) * cloudRay.direction;
+            float desiredMaxStepS = min(
+                _MaxStepSize,
+                baseStepS + rayMarchRange.start * _AdaptiveStepSizeFactor);
+            int sampleBudget = max(1, (int)_NumPrimarySteps);
+            int minimumSamples = min(sampleBudget, 24);
+            int requiredSamples = max(
+                1,
+                (int)ceil(totalDistance * rcp(max(desiredMaxStepS, 0.001))));
+            int sampleCount = clamp(requiredSamples, minimumSamples, sampleBudget);
+
+            // Uniform world-distance intervals spend too much of the fixed budget
+            // at the horizon and make every near-camera interval a visible slab.
+            // Distribute interval lengths geometrically from the requested near
+            // step to the physical maximum. The complete traversal is still
+            // covered, but the samples that occupy many screen pixels receive the
+            // highest physical resolution.
+            float stepRatio = max(1.0, _MaxStepSize * rcp(max(baseStepS, 0.001)));
+            float geometricRate = sampleCount > 1
+                ? pow(stepRatio, rcp((float)(sampleCount - 1)))
+                : 1.0;
+            float geometricSum = abs(geometricRate - 1.0) > 0.00001
+                ? baseStepS * (pow(geometricRate, (float)sampleCount) - 1.0)
+                    * rcp(geometricRate - 1.0)
+                : baseStepS * sampleCount;
+            float stepDistributionScale = totalDistance * rcp(max(geometricSum, 0.001));
+            // Keep one independently scrambled shadow phase for the complete
+            // view ray. Changing it at every primary step makes adjacent samples
+            // receive unrelated four-tap shadow estimates, which integrates into
+            // alternating bright/dark slabs. This phase still varies per pixel and
+            // frame, so temporal accumulation converges without spatial banding.
+            float rayLightJitter = frac(
+                cloudRay.integrationNoise * 0.754877666 + 0.569840296);
+            float currentDistance = 0.0;
 
             // Initialize the values for the optimized ray marching
             bool activeSampling = true;
             int sequentialEmptySamples = 0;
+            half3 reconstructedSunLuminance = 0.0h;
+            half reconstructedAmbientLuminance = 0.0h;
+            half lightingReconstructionValid = 0.0h;
+            half reconstructedDensity = 0.0h;
+            half reconstructedSigmaT = 0.0h;
+            half reconstructedAmbientOcclusion = 1.0h;
+            half densityReconstructionValid = 0.0h;
 
             // Do the ray march for every step that we can.
-            while (currentIndex < (int)_NumPrimarySteps && currentDistance < totalDistance)
+            while (currentIndex < sampleCount && currentDistance < totalDistance)
             {
-                // Preserve near-camera detail and grow the step only with distance.
-                // A single horizon-derived step exceeded a kilometre and turned
-                // small cloud cells into unstable, spherical slabs.
-                float stepS = min(
-                    _MaxStepSize,
-                    baseStepS + (rayMarchRange.start + currentDistance) * _AdaptiveStepSizeFactor);
+                float stepS = baseStepS
+                    * stepDistributionScale
+                    * pow(geometricRate, (float)currentIndex);
+                stepS = min(stepS, totalDistance - currentDistance);
+
+                // Shift the complete sampling lattice by one spatially and
+                // temporally varying phase. Keeping the same phase along a ray is
+                // important: independently jittering every interval leaves fixed
+                // interval boundaries whose averaged lighting still reads as
+                // slices. A moving lattice turns those slices into stationary,
+                // zero-mean sampling noise that temporal reconstruction can remove.
+                float primaryJitter = cloudRay.integrationNoise;
+                float sampleDistance = min(
+                    currentDistance + primaryJitter * stepS,
+                    totalDistance);
+
                 // Compute the camera-distance based attenuation
-                float densityAttenuationValue = DensityFadeValue(rayMarchRange.start + currentDistance);
+                float densityAttenuationValue = DensityFadeValue(rayMarchRange.start + sampleDistance);
                 // Compute the mip offset for the erosion texture
-                float erosionMipOffset = ErosionMipOffset(rayMarchRange.start + currentDistance);
+                float erosionMipOffset = ErosionMipOffset(rayMarchRange.start + sampleDistance);
 
                 // Accumulate in WS and convert at each iteration to avoid precision issues
-                float3 currentPositionPS = ConvertToPS(currentPositionWS);
+                float3 samplePositionWS = cloudRay.originWS
+                    + (rayMarchRange.start + sampleDistance) * cloudRay.direction;
+                float3 currentPositionPS = ConvertToPS(samplePositionWS);
 
                 // Should we be evaluating the clouds or just doing the large ray marching
                 if (activeSampling)
                 {
-                    // If the density is null, we can skip as there will be no contribution
+                    // If the density is null, we can skip as there will be no contribution.
+                    // Do not collapse an antithetic pair to its midpoint here: that
+                    // produces a stable, visible lighting plane at every interval.
                     CloudProperties properties;
                     EvaluateCloudProperties(currentPositionPS, 0.0, erosionMipOffset, false, false, properties);
-
-                    // Apply the fade in function to the density
                     properties.density *= densityAttenuationValue;
+
+                    // Reconstruct fractional interval coverage with a second
+                    // density-only probe half a stratum away. This prevents one
+                    // thresholded lookup from turning an entire long interval
+                    // into an opaque sheet. Lighting remains a single stochastic
+                    // evaluation, so this is much cheaper than doubling either
+                    // primary steps or the four-tap shadow march.
+                    float coverageJitter = frac(primaryJitter + 0.5);
+                    float coverageDistance = min(
+                        currentDistance + coverageJitter * stepS,
+                        totalDistance);
+                    float coverageCameraDistance = rayMarchRange.start + coverageDistance;
+                    float3 coveragePositionWS = cloudRay.originWS
+                        + coverageCameraDistance * cloudRay.direction;
+                    CloudProperties coverageProperties;
+                    EvaluateCloudProperties(
+                        ConvertToPS(coveragePositionWS),
+                        0.0,
+                        ErosionMipOffset(coverageCameraDistance),
+                        false,
+                        false,
+                        coverageProperties);
+                    coverageProperties.density *= DensityFadeValue(coverageCameraDistance);
+
+                    properties.density = 0.5h
+                        * (properties.density + coverageProperties.density);
+                    properties.ambientOcclusion = 0.5h
+                        * (properties.ambientOcclusion + coverageProperties.ambientOcclusion);
+                    properties.sigmaT = 0.5h
+                        * (properties.sigmaT + coverageProperties.sigmaT);
+
+                    // Reconstruct the thresholded density signal continuously
+                    // along the ray. Without this, one binary-like lookup is held
+                    // over the complete physical interval and becomes a visible
+                    // opaque slice. The reconstruction radius is tied to physical
+                    // step length rather than an arbitrary screen-space blur.
+                    half rawDensity = properties.density;
+                    if (densityReconstructionValid > 0.5h)
+                    {
+                        half densityResponse = (half)saturate(
+                            stepS * rcp(stepS + 2.5 * max((float)_BaseStepSize, 0.001)));
+                        densityResponse = max(densityResponse, 0.14h);
+                        properties.density = lerp(
+                            reconstructedDensity,
+                            rawDensity,
+                            densityResponse);
+
+                        // Empty probes should decay the reconstructed coverage,
+                        // not zero the extinction coefficient in the same step.
+                        if (rawDensity <= CLOUD_DENSITY_TRESHOLD)
+                        {
+                            properties.sigmaT = reconstructedSigmaT;
+                            properties.ambientOcclusion = reconstructedAmbientOcclusion;
+                        }
+                    }
+
+                    reconstructedDensity = properties.density;
+                    if (rawDensity > CLOUD_DENSITY_TRESHOLD)
+                    {
+                        reconstructedSigmaT = properties.sigmaT;
+                        reconstructedAmbientOcclusion = properties.ambientOcclusion;
+                    }
+                    densityReconstructionValid = 1.0h;
 
                     if (properties.density > CLOUD_DENSITY_TRESHOLD)
                     {
                         // Contribute to the average depth (must be done first in case we end up inside a cloud at the next step)
                         half transmitanceXdensity = volumetricRay.transmittance * properties.density;
-                        volumetricRay.meanDistance += (rayMarchRange.start + currentDistance) * transmitanceXdensity;
+                        volumetricRay.meanDistance += (rayMarchRange.start + sampleDistance) * transmitanceXdensity;
                         meanDistanceDivider += transmitanceXdensity;
 
                         // Evaluate the cloud at the position
-                        EvaluateCloud(properties, cloudRay.direction, currentPositionPS, stepS, currentDistance / totalDistance, volumetricRay);
+                        EvaluateCloud(
+                            properties,
+                            cloudRay.direction,
+                            currentPositionPS,
+                            stepS,
+                            sampleDistance / totalDistance,
+                            rayLightJitter,
+                            reconstructedSunLuminance,
+                            reconstructedAmbientLuminance,
+                            lightingReconstructionValid,
+                            volumetricRay);
 
                         // if most of the energy is absorbed, just leave.
                         if (volumetricRay.transmittance < 0.003)
@@ -124,19 +251,27 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
                         sequentialEmptySamples = 0;
                     }
                     else
+                    {
                         sequentialEmptySamples++;
+                        if (sequentialEmptySamples >= EMPTY_STEPS_BEFORE_LARGE_STEPS)
+                        {
+                            lightingReconstructionValid = 0.0h;
+                            densityReconstructionValid = 0.0h;
+                        }
+                    }
 
                     // If it has been more than EMPTY_STEPS_BEFORE_LARGE_STEPS, disable active sampling and start large steps
                     if (sequentialEmptySamples == EMPTY_STEPS_BEFORE_LARGE_STEPS)
                         activeSampling = false;
 
                     // Do the next step
-                    currentPositionWS += cloudRay.direction * stepS;
                     currentDistance += stepS;
 
                 }
                 else
                 {
+                    lightingReconstructionValid = 0.0h;
+                    densityReconstructionValid = 0.0h;
                     CloudProperties properties;
                     EvaluateCloudProperties(currentPositionPS, 1.0, 0.0, true, false, properties);
 
@@ -146,15 +281,13 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
                     // If the density is lower than our tolerance,
                     if (properties.density < CLOUD_DENSITY_TRESHOLD)
                     {
-                        currentPositionWS += cloudRay.direction * stepS * 2.0;
                         currentDistance += stepS * 2.0;
                     }
                     else
                     {
                         // Somewhere between this step and the previous clouds started
                         // We reset all the counters and enable active sampling
-                        currentPositionWS -= cloudRay.direction * stepS;
-                        currentDistance -= stepS;
+                        currentDistance = max(0.0, currentDistance - stepS);
                         currentIndex -= 1;
                         activeSampling = true;
                         sequentialEmptySamples = 0;
