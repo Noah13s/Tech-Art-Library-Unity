@@ -278,6 +278,15 @@ MonoBehaviour:
   farSegments: 72
   distantRings: 24
   distantSegments: 48
+  useHeightDisplacement: 0
+  heightMap: {fileID: 0}
+  elevationStrength: 10000
+  heightMapUVScale: {x: 1, y: 1}
+  heightMapUVOffset: {x: 0, y: 0}
+  displacementMin: 0
+  displacementMax: 1
+  cutHoleForLocalSurfacePatch: 1
+  localPatchHolePaddingDegrees: 0.02
 --- !u!1 &524132926
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,6 +626,15 @@ MonoBehaviour:
   farSegments: 72
   distantRings: 24
   distantSegments: 48
+  useHeightDisplacement: 0
+  heightMap: {fileID: 0}
+  elevationStrength: 10000
+  heightMapUVScale: {x: 1, y: 1}
+  heightMapUVOffset: {x: 0, y: 0}
+  displacementMin: 0
+  displacementMax: 1
+  cutHoleForLocalSurfacePatch: 1
+  localPatchHolePaddingDegrees: 0.02
 --- !u!1 &694544965
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1029,15 @@ MonoBehaviour:
   farSegments: 72
   distantRings: 24
   distantSegments: 48
+  useHeightDisplacement: 1
+  heightMap: {fileID: 2800000, guid: 846d10b4ceb8d034ea368373dc312b75, type: 3}
+  elevationStrength: 75000
+  heightMapUVScale: {x: 1, y: 1}
+  heightMapUVOffset: {x: 0, y: 0}
+  displacementMin: 0.52
+  displacementMax: 1
+  cutHoleForLocalSurfacePatch: 1
+  localPatchHolePaddingDegrees: 0
 --- !u!1 &1204706517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1485,7 +1512,19 @@ MonoBehaviour:
   minPatchSize: 25000
   maxPatchSize: 250000
   surfaceSeparation: 0.5
-  elevationStrength: 10000
+  adaptiveTessellation: 1
+  minimumSubdivisionLevel: 3
+  maximumSubdivisionLevel: 10
+  flatTerrainCellSize: 4000
+  roughTerrainCellSize: 350
+  flatHeightVariation: 40
+  roughHeightVariation: 700
+  highDetailDistance: 100000
+  distantCellSizeMultiplier: 5
+  maximumLeafCount: 12000
+  minimumRebuildDistance: 100
+  relativeRebuildThreshold: 0.025
+  elevationStrength: 75000
   heightMapUVScale: {x: 1, y: 1}
   heightMapUVOffset: {x: 0, y: 0}
   displacementMin: 0.52
@@ -1730,6 +1769,15 @@ MonoBehaviour:
   farSegments: 72
   distantRings: 24
   distantSegments: 48
+  useHeightDisplacement: 0
+  heightMap: {fileID: 0}
+  elevationStrength: 10000
+  heightMapUVScale: {x: 1, y: 1}
+  heightMapUVOffset: {x: 0, y: 0}
+  displacementMin: 0
+  displacementMax: 1
+  cutHoleForLocalSurfacePatch: 1
+  localPatchHolePaddingDegrees: 0.02
 --- !u!1 &1971876541
 GameObject:
   m_ObjectHideFlags: 0

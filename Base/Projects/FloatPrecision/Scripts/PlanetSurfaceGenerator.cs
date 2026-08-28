@@ -18,6 +18,7 @@ using UnityEditor;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(PerspectiveIllusionObject))]
+[DefaultExecutionOrder(200)]
 public sealed class PlanetSurfaceGenerator : MonoBehaviour
 {
     [Header("Visibility")]
@@ -52,6 +53,22 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
     [SerializeField, Range(8, 192)] private int distantRings = 24;
     [SerializeField, Range(16, 384)] private int distantSegments = 48;
 
+    [Header("Planet-scale Terrain Relief")]
+    [SerializeField, Tooltip("Displaces the planet cap with the same height map used by the local terrain patch.")]
+    private bool useHeightDisplacement;
+    [SerializeField] private Texture2D heightMap;
+    [SerializeField, Min(0f)] private float elevationStrength = 10000f;
+    [SerializeField] private Vector2 heightMapUVScale = Vector2.one;
+    [SerializeField] private Vector2 heightMapUVOffset = Vector2.zero;
+    [SerializeField, Range(0f, 1f)] private float displacementMin = 0f;
+    [SerializeField, Range(0f, 1f)] private float displacementMax = 1f;
+
+    [Header("Local Surface Patch Integration")]
+    [SerializeField, Tooltip("Removes coarse planet triangles below the detailed SphereSurfacePatchGenerator.")]
+    private bool cutHoleForLocalSurfacePatch = true;
+    [SerializeField, Range(0f, 0.25f), Tooltip("Optional inset/outset around the local square hole, in degrees. Keep at zero for an exact patch match.")]
+    private float localPatchHolePaddingDegrees = 0f;
+
     private PerspectiveIllusionObject planet;
     private MeshFilter meshFilter;
     private Mesh generatedMesh;
@@ -60,6 +77,13 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
     private int lastLod = -1;
     private double lastPlanetDiameter = -1.0;
     private float lastCapAngle = -1f;
+    private SphereSurfacePatchGenerator localSurfacePatch;
+    private Vector3 lastHoleAxis = Vector3.zero;
+    private float lastHoleAngle = -1f;
+    private uint lastHoleRevision = uint.MaxValue;
+    private Vector3 buildHoleAxis = Vector3.zero;
+    private float buildHoleAngle;
+    private bool buildUsesCenteredAnnulus;
 
     public int CurrentVertexCount => generatedMesh != null ? generatedMesh.vertexCount : 0;
     public int CurrentTriangleCount => generatedMesh != null && generatedMesh.subMeshCount > 0
@@ -134,6 +158,7 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
     {
         planet ??= GetComponent<PerspectiveIllusionObject>();
         meshFilter ??= GetComponent<MeshFilter>();
+        ResolveLocalSurfacePatch();
 
         if (generatedMesh == null)
         {
@@ -171,20 +196,79 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
             horizonPaddingDegrees * 0.5f * Mathf.Deg2Rad);
         bool capChanged = lastCapAngle < 0f ||
             Mathf.Abs(lastCapAngle - capAngle) >= capThreshold;
+        GetLocalPatchHole(out Vector3 holeAxis, out float holeAngle);
+        uint holeRevision = localSurfacePatch != null
+            ? localSurfacePatch.ExclusionRevision
+            : 0u;
+        bool holeChanged = holeRevision != lastHoleRevision;
 
-        if (!force && lod == lastLod && !directionChanged && !capChanged &&
+        if (!force && lod == lastLod && !directionChanged && !capChanged && !holeChanged &&
             Math.Abs(lastPlanetDiameter - planet.simulationScale) < 0.001)
         {
             return;
         }
 
         GetLodResolution(lod, out int rings, out int segments);
+        buildHoleAxis = holeAxis;
+        buildHoleAngle = holeAngle > 0f
+            ? holeAngle + localPatchHolePaddingDegrees * Mathf.Deg2Rad
+            : 0f;
         BuildSphericalCap(viewAxis, capAngle, rings, segments);
 
         lastViewAxis = viewAxis;
         lastCapAngle = capAngle;
         lastLod = lod;
         lastPlanetDiameter = planet.simulationScale;
+        lastHoleAxis = holeAxis;
+        lastHoleAngle = holeAngle;
+        lastHoleRevision = holeRevision;
+    }
+
+    private void ResolveLocalSurfacePatch()
+    {
+        if (!cutHoleForLocalSurfacePatch || planet == null)
+        {
+            localSurfacePatch = null;
+            return;
+        }
+
+        if (localSurfacePatch != null && localSurfacePatch.Planet == planet)
+        {
+            return;
+        }
+
+        localSurfacePatch = null;
+        SphereSurfacePatchGenerator[] patches = FindObjectsByType<SphereSurfacePatchGenerator>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+        for (int i = 0; i < patches.Length; i++)
+        {
+            if (patches[i].Planet == planet)
+            {
+                localSurfacePatch = patches[i];
+                break;
+            }
+        }
+    }
+
+    private void GetLocalPatchHole(out Vector3 localAxis, out float angularRadius)
+    {
+        localAxis = Vector3.zero;
+        angularRadius = 0f;
+        if (!cutHoleForLocalSurfacePatch)
+        {
+            return;
+        }
+
+        ResolveLocalSurfacePatch();
+        if (localSurfacePatch == null ||
+            !localSurfacePatch.TryGetPlanetExclusion(out Vector3 worldAxis, out angularRadius))
+        {
+            angularRadius = 0f;
+            return;
+        }
+
+        localAxis = transform.InverseTransformDirection(worldAxis).normalized;
     }
 
     private void GetViewState(
@@ -270,52 +354,64 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
         Vector3 tangent = Vector3.Cross(reference, axis).normalized;
         Vector3 bitangent = Vector3.Cross(axis, tangent).normalized;
 
-        AddVertex(axis, vertices, normals, uvs);
+        float angularCellSize = capAngle / Mathf.Max(1, rings);
+        buildUsesCenteredAnnulus = buildHoleAngle > 0f &&
+            Vector3.Angle(axis, buildHoleAxis) <= Mathf.Max(0.02f, angularCellSize * Mathf.Rad2Deg);
 
-        for (int ring = 1; ring <= rings; ring++)
+        if (buildUsesCenteredAnnulus)
         {
-            float theta = capAngle * ring / rings;
-            float sinTheta = Mathf.Sin(theta);
-            float cosTheta = Mathf.Cos(theta);
-
-            for (int segment = 0; segment <= segments; segment++)
+            // The detailed patch is a projected square, not a circle. Every ring uses
+            // the same angular directions and smoothly morphs from that exact square
+            // boundary into the circular outer cap. The first ring therefore matches
+            // the local patch edge-for-edge, including all four corners.
+            for (int ring = 0; ring <= rings; ring++)
             {
-                float phi = 2f * Mathf.PI * segment / segments;
-                Vector3 radial = tangent * Mathf.Cos(phi) + bitangent * Mathf.Sin(phi);
-                Vector3 direction = (axis * cosTheta + radial * sinTheta).normalized;
-                AddVertex(direction, vertices, normals, uvs);
+                AddSquareMorphRing(
+                    ring / (float)rings,
+                    buildHoleAngle,
+                    capAngle,
+                    axis,
+                    tangent,
+                    bitangent,
+                    segments,
+                    vertices,
+                    normals,
+                    uvs);
+            }
+
+            for (int ring = 0; ring < rings; ring++)
+            {
+                AddRingTriangles(ring * (segments + 1), (ring + 1) * (segments + 1),
+                    segments, vertices, normals, uvs, indices);
             }
         }
-
-        for (int segment = 0; segment < segments; segment++)
+        else
         {
-            AddSeamSafeTriangle(
-                0,
-                1 + segment,
-                1 + segment + 1,
-                vertices,
-                normals,
-                uvs,
-                indices);
-        }
+            AddVertex(axis, vertices, normals, uvs);
 
-        for (int ring = 1; ring < rings; ring++)
-        {
-            int inner = 1 + (ring - 1) * (segments + 1);
-            int outer = inner + segments + 1;
+            for (int ring = 1; ring <= rings; ring++)
+            {
+                float theta = capAngle * ring / rings;
+                AddRing(theta, axis, tangent, bitangent, segments, vertices, normals, uvs);
+            }
+
             for (int segment = 0; segment < segments; segment++)
             {
-                int innerCurrent = inner + segment;
-                int innerNext = innerCurrent + 1;
-                int outerCurrent = outer + segment;
-                int outerNext = outerCurrent + 1;
+                AddSeamSafeTriangle(
+                    0,
+                    1 + segment,
+                    1 + segment + 1,
+                    vertices,
+                    normals,
+                    uvs,
+                    indices);
+            }
 
-                AddSeamSafeTriangle(
-                    innerCurrent, outerCurrent, outerNext,
-                    vertices, normals, uvs, indices);
-                AddSeamSafeTriangle(
-                    innerCurrent, outerNext, innerNext,
-                    vertices, normals, uvs, indices);
+            for (int ring = 1; ring < rings; ring++)
+            {
+                int inner = 1 + (ring - 1) * (segments + 1);
+                int outer = inner + segments + 1;
+                AddRingTriangles(inner, outer, segments, vertices, normals, uvs, indices);
             }
         }
 
@@ -332,23 +428,106 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
         meshFilter.sharedMesh = generatedMesh;
     }
 
-    private static void AddVertex(
+    private void AddRing(
+        float theta,
+        Vector3 axis,
+        Vector3 tangent,
+        Vector3 bitangent,
+        int segments,
+        List<Vector3> vertices,
+        List<Vector3> normals,
+        List<Vector2> uvs)
+    {
+        float sinTheta = Mathf.Sin(theta);
+        float cosTheta = Mathf.Cos(theta);
+        for (int segment = 0; segment <= segments; segment++)
+        {
+            float phi = 2f * Mathf.PI * segment / segments;
+            Vector3 radial = tangent * Mathf.Cos(phi) + bitangent * Mathf.Sin(phi);
+            Vector3 direction = (axis * cosTheta + radial * sinTheta).normalized;
+            AddVertex(direction, vertices, normals, uvs);
+        }
+    }
+
+    private void AddSquareMorphRing(
+        float ringFraction,
+        float squareHalfAngle,
+        float outerAngle,
+        Vector3 axis,
+        Vector3 tangent,
+        Vector3 bitangent,
+        int segments,
+        List<Vector3> vertices,
+        List<Vector3> normals,
+        List<Vector2> uvs)
+    {
+        float squareHalfExtent = Mathf.Tan(squareHalfAngle);
+        for (int segment = 0; segment <= segments; segment++)
+        {
+            float phi = 2f * Mathf.PI * segment / segments;
+            float cosPhi = Mathf.Cos(phi);
+            float sinPhi = Mathf.Sin(phi);
+            float squareDenominator = Mathf.Max(Mathf.Abs(cosPhi), Mathf.Abs(sinPhi));
+            float squareRadialExtent = squareHalfExtent / Mathf.Max(0.000001f, squareDenominator);
+            float squareAngleAtPhi = Mathf.Atan(squareRadialExtent);
+            float theta = Mathf.Lerp(squareAngleAtPhi, outerAngle, ringFraction);
+            Vector3 radial = tangent * cosPhi + bitangent * sinPhi;
+            Vector3 direction = (axis * Mathf.Cos(theta) + radial * Mathf.Sin(theta)).normalized;
+            AddVertex(direction, vertices, normals, uvs);
+        }
+    }
+
+    private void AddRingTriangles(
+        int inner,
+        int outer,
+        int segments,
+        List<Vector3> vertices,
+        List<Vector3> normals,
+        List<Vector2> uvs,
+        List<int> indices)
+    {
+        for (int segment = 0; segment < segments; segment++)
+        {
+            int innerCurrent = inner + segment;
+            int innerNext = innerCurrent + 1;
+            int outerCurrent = outer + segment;
+            int outerNext = outerCurrent + 1;
+
+            AddSeamSafeTriangle(
+                innerCurrent, outerCurrent, outerNext,
+                vertices, normals, uvs, indices);
+            AddSeamSafeTriangle(
+                innerCurrent, outerNext, innerNext,
+                vertices, normals, uvs, indices);
+        }
+    }
+
+    private void AddVertex(
         Vector3 direction,
         List<Vector3> vertices,
         List<Vector3> normals,
         List<Vector2> uvs)
     {
         direction.Normalize();
-        vertices.Add(direction * 0.5f);
-        normals.Add(direction);
-
         float longitude = Mathf.Atan2(-direction.z, -direction.x) / (2f * Mathf.PI);
         float u = Mathf.Repeat(longitude, 1f);
         float v = 1f - Mathf.Acos(Mathf.Clamp(direction.y, -1f, 1f)) / Mathf.PI;
+        float normalizedRadius = 0.5f;
+        if (useHeightDisplacement && heightMap != null && planet != null)
+        {
+            float rawHeight = heightMap.GetPixelBilinear(
+                u * heightMapUVScale.x + heightMapUVOffset.x,
+                v * heightMapUVScale.y + heightMapUVOffset.y).r;
+            float elevation = Mathf.InverseLerp(displacementMin, displacementMax, rawHeight) * elevationStrength;
+            normalizedRadius += elevation / Mathf.Max(0.000001f, (float)planet.simulationScale);
+        }
+
+        vertices.Add(direction * normalizedRadius);
+        normals.Add(direction);
         uvs.Add(new Vector2(u, v));
     }
 
-    private static void AddSeamSafeTriangle(
+    private void AddSeamSafeTriangle(
         int a,
         int b,
         int c,
@@ -357,6 +536,14 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
         List<Vector2> uvs,
         List<int> indices)
     {
+        if (TriangleOverlapsLocalPatch(
+            vertices[a].normalized,
+            vertices[b].normalized,
+            vertices[c].normalized))
+        {
+            return;
+        }
+
         float minU = Mathf.Min(uvs[a].x, Mathf.Min(uvs[b].x, uvs[c].x));
         float maxU = Mathf.Max(uvs[a].x, Mathf.Max(uvs[b].x, uvs[c].x));
         if (maxU - minU > 0.5f)
@@ -369,6 +556,25 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
         indices.Add(a);
         indices.Add(b);
         indices.Add(c);
+    }
+
+    private bool TriangleOverlapsLocalPatch(Vector3 a, Vector3 b, Vector3 c)
+    {
+        if (buildUsesCenteredAnnulus || buildHoleAngle <= 0f || buildHoleAxis == Vector3.zero)
+        {
+            return false;
+        }
+
+        float cosineThreshold = Mathf.Cos(buildHoleAngle);
+        if (Vector3.Dot(buildHoleAxis, a) >= cosineThreshold ||
+            Vector3.Dot(buildHoleAxis, b) >= cosineThreshold ||
+            Vector3.Dot(buildHoleAxis, c) >= cosineThreshold)
+        {
+            return true;
+        }
+
+        Vector3 centroidDirection = (a + b + c).normalized;
+        return Vector3.Dot(buildHoleAxis, centroidDirection) >= cosineThreshold;
     }
 
     private static int DuplicateWrappedVertex(
@@ -406,6 +612,10 @@ public sealed class PlanetSurfaceGenerator : MonoBehaviour
         farSegments = Mathf.Clamp(farSegments, 16, 384);
         distantRings = Mathf.Clamp(distantRings, 8, 192);
         distantSegments = Mathf.Clamp(distantSegments, 16, 384);
+        elevationStrength = Mathf.Max(0f, elevationStrength);
+        displacementMin = Mathf.Clamp01(displacementMin);
+        displacementMax = Mathf.Max(displacementMin + 0.0001f, Mathf.Clamp01(displacementMax));
+        localPatchHolePaddingDegrees = Mathf.Clamp(localPatchHolePaddingDegrees, 0f, 0.25f);
     }
 
     private static string GetLodName(int lod)
