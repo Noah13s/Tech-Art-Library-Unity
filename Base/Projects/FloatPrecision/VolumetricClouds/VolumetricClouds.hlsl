@@ -157,35 +157,43 @@ VolumetricRayResult TraceVolumetricRay(CloudRay cloudRay)
                     EvaluateCloudProperties(currentPositionPS, 0.0, erosionMipOffset, false, false, properties);
                     properties.density *= densityAttenuationValue;
 
-                    // Reconstruct fractional interval coverage with a second
-                    // density-only probe half a stratum away. This prevents one
-                    // thresholded lookup from turning an entire long interval
-                    // into an opaque sheet. Lighting remains a single stochastic
-                    // evaluation, so this is much cheaper than doubling either
-                    // primary steps or the four-tap shadow march.
-                    float coverageJitter = frac(primaryJitter + 0.5);
-                    float coverageDistance = min(
-                        currentDistance + coverageJitter * stepS,
-                        totalDistance);
-                    float coverageCameraDistance = rayMarchRange.start + coverageDistance;
-                    float3 coveragePositionWS = cloudRay.originWS
-                        + coverageCameraDistance * cloudRay.direction;
-                    CloudProperties coverageProperties;
-                    EvaluateCloudProperties(
-                        ConvertToPS(coveragePositionWS),
-                        0.0,
-                        ErosionMipOffset(coverageCameraDistance),
-                        false,
-                        false,
-                        coverageProperties);
-                    coverageProperties.density *= DensityFadeValue(coverageCameraDistance);
+                    // Long intervals need a second, antithetic density probe to
+                    // avoid visible ray-march slabs. Short intervals already meet
+                    // the requested physical sampling density, so evaluating the
+                    // complete procedural weather/erosion stack twice only burns
+                    // GPU time without adding useful information. This branch
+                    // retains the anti-slicing reconstruction at the horizon and
+                    // in coarse empty-space steps while avoiding most duplicate
+                    // density work in nearby, well-sampled cloud volumes.
+                    float coverageProbeThreshold = max(
+                        1.5 * (float)_BaseStepSize,
+                        0.001);
+                    if (stepS > coverageProbeThreshold)
+                    {
+                        float coverageJitter = frac(primaryJitter + 0.5);
+                        float coverageDistance = min(
+                            currentDistance + coverageJitter * stepS,
+                            totalDistance);
+                        float coverageCameraDistance = rayMarchRange.start + coverageDistance;
+                        float3 coveragePositionWS = cloudRay.originWS
+                            + coverageCameraDistance * cloudRay.direction;
+                        CloudProperties coverageProperties;
+                        EvaluateCloudProperties(
+                            ConvertToPS(coveragePositionWS),
+                            0.0,
+                            ErosionMipOffset(coverageCameraDistance),
+                            false,
+                            false,
+                            coverageProperties);
+                        coverageProperties.density *= DensityFadeValue(coverageCameraDistance);
 
-                    properties.density = 0.5h
-                        * (properties.density + coverageProperties.density);
-                    properties.ambientOcclusion = 0.5h
-                        * (properties.ambientOcclusion + coverageProperties.ambientOcclusion);
-                    properties.sigmaT = 0.5h
-                        * (properties.sigmaT + coverageProperties.sigmaT);
+                        properties.density = 0.5h
+                            * (properties.density + coverageProperties.density);
+                        properties.ambientOcclusion = 0.5h
+                            * (properties.ambientOcclusion + coverageProperties.ambientOcclusion);
+                        properties.sigmaT = 0.5h
+                            * (properties.sigmaT + coverageProperties.sigmaT);
+                    }
 
                     // Reconstruct the thresholded density signal continuously
                     // along the ray. Without this, one binary-like lookup is held

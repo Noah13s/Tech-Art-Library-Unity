@@ -550,7 +550,8 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private static readonly int orbitalProxyTint = Shader.PropertyToID("_OrbitalProxyTint");
         private static readonly int orbitalProxyAmbient = Shader.PropertyToID("_OrbitalProxyAmbient");
         private static readonly int planetaryWeatherMap = Shader.PropertyToID("_PlanetaryWeatherMap");
-        private static readonly int planetaryWeatherOffset = Shader.PropertyToID("_PlanetaryWeatherOffset");
+        private static readonly int planetaryWindMap = Shader.PropertyToID("_PlanetaryWindMap");
+        private static readonly int planetaryWeatherAdvection = Shader.PropertyToID("_PlanetaryWeatherAdvection");
         private static readonly int erosionScale = Shader.PropertyToID("_ErosionScale");
         private static readonly int erosionFactor = Shader.PropertyToID("_ErosionFactor");
         private static readonly int erosionOcclusion = Shader.PropertyToID("_ErosionOcclusion");
@@ -640,6 +641,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private float verticalShapeOffset = 0.0f;
         private float verticalErosionOffset = 0.0f;
         private Vector2 windVector = Vector2.zero;
+        private double planetaryWeatherTravelRadians;
 
         private static float square(float x) => x * x;
 
@@ -722,6 +724,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
             float bottomAltitude = cloudsVolume.bottomAltitude.value * unitsPerMeter + actualEarthRad;
             float highestAltitude = bottomAltitude + altitudeRange;
+            float physicalPlanetRadius = Mathf.Max(1.0f, actualEarthRad / unitsPerMeter);
             cloudsMaterial.SetFloat(highestCloudAltitude, highestAltitude);
             cloudsMaterial.SetFloat(lowestCloudAltitude, bottomAltitude);
             cloudsMaterial.SetVector(shapeNoiseOffset, new Vector4(cloudsVolume.shapeOffset.value.x, cloudsVolume.shapeOffset.value.z, 0.0f, 0.0f));
@@ -750,10 +753,14 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 windVector = Vector2.zero;
                 verticalShapeOffset = 0.0f;
                 verticalErosionOffset = 0.0f;
+                planetaryWeatherTravelRadians = 0.0;
             }
             else
             {
-                windVector += deltaTime * cloudsVolume.globalSpeed.value * windDirection;
+                Vector2 windDisplacement = deltaTime * cloudsVolume.globalSpeed.value * windDirection;
+                windVector += windDisplacement;
+                planetaryWeatherTravelRadians +=
+                    deltaTime * cloudsVolume.globalSpeed.value / physicalPlanetRadius;
                 verticalShapeOffset += deltaTime * cloudsVolume.verticalShapeWindSpeed.value;
                 verticalErosionOffset += deltaTime * cloudsVolume.erosionSpeedMultiplier.value;
                 // Reset the accumulated wind variables periodically to avoid extreme values.
@@ -807,10 +814,14 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 cloudsVolume.planetaryWeatherMap.value != null
                     ? cloudsVolume.planetaryWeatherMap.value
                     : Texture2D.whiteTexture);
-            float physicalPlanetRadius = Mathf.Max(1.0f, actualEarthRad / unitsPerMeter);
+            cloudsMaterial.SetTexture(
+                planetaryWindMap,
+                cloudsVolume.planetaryWindMap.value != null
+                    ? cloudsVolume.planetaryWindMap.value
+                    : Texture2D.grayTexture);
             cloudsMaterial.SetFloat(
-                planetaryWeatherOffset,
-                Mathf.Repeat(windVector.x / (2.0f * Mathf.PI * physicalPlanetRadius), 1.0f));
+                planetaryWeatherAdvection,
+                (float)planetaryWeatherTravelRadians);
             cloudsMaterial.SetFloat(erosionScale, cloudsVolume.erosionScale.value / unitsPerMeter);
             cloudsMaterial.SetFloat(erosionFactor, cloudsVolume.erosionFactor.value);
             cloudsMaterial.SetFloat(erosionOcclusion, cloudsVolume.erosionOcclusion.value);
@@ -1751,6 +1762,10 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         private RTHandle intermediateShadowTextureHandle;
 
         private Light targetLight;
+        private int lastShadowUpdateFrame = int.MinValue;
+        private bool cachedShadowRegionValid;
+        private ShadowRegion cachedShadowRegion;
+        private int cachedShadowResolution = -1;
 
         private static readonly int shadowCookieResolution = Shader.PropertyToID("_ShadowCookieResolution");
         private static readonly int shadowIntensity = Shader.PropertyToID("_ShadowIntensity");
@@ -1837,7 +1852,10 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
 
         public bool ShouldRender(Camera camera)
         {
-            return camera != null && camera.cameraType != CameraType.Reflection &&
+            // The cookie is camera-centred gameplay lighting. Rendering another
+            // expensive transmittance map for the Editor Scene view (or a probe)
+            // only overwrites the game camera's cookie and can double its cost.
+            return camera != null && camera.cameraType == CameraType.Game &&
                 GetAltitudeFade(camera) > 0.001f;
         }
 
@@ -1921,6 +1939,8 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
         public void DisableCloudShadow()
         {
             ResetShadowCookie();
+            cachedShadowRegionValid = false;
+            cachedShadowResolution = -1;
             Shader.SetGlobalTexture(mainLightTexture, Texture2D.whiteTexture);
             Shader.SetGlobalMatrix(mainLightWorldToLight, Matrix4x4.identity);
             Shader.SetGlobalFloat(
@@ -1968,10 +1988,12 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             desc.dimension = TextureDimension.Tex2D;
             
         #if UNITY_6000_0_OR_NEWER
-            RenderingUtils.ReAllocateHandleIfNeeded(ref shadowTextureHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: _VolumetricCloudsShadowTexture);
+            bool shadowTextureChanged = RenderingUtils.ReAllocateHandleIfNeeded(ref shadowTextureHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: _VolumetricCloudsShadowTexture);
         #else
-            RenderingUtils.ReAllocateIfNeeded(ref shadowTextureHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: _VolumetricCloudsShadowTexture);
+            bool shadowTextureChanged = RenderingUtils.ReAllocateIfNeeded(ref shadowTextureHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: _VolumetricCloudsShadowTexture);
         #endif
+            if (shadowTextureChanged)
+                cachedShadowRegionValid = false;
 
         #if UNITY_6000_0_OR_NEWER
             RenderingUtils.ReAllocateHandleIfNeeded(ref intermediateShadowTextureHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: _VolumetricCloudsShadowTempTexture);
@@ -1999,6 +2021,7 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
             {
                 ResetShadowCookie();
                 targetLight = light;
+                cachedShadowRegionValid = false;
             }
 
             // Check if we need shadow cookie
@@ -2009,11 +2032,31 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 return;
             }
 
-            if (!TryBuildShadowRegion(camera, targetLight, out ShadowRegion region))
+            if (!TryBuildShadowRegion(camera, targetLight, out ShadowRegion requestedRegion))
             {
                 DisableCloudShadow();
                 return;
             }
+
+            int shadowResolution = (int)cloudsVolume.shadowResolution.value;
+            int updateInterval = Mathf.Max(1, cloudsVolume.shadowUpdateInterval.value);
+            int frame = Time.renderedFrameCount;
+            bool updateShadowTexture = !cachedShadowRegionValid ||
+                cachedShadowResolution != shadowResolution ||
+                frame - lastShadowUpdateFrame >= updateInterval;
+
+            if (updateShadowTexture)
+            {
+                cachedShadowRegion = requestedRegion;
+                cachedShadowRegionValid = true;
+                cachedShadowResolution = shadowResolution;
+                lastShadowUpdateFrame = frame;
+            }
+
+            ShadowRegion region = cachedShadowRegion;
+            // Opacity can still react continuously to altitude while the much
+            // more expensive density integration is amortized over several frames.
+            region.altitudeFade = requestedRegion.altitudeFade;
 
             CommandBuffer cmd = CommandBufferPool.Get();
             using (new ProfilingScope(cmd, m_ProfilingSampler))
@@ -2022,8 +2065,6 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                     cmd.DisableShaderKeyword(STEREO_INSTANCING_ON);
 
                 Vector3 cameraPos = camera.transform.position;
-
-                int shadowResolution = (int)cloudsVolume.shadowResolution.value;
 
                 // Update material properties
                 cloudsMaterial.SetFloat(shadowCookieResolution, shadowResolution);
@@ -2071,12 +2112,15 @@ public class VolumetricCloudsURP : ScriptableRendererFeature
                 cmd.SetGlobalFloat(mainLightCookieTextureFormat, cookieFormat);
                 cmd.EnableShaderKeyword(_LIGHT_COOKIES);
 
-                // Render shadow cookie texture
-                Blitter.BlitCameraTexture(cmd, shadowTextureHandle, shadowTextureHandle, cloudsMaterial, pass: 4);
-
-                // Given the low number of steps available and the absence of noise in the integration, we try to reduce the artifacts by doing two consecutive 3x3 blur passes.
-                Blitter.BlitCameraTexture(cmd, shadowTextureHandle, intermediateShadowTextureHandle, cloudsMaterial, pass: 5);
-                Blitter.BlitCameraTexture(cmd, intermediateShadowTextureHandle, shadowTextureHandle, cloudsMaterial, pass: 5);
+                if (updateShadowTexture)
+                {
+                    // Rebuild the density-based cookie only at the configured
+                    // cadence. Its light-space texel snapping keeps cached frames
+                    // stable while the camera moves.
+                    Blitter.BlitCameraTexture(cmd, shadowTextureHandle, shadowTextureHandle, cloudsMaterial, pass: 4);
+                    Blitter.BlitCameraTexture(cmd, shadowTextureHandle, intermediateShadowTextureHandle, cloudsMaterial, pass: 5);
+                    Blitter.BlitCameraTexture(cmd, intermediateShadowTextureHandle, shadowTextureHandle, cloudsMaterial, pass: 5);
+                }
 
                 if (isStereoEnabled)
                     cmd.EnableShaderKeyword(STEREO_INSTANCING_ON);

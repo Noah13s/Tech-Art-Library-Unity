@@ -97,6 +97,10 @@ class VolumetricCloudsEditor : VolumeComponentEditor
     SerializedDataParameter m_ShadowDistance;
     SerializedDataParameter m_ShadowOpacity;
     SerializedDataParameter m_ShadowOpacityFallback;
+    SerializedDataParameter m_ShadowSampleCount;
+    SerializedDataParameter m_ShadowUpdateInterval;
+    SerializedDataParameter m_ShadowFadeStartAltitude;
+    SerializedDataParameter m_ShadowFadeEndAltitude;
 
     const string k_RendererDataList = "m_RendererDataList";
 
@@ -204,6 +208,10 @@ class VolumetricCloudsEditor : VolumeComponentEditor
         m_ShadowDistance = Unpack(o.Find(x => x.shadowDistance));
         m_ShadowOpacity = Unpack(o.Find(x => x.shadowOpacity));
         m_ShadowOpacityFallback = Unpack(o.Find(x => x.shadowOpacityFallback));
+        m_ShadowSampleCount = Unpack(o.Find(x => x.shadowSampleCount));
+        m_ShadowUpdateInterval = Unpack(o.Find(x => x.shadowUpdateInterval));
+        m_ShadowFadeStartAltitude = Unpack(o.Find(x => x.shadowFadeStartAltitude));
+        m_ShadowFadeEndAltitude = Unpack(o.Find(x => x.shadowFadeEndAltitude));
 
         base.OnEnable();
     }
@@ -309,6 +317,10 @@ class VolumetricCloudsEditor : VolumeComponentEditor
                 PropertyField(m_ShadowOpacity);
                 PropertyField(m_ShadowDistance);
                 PropertyField(m_ShadowOpacityFallback);
+                PropertyField(m_ShadowSampleCount);
+                PropertyField(m_ShadowUpdateInterval);
+                PropertyField(m_ShadowFadeStartAltitude);
+                PropertyField(m_ShadowFadeEndAltitude);
             }
         }
 

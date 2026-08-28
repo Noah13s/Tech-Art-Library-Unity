@@ -122,132 +122,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &135048978
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 135048979}
-  - component: {fileID: 135048982}
-  - component: {fileID: 135048981}
-  - component: {fileID: 135048980}
-  - component: {fileID: 135048983}
-  m_Layer: 0
-  m_Name: Sun
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &135048979
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135048978}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 1971876542}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &135048980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135048978}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56d588086c0c2f948b194738d3375434, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  simulationPosition:
-    x: 0
-    y: 0
-    z: 0
-  simulationScale: 1392700000
-  maxDistanceFromPlayer: 80000
-  player: {fileID: 694544967}
-  altitude:
-    m_PersistentCalls:
-      m_Calls: []
-  centerDistance:
-    m_PersistentCalls:
-      m_Calls: []
-  transitionRange: 100
-  castRealtimeShadows: 0
---- !u!23 &135048981
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135048978}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: dc5842121dd6cec4087648049ca4f7e5, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &135048982
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135048978}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &135048983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 135048978}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0714872af4141a3479706526c59bf278, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mass: 1.989e+30
---- !u!43 &365554667
+--- !u!43 &78560193
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -412,6 +287,131 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &135048978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 135048979}
+  - component: {fileID: 135048982}
+  - component: {fileID: 135048981}
+  - component: {fileID: 135048980}
+  - component: {fileID: 135048983}
+  m_Layer: 0
+  m_Name: Sun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &135048979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135048978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 1971876542}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &135048980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135048978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d588086c0c2f948b194738d3375434, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simulationPosition:
+    x: 0
+    y: 0
+    z: 0
+  simulationScale: 1392700000
+  maxDistanceFromPlayer: 80000
+  player: {fileID: 694544967}
+  altitude:
+    m_PersistentCalls:
+      m_Calls: []
+  centerDistance:
+    m_PersistentCalls:
+      m_Calls: []
+  transitionRange: 100
+  castRealtimeShadows: 0
+--- !u!23 &135048981
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135048978}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: dc5842121dd6cec4087648049ca4f7e5, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &135048982
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135048978}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &135048983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135048978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0714872af4141a3479706526c59bf278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mass: 1.989e+30
 --- !u!1 &524132926
 GameObject:
   m_ObjectHideFlags: 0
@@ -960,7 +960,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1185176541}
-  m_Mesh: {fileID: 365554667}
+  m_Mesh: {fileID: 78560193}
 --- !u!114 &1185176547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1041,22 +1041,43 @@ MonoBehaviour:
   cumulusScale: 32
   cumulusStrength: 0.82
   verticalDevelopment: 0.8
-  detailStrength: 0.62
   edgeHardness: 0.96
   planetaryCoverageScale: 1.45
   planetaryCoverage: 0.58
   planetaryCoverageContrast: 1
   planetaryCoverageInfluence: 1
   weatherMapOverride: {fileID: 0}
-  weatherMapWidth: 1024
+  weatherMapWidth: 1006
   weatherSeed: 15873
+  weatherWarpStrength: 1
+  weatherVortexStrength: 1
+  synopticThreshold: 0.4
+  synopticSoftness: 0.22
+  weatherFrontStrength: 1
+  weatherClearingStrength: 0
+  weatherConvectionStrength: 1
+  weatherDetailStrength: 1
+  weatherErosionStrength: 1
+  weatherTurbulenceStrength: 1
+  weatherCellularVariation: 1
+  weatherFrontSharpness: 1.8
+  weatherBandStrength: 1
+  polarCoverageBoost: 0.14
   detailFadeStartAltitude: 35000
   detailFadeEndAltitude: 240000
-  erosionFactor: 0.0005
-  erosionScale: 72
+  detailStrength: 1
+  erosionFactor: 1
+  erosionScale: 1
   microErosion: 1
+  microErosionFactor: 0.5
+  microErosionScale: 200
   windOrientation: 65
   windSpeedKph: 35
+  planetaryWindFieldStrength: 1
+  zonalJetStrength: 0.85
+  meridionalFlowStrength: 0.45
+  vortexWindStrength: 1
+  planetaryWindSpeedVariation: 0.55
   ambientLight: 2
   sunlight: 2
   extinctionCoefficient: 0.007

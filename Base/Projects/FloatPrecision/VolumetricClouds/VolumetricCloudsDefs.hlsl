@@ -3,6 +3,8 @@
 
 TEXTURE2D(_PlanetaryWeatherMap);
 SAMPLER(sampler_PlanetaryWeatherMap);
+TEXTURE2D(_PlanetaryWindMap);
+SAMPLER(sampler_PlanetaryWindMap);
 
 CBUFFER_START(UnityPerMaterial)
 float _Seed;
@@ -44,7 +46,7 @@ float _PlanetDetailFadeEnd;
 half _OrbitalProxyOpacity;
 half4 _OrbitalProxyTint;
 half _OrbitalProxyAmbient;
-float _PlanetaryWeatherOffset;
+float _PlanetaryWeatherAdvection;
 float _ErosionScale;
 half _ErosionFactor;
 half _ErosionOcclusion;

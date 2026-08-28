@@ -359,6 +359,23 @@ float3 AnimateErosionNoisePosition(float3 positionPS)
     //return positionPS;
 }
 
+// Keep the broad erosion field coherent through most of the cloud column. With
+// the physical erosion scale used by the Earth preset, sampling the raw planet
+// position repeats the 3D texture several times over the layer thickness. A
+// view ray then finds dense material behind every carved voxel and Erosion
+// Factor appears to do nothing. Compress only the radial coordinate; tangent
+// variation and a small amount of vertical evolution remain fully 3D.
+float3 EvaluateErosionNoiseCoordinates(float3 positionPS, float scale)
+{
+    float radialDistance = max(length(positionPS), 0.0001);
+    float3 radialDirection = positionPS / radialDistance;
+    float heightAboveCloudBase = max(0.0, radialDistance - _LowestCloudAltitude);
+    float3 columnCoherentPosition = positionPS
+        - radialDirection * heightAboveCloudBase * 0.86;
+    return AnimateErosionNoisePosition(columnCoherentPosition)
+        / NOISE_TEXTURE_NORMALIZATION_FACTOR * scale;
+}
+
 // Structure that holds all the data used to define the cloud density of a point in space
 struct CloudCoverageData
 {
@@ -419,8 +436,44 @@ void DecodePlanetaryWeather(
         + smoothstep(0.62, 0.90, weather.y) * 0.30);
 }
 
+float2 GetPlanetaryWeatherUV(float3 planetDirection)
+{
+    float2 baseUV = float2(
+        atan2(planetDirection.z, planetDirection.x) * 0.159154943 + 0.5,
+        asin(clamp(planetDirection.y, -1.0, 1.0)) * 0.318309886 + 0.5);
+
+    // The wind map defines a local tangent vector at every point on the sphere.
+    // R/G are east/north direction and B varies the local speed. This is a
+    // spatially varying backtrace, rather than one offset shared by the planet.
+    half3 encodedWind = SAMPLE_TEXTURE2D_LOD(
+        _PlanetaryWindMap,
+        sampler_PlanetaryWindMap,
+        baseUV,
+        0.0).rgb;
+    float2 flowDirection = encodedWind.rg * 2.0 - 1.0;
+    float directionLength = length(flowDirection);
+    flowDirection = directionLength > 0.001
+        ? flowDirection / directionLength
+        : float2(1.0, 0.0);
+    float localSpeed = lerp(0.25, 1.75, encodedWind.b);
+    float latitude = (baseUV.y - 0.5) * 3.141592654;
+    float longitudeMetric = max(abs(cos(latitude)), 0.16);
+    float2 radiansToUV = float2(
+        0.159154943 / longitudeMetric,
+        0.318309886);
+    float2 displacement = flowDirection
+        * localSpeed
+        * _PlanetaryWeatherAdvection
+        * radiansToUV;
+
+    return float2(
+        baseUV.x + displacement.x,
+        clamp(baseUV.y + displacement.y, 0.001, 0.999));
+}
+
 // Samples the unique, procedurally generated global weather field once around
-// the planet. The texture wraps only at longitude and clamps at the poles.
+// the planet. Longitude wraps seamlessly while the vector field naturally
+// attenuates meridional motion toward the poles.
 void EvaluatePlanetaryWeather(
     float3 positionPS,
     out half coverage,
@@ -431,9 +484,7 @@ void EvaluatePlanetaryWeather(
     // Adding the local-noise wind displacement here as well made the planet-wide
     // field shear and travel twice as fast, especially in compressed orbit views.
     float3 planetDirection = normalize(positionPS);
-    float2 weatherUV = float2(
-        atan2(planetDirection.z, planetDirection.x) * 0.159154943 + 0.5 + _PlanetaryWeatherOffset,
-        asin(clamp(planetDirection.y, -1.0, 1.0)) * 0.318309886 + 0.5);
+    float2 weatherUV = GetPlanetaryWeatherUV(planetDirection);
 
     half3 weather = SAMPLE_TEXTURE2D_LOD(
         _PlanetaryWeatherMap,
@@ -488,10 +539,7 @@ OrbitalCloudShellResult EvaluateOrbitalCloudShell(CloudRay cloudRay)
     // feeding the already-thresholded volumetric outputs into a second shell
     // threshold produces the large opaque "cloud continents" seen previously.
     float3 weatherDirection = normalize(hitPositionPS);
-    float2 weatherUV = float2(
-        atan2(weatherDirection.z, weatherDirection.x) * 0.159154943
-            + 0.5 + _PlanetaryWeatherOffset,
-        asin(clamp(weatherDirection.y, -1.0, 1.0)) * 0.318309886 + 0.5);
+    float2 weatherUV = GetPlanetaryWeatherUV(weatherDirection);
     half3 weather = SAMPLE_TEXTURE2D_LOD(
         _PlanetaryWeatherMap,
         sampler_PlanetaryWeatherMap,
@@ -877,10 +925,11 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
     properties.ambientOcclusion = lerp(1.0, properties.ambientOcclusion, ambientOcclusionBlend);
 
     // Apply the erosion for nicer details
-    if (!cheapVersion && erosionFactor > 0.0001)
+    if (!cheapVersion && erosionFactor > 0.0)
     {
-        float3 erosionCoords = AnimateErosionNoisePosition(positionPS)
-            / NOISE_TEXTURE_NORMALIZATION_FACTOR * _ErosionScale;
+        float3 erosionCoords = EvaluateErosionNoiseCoordinates(
+            positionPS,
+            _ErosionScale);
         float3 erosionCoordsB = RotateCloudCoordinates(erosionCoords) * 0.873
             + float3(0.173, 0.619, 0.947);
         half erosionA = SAMPLE_TEXTURE3D_LOD(
@@ -893,13 +942,32 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
             s_linear_repeat_sampler,
             erosionCoordsB,
             CLOUD_DETAIL_MIP_OFFSET + 0.65 + erosionMipOffset + detailLod * 4.0).x;
-        half erosionNoise = 1.0 - lerp(erosionA, erosionB, 0.43);
-        erosionNoise = lerp(
-            0.0,
-            erosionNoise,
-            erosionFactor * _DetailStrength * cloudCoverageData.coverage);
-        properties.ambientOcclusion = saturate(properties.ambientOcclusion - sqrt(erosionNoise * _ErosionOcclusion));
-        base_cloud = DensityRemap(base_cloud, erosionNoise, 1.0, 0.0, 1.0);
+        half erosionPattern = 1.0 - lerp(erosionA, erosionB, 0.43);
+        half erosionWeight = saturate(
+            erosionFactor * cloudCoverageData.coverage);
+
+        // Erosion is a detail modulation inside the planet-wide weather
+        // envelope, not an absolute density threshold. The previous remap
+        // subtracted erosionPattern * erosionWeight directly from base_cloud.
+        // Consequently even a 0.0005 factor erased every valid sample whose
+        // density happened to be below that absolute value, producing large
+        // coverage holes near the planet. A multiplicative response makes the
+        // parameter proportional: 0.0005 can alter density by at most 0.05%.
+        // Detail Strength shapes a contrast-preserving keep mask instead of
+        // limiting the maximum effect. Erosion Factor can therefore reach that
+        // complete mask at 1.0 and carve readable gaps, while low values remain
+        // genuinely subtle and cannot act as absolute density cutoffs.
+        half detailContrast = saturate(_DetailStrength);
+        half erosionThreshold = lerp(0.74, 0.42, detailContrast);
+        half erosionFeather = lerp(0.22, 0.08, detailContrast);
+        half erosionKeepMask = 1.0 - smoothstep(
+            erosionThreshold - erosionFeather,
+            erosionThreshold + erosionFeather,
+            erosionPattern);
+        base_cloud *= lerp(1.0, erosionKeepMask, erosionWeight);
+        properties.ambientOcclusion = saturate(
+            properties.ambientOcclusion
+            - erosionPattern * erosionWeight * _ErosionOcclusion);
 
         #if defined(_CLOUDS_MICRO_EROSION)
         float3 fineCoords = AnimateErosionNoisePosition(positionPS)
@@ -914,21 +982,25 @@ void EvaluateCloudProperties(float3 positionPS, float noiseMipOffset, float eros
             s_linear_repeat_sampler,
             RotateCloudCoordinates(fineCoords) * 1.117 + float3(0.31, 0.79, 0.53),
             CLOUD_DETAIL_MIP_OFFSET + 0.8 + erosionMipOffset).x;
-        half fineNoise = 1.0 - lerp(fineA, fineB, 0.38);
-        fineNoise = lerp(
-            0.0,
-            fineNoise,
+        half finePattern = 1.0 - lerp(fineA, fineB, 0.38);
+        half fineWeight = saturate(
             microDetailFactor * 0.45 * _DetailStrength * cloudCoverageData.coverage);
-        base_cloud = DensityRemap(base_cloud, fineNoise, 1.0, 0.0, 1.0);
+        base_cloud *= saturate(1.0 - finePattern * fineWeight);
         #endif
     }
 
-    // Given that we are not sampling the erosion texture, we compensate by substracting an erosion value
+    // Light rays use a cheap mean erosion estimate. Keep it multiplicative too;
+    // an absolute subtraction would reintroduce the same discontinuity in cloud
+    // self-shadowing even after camera-visible density had been corrected.
     if (lightSampling)
     {
-        base_cloud -= erosionFactor * 0.1;
+        half meanErosionWeight = saturate(
+            erosionFactor * cloudCoverageData.coverage);
+        base_cloud *= lerp(1.0, 0.72, meanErosionWeight);
         #if defined(_CLOUDS_MICRO_EROSION)
-        base_cloud -= microDetailFactor * 0.15;
+        half meanMicroWeight = saturate(
+            microDetailFactor * 0.45 * _DetailStrength * cloudCoverageData.coverage);
+        base_cloud *= lerp(1.0, 0.82, meanMicroWeight);
         #endif
     }
 

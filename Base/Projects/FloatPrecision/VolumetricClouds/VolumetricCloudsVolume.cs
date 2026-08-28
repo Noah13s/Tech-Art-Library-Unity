@@ -93,6 +93,9 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [Tooltip("Unique procedural weather field mapped once around the planet.")]
     public TextureParameter planetaryWeatherMap = new(null);
 
+    [Tooltip("Surface vector field for planet-wide cloud advection. Red/green encode local east/north direction and blue encodes local speed.")]
+    public TextureParameter planetaryWindMap = new(null);
+
     [Tooltip("Physical altitude in metres where fine cloud detail starts fading into the planetary pattern.")]
     public MinFloatParameter planetaryDetailFadeStart = new(40000.0f, 0.0f);
 
@@ -340,6 +343,10 @@ public class VolumetricClouds : VolumeComponent, IPostProcessComponent
     [Tooltip("Number of density samples used for each cloud-shadow texel. This is independent of the camera primary-ray step count.")]
     [AdditionalProperty]
     public ClampedIntParameter shadowSampleCount = new ClampedIntParameter(16, 6, 32);
+
+    [Tooltip("Render the expensive cloud-shadow transmittance map once every N frames while rebinding the cached cookie every frame.")]
+    [AdditionalProperty]
+    public ClampedIntParameter shadowUpdateInterval = new ClampedIntParameter(3, 1, 8);
 
     /// <summary>
     /// Temporal accumulation increases the visual quality of clouds by decreasing the noise. A higher value will give you better quality but can create ghosting.
