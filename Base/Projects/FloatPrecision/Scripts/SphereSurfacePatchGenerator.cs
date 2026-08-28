@@ -1,8 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 [DefaultExecutionOrder(100)]
@@ -47,8 +48,16 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     [Range(256, 50000)] public int maximumLeafCount = 12000;
     [Tooltip("Minimum player movement before rebuilding the anchored mesh. Between rebuilds the mesh is translated in player-relative space.")]
     [Min(0f)] public float minimumRebuildDistance = 100f;
+    [Tooltip("Fraction of the current patch width the player may travel before a new adaptive mesh is requested.")]
+    [Range(0.01f, 0.4f)] public float rebuildDistanceFraction = 0.08f;
+    [Tooltip("Upper limit for the adaptive mesh anchor distance. This keeps detail centered without rebuilding every few metres.")]
+    [Min(100f)] public float maximumRebuildDistance = 20000f;
     [Tooltip("Relative patch-size or perspective-scale change that forces a rebuild.")]
     [Range(0.001f, 0.25f)] public float relativeRebuildThreshold = 0.025f;
+    [Tooltip("Maximum CPU time spent constructing an adaptive patch per frame. The previous patch remains visible until the new one is ready.")]
+    [Range(0.5f, 10f)] public float adaptiveBuildBudgetMilliseconds = 3f;
+    [Tooltip("Recalculate mesh tangents after a rebuild. Keep disabled unless the ground material uses tangent-space normal mapping.")]
+    public bool recalculateTangents;
 
     [Header("Height Map Control")]
     public float elevationStrength = 10f;   // Maximum elevation displacement from height map
@@ -115,6 +124,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     private Vector3 exclusionWorldAxis = Vector3.up;
     private float exclusionHalfAngle;
     private uint exclusionRevision;
+    private Coroutine adaptiveBuildCoroutine;
     private DoubleVector3 previousPlayerPosition;
     private bool hasPreviousPlayerPosition;
     private Renderer planetRenderer;
@@ -133,6 +143,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     public bool IsPatchVisible => patchIsVisible;
     public PerspectiveIllusionObject Planet => planet;
     public uint ExclusionRevision => exclusionRevision;
+    public bool IsRebuildInProgress => adaptiveBuildCoroutine != null;
 
     private readonly struct QuadLeaf
     {
@@ -277,39 +288,50 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             bool rebuild = ShouldRebuildPatch(patchSize, perspectiveScale);
             if (rebuild)
             {
-                transform.position = player.transform.position;
-                transform.localScale = Vector3.one;
-                GenerateSurfacePatch(
-                    renderedCenter,
-                    renderedScale * 0.5,
-                    planet.simulationScale * 0.5,
-                    patchSize,
-                    renderedPatchSize,
-                    renderedElevationStrength,
-                    renderedSurfaceSeparation,
-                    (float)surfaceDistance);
+                if (adaptiveTessellation)
+                {
+                    if (adaptiveBuildCoroutine == null)
+                    {
+                        adaptiveBuildCoroutine = StartCoroutine(GenerateAdaptiveSurfacePatchCooperatively(
+                            renderedCenter,
+                            renderedScale * 0.5,
+                            planet.simulationScale * 0.5,
+                            patchSize,
+                            renderedPatchSize,
+                            renderedElevationStrength,
+                            renderedSurfaceSeparation,
+                            (float)surfaceDistance,
+                            player.playerPosition,
+                            perspectiveScale));
+                    }
+                }
+                else
+                {
+                    transform.position = player.transform.position;
+                    transform.localScale = Vector3.one;
+                    GenerateSurfacePatch(
+                        renderedCenter,
+                        renderedScale * 0.5,
+                        planet.simulationScale * 0.5,
+                        patchSize,
+                        renderedPatchSize,
+                        renderedElevationStrength,
+                        renderedSurfaceSeparation,
+                        (float)surfaceDistance);
+                    CommitBuiltPatch(player.playerPosition, patchSize, perspectiveScale);
+                }
+            }
 
-                meshAnchorPlayerPosition = player.playerPosition;
-                hasMeshAnchor = true;
-                lastSimulationPatchSize = patchSize;
-                lastPerspectiveScale = perspectiveScale;
-                UpdateBuiltExclusion();
+            if (hasMeshAnchor)
+            {
+                UpdateAnchoredPatchTransform(perspectiveScale);
+                activeSimulationPatchSize = lastSimulationPatchSize;
+                SetPatchVisible(true, surfaceDistance <= coarsePlanetHideRange);
             }
             else
             {
-                // Keep the generated vertices anchored to the same real point on the
-                // planet while the player moves. This avoids rebuilding a large adaptive
-                // mesh every frame and preserves double-precision stability.
-                DoubleVector3 anchorOffset = meshAnchorPlayerPosition - player.playerPosition;
-                transform.position = player.transform.position + (Vector3)(anchorOffset * perspectiveScale);
-                float scaleRatio = lastPerspectiveScale > double.Epsilon
-                    ? (float)(perspectiveScale / lastPerspectiveScale)
-                    : 1f;
-                transform.localScale = Vector3.one * scaleRatio;
+                SetPatchVisible(false);
             }
-
-            activeSimulationPatchSize = patchSize;
-            SetPatchVisible(true, surfaceDistance <= coarsePlanetHideRange);
         }
         else
         {
@@ -317,6 +339,28 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             activeSimulationPatchSize = 0f;
             transform.localScale = Vector3.one;
         }
+    }
+
+    private void UpdateAnchoredPatchTransform(double perspectiveScale)
+    {
+        DoubleVector3 anchorOffset = meshAnchorPlayerPosition - player.playerPosition;
+        transform.position = player.transform.position + (Vector3)(anchorOffset * perspectiveScale);
+        float scaleRatio = lastPerspectiveScale > double.Epsilon
+            ? (float)(perspectiveScale / lastPerspectiveScale)
+            : 1f;
+        transform.localScale = Vector3.one * scaleRatio;
+    }
+
+    private void CommitBuiltPatch(
+        DoubleVector3 anchorPlayerPosition,
+        float simulationPatchSize,
+        double perspectiveScale)
+    {
+        meshAnchorPlayerPosition = anchorPlayerPosition;
+        hasMeshAnchor = true;
+        lastSimulationPatchSize = simulationPatchSize;
+        lastPerspectiveScale = perspectiveScale;
+        UpdateBuiltExclusion();
     }
 
     private void UpdateBuiltExclusion()
@@ -369,7 +413,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         double moved = (player.playerPosition - meshAnchorPlayerPosition).Magnitude();
         float movementThreshold = Mathf.Max(
             minimumRebuildDistance,
-            Mathf.Min(roughTerrainCellSize * 0.5f, patchSize * 0.002f));
+            Mathf.Min(
+                maximumRebuildDistance,
+                Mathf.Min(
+                    patchSize * rebuildDistanceFraction,
+                    highDetailDistance * 0.25f)));
         if (moved >= movementThreshold)
         {
             return true;
@@ -437,20 +485,6 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         float renderedSurfaceSeparation,
         float surfaceDistance)
     {
-        if (adaptiveTessellation)
-        {
-            GenerateAdaptiveSurfacePatch(
-                relativeCenter,
-                planetRadius,
-                simulationRadius,
-                simulationPatchSize,
-                renderedPatchSize,
-                renderedElevationStrength,
-                renderedSurfaceSeparation,
-                surfaceDistance);
-            return;
-        }
-
         int resolution = Mathf.Max(1, gridResolution);
         EnsureMeshBuffers(resolution);
 
@@ -536,7 +570,10 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         patchMesh.triangles = triangles;
         patchMesh.uv = uvs;
         patchMesh.RecalculateNormals();
-        patchMesh.RecalculateTangents();
+        if (recalculateTangents)
+        {
+            patchMesh.RecalculateTangents();
+        }
         patchMesh.RecalculateBounds();
 
         currentLeafCount = resolution * resolution;
@@ -544,7 +581,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         UpdateColliderBounds();
     }
 
-    private void GenerateAdaptiveSurfacePatch(
+    private IEnumerator GenerateAdaptiveSurfacePatchCooperatively(
         DoubleVector3 relativeCenter,
         double renderedPlanetRadius,
         double simulationPlanetRadius,
@@ -552,7 +589,9 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         float renderedPatchSize,
         float renderedElevationStrength,
         float renderedSurfaceSeparation,
-        float surfaceDistance)
+        float surfaceDistance,
+        DoubleVector3 anchorPlayerPosition,
+        double perspectiveScale)
     {
         DoubleVector3 direction = relativeCenter.Negate().Normalized();
         if (direction.Magnitude() <= double.Epsilon)
@@ -585,11 +624,6 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             surfaceOrigin = GetSurfaceCoordinatesInMeters(direction, simulationPlanetRadius)
         };
 
-        if (uvMappingMode == UVMappingMode.Planar)
-        {
-            UpdateMaterialOffset(context.surfaceOrigin);
-        }
-
         adaptiveLeaves.Clear();
         adaptiveSamples.Clear();
         adaptiveVertexIndices.Clear();
@@ -599,16 +633,65 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         adaptiveUVs.Clear();
         adaptiveTriangles.Clear();
 
+        float frameBudget = Mathf.Max(0.5f, adaptiveBuildBudgetMilliseconds);
+        var frameTimer = Stopwatch.StartNew();
         int remainingLeafBudget = Mathf.Max(0, maximumLeafCount - 1);
-        BuildAdaptiveLeaves(
-            ref context,
-            new QuadLeaf(0, 0, context.gridSize, 0),
-            ref remainingLeafBudget);
+        var pendingNodes = new Stack<QuadLeaf>();
+        pendingNodes.Push(new QuadLeaf(0, 0, context.gridSize, 0));
 
-        BuildBoundaryLookup();
+        while (pendingNodes.Count > 0)
+        {
+            QuadLeaf node = pendingNodes.Pop();
+            if (ShouldSplitLeaf(ref context, node) && remainingLeafBudget >= 3)
+            {
+                remainingLeafBudget -= 3;
+                int half = node.size / 2;
+                int depth = node.depth + 1;
+                pendingNodes.Push(new QuadLeaf(node.x + half, node.y, half, depth));
+                pendingNodes.Push(new QuadLeaf(node.x + half, node.y + half, half, depth));
+                pendingNodes.Push(new QuadLeaf(node.x, node.y + half, half, depth));
+                pendingNodes.Push(new QuadLeaf(node.x, node.y, half, depth));
+            }
+            else
+            {
+                adaptiveLeaves.Add(node);
+            }
+
+            if (frameTimer.Elapsed.TotalMilliseconds >= frameBudget)
+            {
+                yield return null;
+                frameTimer.Restart();
+            }
+        }
+
+        for (int i = 0; i < adaptiveLeaves.Count; i++)
+        {
+            QuadLeaf leaf = adaptiveLeaves[i];
+            AddBoundaryPoint(leaf.x, leaf.y);
+            AddBoundaryPoint(leaf.x, leaf.y + leaf.size);
+            AddBoundaryPoint(leaf.x + leaf.size, leaf.y + leaf.size);
+            AddBoundaryPoint(leaf.x + leaf.size, leaf.y);
+
+            if (frameTimer.Elapsed.TotalMilliseconds >= frameBudget)
+            {
+                yield return null;
+                frameTimer.Restart();
+            }
+        }
+
         for (int i = 0; i < adaptiveLeaves.Count; i++)
         {
             TriangulateAdaptiveLeaf(ref context, adaptiveLeaves[i]);
+            if (frameTimer.Elapsed.TotalMilliseconds >= frameBudget)
+            {
+                yield return null;
+                frameTimer.Restart();
+            }
+        }
+
+        if (uvMappingMode == UVMappingMode.Planar)
+        {
+            UpdateMaterialOffset(context.surfaceOrigin);
         }
 
         patchMesh.Clear();
@@ -619,31 +702,26 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         patchMesh.SetUVs(0, adaptiveUVs);
         patchMesh.SetTriangles(adaptiveTriangles, 0, true);
         patchMesh.RecalculateNormals();
-        patchMesh.RecalculateTangents();
+        if (recalculateTangents)
+        {
+            patchMesh.RecalculateTangents();
+        }
         patchMesh.RecalculateBounds();
 
         currentLeafCount = adaptiveLeaves.Count;
         UpdateColliderBounds();
-    }
+        CommitBuiltPatch(anchorPlayerPosition, simulationPatchSize, perspectiveScale);
 
-    private void BuildAdaptiveLeaves(
-        ref AdaptiveBuildContext context,
-        QuadLeaf node,
-        ref int remainingLeafBudget)
-    {
-        if (ShouldSplitLeaf(ref context, node) && remainingLeafBudget >= 3)
-        {
-            remainingLeafBudget -= 3;
-            int half = node.size / 2;
-            int nextDepth = node.depth + 1;
-            BuildAdaptiveLeaves(ref context, new QuadLeaf(node.x, node.y, half, nextDepth), ref remainingLeafBudget);
-            BuildAdaptiveLeaves(ref context, new QuadLeaf(node.x, node.y + half, half, nextDepth), ref remainingLeafBudget);
-            BuildAdaptiveLeaves(ref context, new QuadLeaf(node.x + half, node.y + half, half, nextDepth), ref remainingLeafBudget);
-            BuildAdaptiveLeaves(ref context, new QuadLeaf(node.x + half, node.y, half, nextDepth), ref remainingLeafBudget);
-            return;
-        }
-
-        adaptiveLeaves.Add(node);
+        planet.CalculateRenderState(out _, out double currentRenderedScale, out _, out double currentSurfaceDistance);
+        double currentPerspectiveScale = planet.simulationScale > double.Epsilon
+            ? currentRenderedScale / planet.simulationScale
+            : 1.0;
+        UpdateAnchoredPatchTransform(currentPerspectiveScale);
+        activeSimulationPatchSize = lastSimulationPatchSize;
+        SetPatchVisible(
+            currentSurfaceDistance <= proximityRange,
+            currentSurfaceDistance <= coarsePlanetHideRange);
+        adaptiveBuildCoroutine = null;
     }
 
     private bool ShouldSplitLeaf(ref AdaptiveBuildContext context, QuadLeaf node)
@@ -740,8 +818,9 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             context.right * offsetU + context.forward * offsetV;
         DoubleVector3 direction = (pointOnPlane - context.relativeCenter).Normalized();
         Vector2 sphericalUV = GetSphericalUV(direction);
-        float simulationElevation = SampleElevation(sphericalUV, elevationStrength);
-        float renderedElevation = SampleElevation(sphericalUV, context.renderedElevationStrength);
+        float normalizedElevation = SampleNormalizedElevation(sphericalUV);
+        float simulationElevation = normalizedElevation * elevationStrength;
+        float renderedElevation = normalizedElevation * context.renderedElevationStrength;
         DoubleVector3 pointOnSphere = context.relativeCenter + direction *
             (context.renderedPlanetRadius + context.renderedSurfaceSeparation + renderedElevation);
 
@@ -770,18 +849,6 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         }
 
         return new TerrainSample((Vector3)pointOnSphere, meshUV, simulationElevation);
-    }
-
-    private void BuildBoundaryLookup()
-    {
-        for (int i = 0; i < adaptiveLeaves.Count; i++)
-        {
-            QuadLeaf leaf = adaptiveLeaves[i];
-            AddBoundaryPoint(leaf.x, leaf.y);
-            AddBoundaryPoint(leaf.x, leaf.y + leaf.size);
-            AddBoundaryPoint(leaf.x + leaf.size, leaf.y + leaf.size);
-            AddBoundaryPoint(leaf.x + leaf.size, leaf.y);
-        }
     }
 
     private void AddBoundaryPoint(int x, int y)
@@ -853,10 +920,13 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         }
         else
         {
-            foreach (int x in values.GetViewBetween(minimumX, maximumX).Reverse())
+            int reverseStart = leafBoundary.Count;
+            foreach (int x in values.GetViewBetween(minimumX, maximumX))
             {
                 AppendBoundaryKey(GridKey(x, y));
             }
+
+            leafBoundary.Reverse(reverseStart, leafBoundary.Count - reverseStart);
         }
     }
 
@@ -876,10 +946,13 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         }
         else
         {
-            foreach (int y in values.GetViewBetween(minimumY, maximumY).Reverse())
+            int reverseStart = leafBoundary.Count;
+            foreach (int y in values.GetViewBetween(minimumY, maximumY))
             {
                 AppendBoundaryKey(GridKey(x, y));
             }
+
+            leafBoundary.Reverse(reverseStart, leafBoundary.Count - reverseStart);
         }
     }
 
@@ -991,6 +1064,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
     private float SampleElevation(Vector2 sphericalUV, float strength)
     {
+        return SampleNormalizedElevation(sphericalUV) * strength;
+    }
+
+    private float SampleNormalizedElevation(Vector2 sphericalUV)
+    {
         if (heightMap == null)
         {
             return 0f;
@@ -999,7 +1077,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         float texU = sphericalUV.x * heightMapUVScale.x + heightMapUVOffset.x;
         float texV = sphericalUV.y * heightMapUVScale.y + heightMapUVOffset.y;
         float rawHeight = heightMap.GetPixelBilinear(texU, texV).r;
-        return Mathf.InverseLerp(displacementMin, displacementMax, rawHeight) * strength;
+        return Mathf.InverseLerp(displacementMin, displacementMax, rawHeight);
     }
 
     private void ConstrainPlayerAboveGround()
@@ -1196,7 +1274,10 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         distantCellSizeMultiplier = Mathf.Clamp(distantCellSizeMultiplier, 1f, 12f);
         maximumLeafCount = Mathf.Clamp(maximumLeafCount, 256, 50000);
         minimumRebuildDistance = Mathf.Max(0f, minimumRebuildDistance);
+        rebuildDistanceFraction = Mathf.Clamp(rebuildDistanceFraction, 0.01f, 0.4f);
+        maximumRebuildDistance = Mathf.Max(100f, maximumRebuildDistance);
         relativeRebuildThreshold = Mathf.Clamp(relativeRebuildThreshold, 0.001f, 0.25f);
+        adaptiveBuildBudgetMilliseconds = Mathf.Clamp(adaptiveBuildBudgetMilliseconds, 0.5f, 10f);
         elevationStrength = Mathf.Max(0f, elevationStrength);
         groundClearance = Mathf.Max(0f, groundClearance);
         groundFriction = Mathf.Max(0f, groundFriction);
@@ -1208,6 +1289,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
 
     private void OnDisable()
     {
+        adaptiveBuildCoroutine = null;
         UpdatePlanetRendererState(false);
     }
 
