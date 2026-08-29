@@ -68,6 +68,18 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     [Range(0f, 1f)]
     public float displacementMax = 1f;      // Raw height value corresponding to peak elevation (full displacement)
 
+    [Header("Land / Water Classification")]
+    [Tooltip("Planet-wide mask sampled while the patch is generated. The supplied Earth specular map stores ocean in alpha (1) and land as 0.")]
+    public Texture2D landWaterMask;
+    [Tooltip("Mask value used by adaptive tessellation to identify coastlines.")]
+    [Range(0f, 1f)] public float waterMaskThreshold = 0.5f;
+    [Tooltip("How far ocean terrain is lowered below the land datum, in simulation metres.")]
+    [Min(0f)] public float oceanDepth = 500f;
+    [Tooltip("Softens the ocean excavation across the coastline mask to avoid a vertical shoreline wall.")]
+    [Range(0.0001f, 0.25f)] public float oceanCoastFeather = 0.04f;
+    [Tooltip("Maximum cell size along a coastline. This gives the interpolated land/water boundary enough geometry without refining the whole patch.")]
+    [Min(1f)] public float coastlineCellSize = 500f;
+
     public enum UVMappingMode { Spherical, Planar }
     [Header("UV Mapping Control")]
     public UVMappingMode uvMappingMode = UVMappingMode.Planar;
@@ -103,6 +115,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     private MaterialPropertyBlock materialProperties;
     private Vector3[] vertices;
     private Vector2[] uvs;
+    private Vector2[] biomeData;
+    private Vector3[] radialNormals;
     private int[] triangles;
     private int cachedResolution = -1;
     private readonly List<QuadLeaf> adaptiveLeaves = new();
@@ -112,6 +126,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
     private readonly Dictionary<int, SortedSet<int>> verticalBoundaries = new();
     private readonly List<Vector3> adaptiveVertices = new();
     private readonly List<Vector2> adaptiveUVs = new();
+    private readonly List<Vector2> adaptiveBiomeData = new();
+    private readonly List<Vector3> adaptiveRadialNormals = new();
     private readonly List<int> adaptiveTriangles = new();
     private readonly List<long> leafBoundary = new();
     private DoubleVector3 meshAnchorPlayerPosition;
@@ -166,12 +182,21 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         public readonly Vector3 position;
         public readonly Vector2 uv;
         public readonly float simulationElevation;
+        public readonly float waterMask;
+        public readonly Vector3 radialNormal;
 
-        public TerrainSample(Vector3 position, Vector2 uv, float simulationElevation)
+        public TerrainSample(
+            Vector3 position,
+            Vector2 uv,
+            float simulationElevation,
+            float waterMask,
+            Vector3 radialNormal)
         {
             this.position = position;
             this.uv = uv;
             this.simulationElevation = simulationElevation;
+            this.waterMask = waterMask;
+            this.radialNormal = radialNormal;
         }
     }
 
@@ -186,6 +211,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         public float renderedPatchSize;
         public float simulationPatchSize;
         public float renderedElevationStrength;
+        public float renderedOceanDepth;
         public float renderedSurfaceSeparation;
         public float surfaceDistance;
         public int gridSize;
@@ -283,6 +309,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 : 1.0;
             float renderedPatchSize = (float)(patchSize * perspectiveScale);
             float renderedElevationStrength = (float)(elevationStrength * perspectiveScale);
+            float renderedOceanDepth = (float)(oceanDepth * perspectiveScale);
             float renderedSurfaceSeparation = (float)(surfaceSeparation * perspectiveScale);
 
             bool rebuild = ShouldRebuildPatch(patchSize, perspectiveScale);
@@ -299,6 +326,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                             patchSize,
                             renderedPatchSize,
                             renderedElevationStrength,
+                            renderedOceanDepth,
                             renderedSurfaceSeparation,
                             (float)surfaceDistance,
                             player.playerPosition,
@@ -316,6 +344,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                         patchSize,
                         renderedPatchSize,
                         renderedElevationStrength,
+                        renderedOceanDepth,
                         renderedSurfaceSeparation,
                         (float)surfaceDistance);
                     CommitBuiltPatch(player.playerPosition, patchSize, perspectiveScale);
@@ -482,6 +511,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         float simulationPatchSize,
         float renderedPatchSize,
         float renderedElevationStrength,
+        float renderedOceanDepth,
         float renderedSurfaceSeparation,
         float surfaceDistance)
     {
@@ -530,10 +560,16 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 double displacedRadius = planetRadius + renderedSurfaceSeparation;
 
                 Vector2 sphericalUV = GetSphericalUV(dirFromCenter);
-                displacedRadius += SampleElevation(sphericalUV, renderedElevationStrength);
+                float normalizedElevation = SampleNormalizedElevation(sphericalUV);
+                float waterMask = SampleWaterMask(sphericalUV);
+                float waterAmount = GetWaterAmount(waterMask);
+                float simulationElevation = normalizedElevation * elevationStrength - waterAmount * oceanDepth;
+                displacedRadius += normalizedElevation * renderedElevationStrength - waterAmount * renderedOceanDepth;
 
                 DoubleVector3 pointOnSphere = relativeCenter + dirFromCenter * displacedRadius;
                 vertices[vertexIndex] = (Vector3)pointOnSphere;
+                biomeData[vertexIndex] = new Vector2(simulationElevation, waterMask);
+                radialNormals[vertexIndex] = (Vector3)dirFromCenter;
 
                 if (uvMappingMode == UVMappingMode.Spherical)
                 {
@@ -569,6 +605,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         patchMesh.vertices = vertices;
         patchMesh.triangles = triangles;
         patchMesh.uv = uvs;
+        patchMesh.SetUVs(1, biomeData);
+        patchMesh.SetUVs(2, radialNormals);
         patchMesh.RecalculateNormals();
         if (recalculateTangents)
         {
@@ -588,6 +626,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         float simulationPatchSize,
         float renderedPatchSize,
         float renderedElevationStrength,
+        float renderedOceanDepth,
         float renderedSurfaceSeparation,
         float surfaceDistance,
         DoubleVector3 anchorPlayerPosition,
@@ -618,6 +657,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             renderedPatchSize = renderedPatchSize,
             simulationPatchSize = simulationPatchSize,
             renderedElevationStrength = renderedElevationStrength,
+            renderedOceanDepth = renderedOceanDepth,
             renderedSurfaceSeparation = renderedSurfaceSeparation,
             surfaceDistance = Mathf.Max(0f, surfaceDistance),
             gridSize = 1 << maximumSubdivisionLevel,
@@ -631,6 +671,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         verticalBoundaries.Clear();
         adaptiveVertices.Clear();
         adaptiveUVs.Clear();
+        adaptiveBiomeData.Clear();
+        adaptiveRadialNormals.Clear();
         adaptiveTriangles.Clear();
 
         float frameBudget = Mathf.Max(0.5f, adaptiveBuildBudgetMilliseconds);
@@ -700,6 +742,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             : IndexFormat.UInt16;
         patchMesh.SetVertices(adaptiveVertices);
         patchMesh.SetUVs(0, adaptiveUVs);
+        patchMesh.SetUVs(1, adaptiveBiomeData);
+        patchMesh.SetUVs(2, adaptiveRadialNormals);
         patchMesh.SetTriangles(adaptiveTriangles, 0, true);
         patchMesh.RecalculateNormals();
         if (recalculateTangents)
@@ -776,6 +820,27 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             Mathf.InverseLerp(flatHeightVariation, roughHeightVariation, heightVariation));
 
         float cellSize = context.simulationPatchSize * node.size / context.gridSize;
+        float minimumWaterMask = Mathf.Min(
+            Mathf.Min(bottomLeft.waterMask, topLeft.waterMask),
+            Mathf.Min(topRight.waterMask, bottomRight.waterMask));
+        float maximumWaterMask = Mathf.Max(
+            Mathf.Max(bottomLeft.waterMask, topLeft.waterMask),
+            Mathf.Max(topRight.waterMask, bottomRight.waterMask));
+        minimumWaterMask = Mathf.Min(minimumWaterMask, Mathf.Min(center.waterMask,
+            Mathf.Min(Mathf.Min(left.waterMask, top.waterMask),
+                Mathf.Min(right.waterMask, bottom.waterMask))));
+        maximumWaterMask = Mathf.Max(maximumWaterMask, Mathf.Max(center.waterMask,
+            Mathf.Max(Mathf.Max(left.waterMask, top.waterMask),
+                Mathf.Max(right.waterMask, bottom.waterMask))));
+        bool crossesCoastline = landWaterMask != null &&
+            minimumWaterMask <= waterMaskThreshold &&
+            maximumWaterMask >= waterMaskThreshold &&
+            maximumWaterMask - minimumWaterMask > 0.01f;
+        if (crossesCoastline && cellSize > Mathf.Max(1f, coastlineCellSize))
+        {
+            return true;
+        }
+
         float centerX = ((node.x + half) / (float)context.gridSize - 0.5f) * context.simulationPatchSize;
         float centerY = ((node.y + half) / (float)context.gridSize - 0.5f) * context.simulationPatchSize;
         float cameraDistance = Mathf.Sqrt(
@@ -819,8 +884,11 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         DoubleVector3 direction = (pointOnPlane - context.relativeCenter).Normalized();
         Vector2 sphericalUV = GetSphericalUV(direction);
         float normalizedElevation = SampleNormalizedElevation(sphericalUV);
-        float simulationElevation = normalizedElevation * elevationStrength;
-        float renderedElevation = normalizedElevation * context.renderedElevationStrength;
+        float waterMask = SampleWaterMask(sphericalUV);
+        float waterAmount = GetWaterAmount(waterMask);
+        float simulationElevation = normalizedElevation * elevationStrength - waterAmount * oceanDepth;
+        float renderedElevation = normalizedElevation * context.renderedElevationStrength -
+            waterAmount * context.renderedOceanDepth;
         DoubleVector3 pointOnSphere = context.relativeCenter + direction *
             (context.renderedPlanetRadius + context.renderedSurfaceSeparation + renderedElevation);
 
@@ -848,7 +916,12 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
                 (float)((surfaceMeters.y - context.surfaceOrigin.y) * uvScale.y) + uvOffset.y);
         }
 
-        return new TerrainSample((Vector3)pointOnSphere, meshUV, simulationElevation);
+        return new TerrainSample(
+            (Vector3)pointOnSphere,
+            meshUV,
+            simulationElevation,
+            waterMask,
+            (Vector3)direction);
     }
 
     private void AddBoundaryPoint(int x, int y)
@@ -891,6 +964,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         int centerIndex = adaptiveVertices.Count;
         adaptiveVertices.Add(centerSample.position);
         adaptiveUVs.Add(centerSample.uv);
+        adaptiveBiomeData.Add(new Vector2(centerSample.simulationElevation, 0f));
+        adaptiveRadialNormals.Add(centerSample.radialNormal);
 
         for (int i = 0; i < leafBoundary.Count; i++)
         {
@@ -977,6 +1052,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         index = adaptiveVertices.Count;
         adaptiveVertices.Add(sample.position);
         adaptiveUVs.Add(sample.uv);
+        adaptiveBiomeData.Add(new Vector2(sample.simulationElevation, sample.waterMask));
+        adaptiveRadialNormals.Add(sample.radialNormal);
         adaptiveVertexIndices.Add(key, index);
         return index;
     }
@@ -997,6 +1074,8 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         int rowSize = resolution + 1;
         vertices = new Vector3[rowSize * rowSize];
         uvs = new Vector2[vertices.Length];
+        biomeData = new Vector2[vertices.Length];
+        radialNormals = new Vector3[vertices.Length];
         triangles = new int[resolution * resolution * 6];
 
         int triangleIndex = 0;
@@ -1080,6 +1159,38 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         return Mathf.InverseLerp(displacementMin, displacementMax, rawHeight);
     }
 
+    private float SampleWaterMask(Vector2 sphericalUV)
+    {
+        if (landWaterMask == null)
+        {
+            return 0f;
+        }
+
+        // The Earth specular asset is imported as Alpha8: ocean is 1 and land is 0.
+        // Sampling this once per generated vertex avoids fragile per-pixel spherical
+        // UV reconstruction and keeps the known-good mesh vertex layout unchanged.
+        float u = Mathf.Repeat(sphericalUV.x, 1f);
+        float v = Mathf.Clamp01(sphericalUV.y);
+        return landWaterMask.GetPixelBilinear(u, v).a;
+    }
+
+    private float GetWaterAmount(float rawWaterMask)
+    {
+        float feather = Mathf.Max(0.0001f, oceanCoastFeather);
+        float t = Mathf.Clamp01(Mathf.InverseLerp(
+            waterMaskThreshold - feather,
+            waterMaskThreshold + feather,
+            rawWaterMask));
+        return t * t * (3f - 2f * t);
+    }
+
+    private float SampleTerrainElevation(DoubleVector3 direction)
+    {
+        Vector2 sphericalUV = GetSphericalUV(direction);
+        float landElevation = SampleNormalizedElevation(sphericalUV) * elevationStrength;
+        return landElevation - GetWaterAmount(SampleWaterMask(sphericalUV)) * oceanDepth;
+    }
+
     private void ConstrainPlayerAboveGround()
     {
         double baseRadius = planet.simulationScale * 0.5;
@@ -1089,7 +1200,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
             ? currentRelativePosition * (1.0 / currentDistance)
             : new DoubleVector3(0, 1, 0);
         double minimumRadius = baseRadius + surfaceSeparation
-            + SampleElevation(outwardDirection, elevationStrength) + groundClearance;
+            + SampleTerrainElevation(outwardDirection) + groundClearance;
 
         if (currentDistance < minimumRadius)
         {
@@ -1122,7 +1233,7 @@ public class SphereSurfacePatchGenerator : MonoBehaviour
         for (int iteration = 0; iteration < 2; iteration++)
         {
             collisionRadius = baseRadius + surfaceSeparation
-                + SampleElevation(contactDirection, elevationStrength) + groundClearance;
+                + SampleTerrainElevation(contactDirection) + groundClearance;
             if (!TryGetSphereEntry(previousRelativePosition, currentRelativePosition, collisionRadius, out entryPoint))
             {
                 return;

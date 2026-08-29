@@ -684,9 +684,9 @@ MonoBehaviour:
   moveSpeed: 50
   sensitivity: 0.3
   playerPosition:
-    x: 149571499700
-    y: 0
-    z: 0
+    x: 149592904669.35843
+    y: -621235.8622994578
+    z: 3951004.169280592
   velocityActive: 0
   velocity:
     x: 0
@@ -1316,8 +1316,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1313644640}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 2, z: 10}
+  m_LocalRotation: {x: 0.05056409, y: 0.947907, z: 0.19302876, w: -0.24830526}
+  m_LocalPosition: {x: 2.2892609, y: -9.55618, z: 8.04}
   m_LocalScale: {x: 0.50872463, y: 2.4629328, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1514,7 +1514,7 @@ MonoBehaviour:
   surfaceSeparation: 0.5
   adaptiveTessellation: 1
   minimumSubdivisionLevel: 3
-  maximumSubdivisionLevel: 10
+  maximumSubdivisionLevel: 12
   flatTerrainCellSize: 4000
   roughTerrainCellSize: 350
   flatHeightVariation: 40
@@ -1523,16 +1523,25 @@ MonoBehaviour:
   distantCellSizeMultiplier: 5
   maximumLeafCount: 12000
   minimumRebuildDistance: 100
+  rebuildDistanceFraction: 0.08
+  maximumRebuildDistance: 20000
   relativeRebuildThreshold: 0.025
+  adaptiveBuildBudgetMilliseconds: 3
+  recalculateTangents: 0
   elevationStrength: 75000
   heightMapUVScale: {x: 1, y: 1}
   heightMapUVOffset: {x: 0, y: 0}
   displacementMin: 0.52
   displacementMax: 1
+  landWaterMask: {fileID: 2800000, guid: 33bc790ad4dc1cb49b93bc0789da6b5b, type: 3}
+  waterMaskThreshold: 0.5
+  oceanDepth: 500
+  oceanCoastFeather: 0.04
+  coastlineCellSize: 500
   uvMappingMode: 1
   uvScale: {x: 1, y: 1}
   uvOffset: {x: 0, y: 0}
-  material: {fileID: 2100000, guid: d89608ddf4c7cd749a172b0dd578b105, type: 2}
+  material: {fileID: 2100000, guid: 4bfb83d2b6d65ff47b6bdfa00f7b2fb3, type: 2}
   preventGroundPenetration: 1
   groundClearance: 1
   groundFriction: 8
@@ -1562,7 +1571,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 122f9ea5c19c5194fb3336b7dd5cb991, type: 2}
+  - {fileID: 2100000, guid: 4bfb83d2b6d65ff47b6bdfa00f7b2fb3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1716,7 +1725,7 @@ MonoBehaviour:
     y: 0
     z: 0
   simulationScale: 3474800
-  maxDistanceFromPlayer: 80000
+  maxDistanceFromPlayer: 20000
   player: {fileID: 694544967}
   altitude:
     m_PersistentCalls:
@@ -1769,9 +1778,9 @@ MonoBehaviour:
   farSegments: 72
   distantRings: 24
   distantSegments: 48
-  useHeightDisplacement: 0
-  heightMap: {fileID: 0}
-  elevationStrength: 10000
+  useHeightDisplacement: 1
+  heightMap: {fileID: 2800000, guid: 58ce8dc37ba6c82439a76f30f6390da6, type: 3}
+  elevationStrength: 75000
   heightMapUVScale: {x: 1, y: 1}
   heightMapUVOffset: {x: 0, y: 0}
   displacementMin: 0
